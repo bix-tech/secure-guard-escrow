@@ -1,0 +1,29 @@
+{
+  "canisters": {
+    "icp_escrow_service_backend": {
+      "main": "src/icp_escrow_service_backend/main.mo",
+      "type": "motoko"
+    },
+    "icp_escrow_service_frontend": {
+      "dependencies": [
+        "icp_escrow_service_backend"
+      ],
+      "frontend": {
+        "entrypoint": "src/icp_escrow_service_frontend/src/index.html"
+      },
+      "source": [
+        "src/icp_escrow_service_frontend/assets",
+        "dist/icp_escrow_service_frontend/"
+      ],
+      "type": "assets"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
