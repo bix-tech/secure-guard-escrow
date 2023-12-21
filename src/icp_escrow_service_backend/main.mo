@@ -7,6 +7,7 @@ import Result "mo:base/Result";
 import Text "mo:base/Text";
 import Hash "mo:base/Hash";
 import Array "mo:base/Array";
+import Float "mo:base/Float";
 import Account "account";
 import Wallet "wallet";
 import Deal "deal";
@@ -22,12 +23,22 @@ actor {
 
   let deals : TrieMap.TrieMap<Nat, Deal> = TrieMap.TrieMap(Nat.equal, Hash.hash);
 
+  let activityLogs : TrieMap.TrieMap<Nat, [ActivityLog]> = TrieMap.TrieMap(Nat.equal, Hash.hash);
+
+  public type User = {
+    #Buyer;
+    #Seller;
+  };
   public type DealStatus = {
     #Pending;
     #InProgress;
     #SubmittedDeliverables;
     #Completed;
     #Cancelled;
+  };
+
+  public type DealFee = {
+    percent : Float;
   };
 
   public type BuyerStatus = {
@@ -44,14 +55,23 @@ actor {
   type Time = Int;
 
   public type DealTimeline = {
-   dealStart : Time;
-   dealEnd : Time;
+    dealStart : Time;
+    dealEnd : Time;
   };
 
   public type PaymentScheduleInfo = {
     packageName : Text;
     packageDescription : Text;
     packagePrice : Nat;
+  };
+
+  public type DealCategory = {
+    #Services;
+    #PhysicalProducts;
+    #DigitalProducts;
+    #DomainName;
+    #NFT;
+    #Tokens;
   };
 
   public type Deal = {
@@ -62,8 +82,8 @@ actor {
     amount : Nat;
     picture : Text;
     description : Text;
-    dealCategory : Text;
-    dealType : Text;
+    dealCategory : DealCategory;
+    dealType : User;
     paymentScheduleInfo : [PaymentScheduleInfo];
     dealTimeline : [DealTimeline];
     deliverables : [Deliverable];
@@ -73,10 +93,18 @@ actor {
     acceptor : Principal;
   };
 
+  public type ActivityLog = {
+    dealId : Nat;
+    description : Text;
+    activityType : Text;
+    amount : Nat;
+    activityTime : Time;
+  };
+
   public shared ({ caller }) func createDeal(newDeal : Deal) : async Deal.createDealResult {
     let dealToCreate = {
       id = nextDealId;
-      status = #Pending;
+      status = newDeal.status;
       name = newDeal.name;
       from = newDeal.from;
       to = newDeal.to;
@@ -132,7 +160,12 @@ actor {
     return ledger.get(defaultAccount);
   };
 
-  public shared ({ caller }) func lockToken(principal:Principal, amount : Nat) : async Wallet.LockTokenResult {
+  public shared ({ caller }) func checkLockedToken(principal : Principal) : async ?Nat {
+    let defaultAccount = { owner = principal; subaccount = null };
+    return lockedTokens.get(defaultAccount);
+  };
+
+  public shared ({ caller }) func lockToken(principal : Principal, amount : Nat) : async Wallet.LockTokenResult {
     let buyerAccount = { owner = principal; subaccount = null };
     let balance = ledger.get(buyerAccount);
 
@@ -205,6 +238,15 @@ actor {
             };
 
             deals.put(dealId, updatedDeal);
+
+            let log = {
+              dealId = dealId;
+              description = "Deal confirmed";
+              activityType = "DealConfirmed";
+              amount = deal.amount;
+              activityTime = Time.now();
+            };
+            await createActivityLog(log);
 
             return #ok(());
           };
@@ -331,7 +373,51 @@ actor {
     };
   };
 
+  public func getActivityLogs(dealId : Nat) : async [ActivityLog] {
+    let logsOpt = activityLogs.get(dealId);
+    switch (logsOpt) {
+      case (null) {
+        return [];
+      };
+      case (?logs) {
+        return logs;
+      };
+    };
+  };
 
+  public func createActivityLog(newLog : ActivityLog) : async () {
+    let existingLogs = switch (activityLogs.get(newLog.dealId)) {
+      case (null) {
+        [];
+      };
+      case (?logs) {
+        logs;
+      };
+    };
+
+    let createLog = {
+      dealId = newLog.dealId;
+      description = newLog.description;
+      activityType = newLog.activityType;
+      amount = newLog.amount;
+      activityTime = Time.now();
+    };
+
+    activityLogs.put(newLog.dealId, Array.append(existingLogs, [createLog]));
+  };
+
+  public func mintTokens(principal : Principal, amount : Nat) : async () {
+    let defaultAccount = { owner = principal; subaccount = null };
+    let balanceOpt = ledger.get(defaultAccount);
+    switch (balanceOpt) {
+      case (null) {
+        ledger.put(defaultAccount, amount);
+      };
+      case (?balance) {
+        ledger.put(defaultAccount, balance + amount);
+      };
+    };
+  };
 
   public shared (msg) func callerPrincipal() : async Principal {
     return msg.caller;
