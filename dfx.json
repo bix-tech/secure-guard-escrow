@@ -1,29 +1,32 @@
 {
   "canisters": {
-    "icp_escrow_service_backend": {
+    "backend": {
       "main": "src/icp_escrow_service_backend/main.mo",
       "type": "motoko"
     },
-    "icp_escrow_service_frontend": {
-      "dependencies": [
-        "icp_escrow_service_backend"
-      ],
-      "frontend": {
-        "entrypoint": "src/icp_escrow_service_frontend/src/index.html"
+    "frontend": {
+      "dependencies": ["backend"],
+      "type": "assets",
+      "source": ["dist/"]
+    },
+    "internet_identity": {
+      "type": "custom",
+      "candid": "https://github.com/dfinity/internet-identity/releases/download/release-2023-11-17/internet_identity.did",
+      "wasm": "https://github.com/dfinity/internet-identity/releases/download/release-2023-11-17/internet_identity_dev.wasm.gz",
+      "remote": {
+        "id": {
+          "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
+        }
       },
-      "source": [
-        "src/icp_escrow_service_frontend/assets",
-        "dist/icp_escrow_service_frontend/"
-      ],
-      "type": "assets"
+      "frontend": {}
     }
   },
   "defaults": {
     "build": {
-      "args": "",
-      "packtool": ""
+      "packtool": "mops sources"
     }
   },
   "output_env_file": ".env",
-  "version": 1
+  "dfx": "0.15.2",
+  "version": 2
 }
