@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-// import HomePage from './pages/HomePage';
 import Login from '../src/pages/Login';
 import Dashboard from './pages/Dashboard';
 import DealProgress_1 from './pages/DealProgress_1';
