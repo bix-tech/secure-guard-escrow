@@ -1,4 +1,9 @@
-const DealProgress_1 = () => {
+
+interface DealProgressProps {
+    onNext: () => void; 
+  }
+
+const DealProgress_1 = ({ onNext }: DealProgressProps) => {
     return (
         <div className="card p-5 mx-auto my-5" style={{width: '75%'}}>
             <div className="card-body text-center">
@@ -50,7 +55,7 @@ const DealProgress_1 = () => {
                         </div>
                     </div>
                     
-                    <button type="submit" className="btn mx-auto col-md-9 submit-deal-btn mt-3">Lock Token</button>
+                    <button onClick={(e) => { e.preventDefault(); onNext(); }} type="submit" className="btn mx-auto col-md-9 submit-deal-btn mt-3">Lock Token</button>
                 </form>
     
             </div>

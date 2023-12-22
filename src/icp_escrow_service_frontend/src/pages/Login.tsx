@@ -2,9 +2,6 @@ import { useState, useEffect } from 'react';
 import { AuthClient } from "@dfinity/auth-client";
 import { HttpAgent } from "@dfinity/agent";
 import { createActor as createBackendActor } from "../../../declarations/backend";
-// import minionLogo from './assets/minion.jpeg'; 
-// import loginIcon from './assets/login_icon.png'; 
-// import './Login.css'; 
 import { createActor } from "../../../declarations/backend";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -18,15 +15,35 @@ const Login = () => {
 
     useEffect(() => {
         const initAuth = async () => {
-            try {
-                const authClient = await AuthClient.create();
-                setAuthClient(authClient);
-            } catch (error) {
-                console.error("Failed to create auth client:", error);
+          try {
+            const authClient = await AuthClient.create();
+            setAuthClient(authClient);
+      
+            const storedPrincipal = localStorage.getItem('principal');
+            if (storedPrincipal) {
+              setPrincipal(storedPrincipal);
+              login();
+              navigate('/dealProgress_1');
+            } else if (await authClient.isAuthenticated()) {
+              reinitializeSession(authClient);
             }
+          } catch (error) {
+            console.error("Failed to initialize authentication:", error);
+          }
         };
+      
+        const reinitializeSession = async (authClient: AuthClient) => {
+          const identity = authClient.getIdentity();
+          const principal = identity.getPrincipal().toString();
+          setPrincipal(principal);
+          localStorage.setItem('principal', principal);
+          login();
+          navigate('/dealProgress_1');
+        }
+      
         initAuth();
-    }, []);
+      }, []);
+    
 
     const handleLogin = async () => {
         try {
@@ -40,13 +57,16 @@ const Login = () => {
                 onSuccess: async () => {
                     console.log("Login successful");
                     const identity = authClient.getIdentity();
-                    setPrincipal(identity.getPrincipal().toString());
+                    const principal = identity.getPrincipal().toString();
+                    setPrincipal(principal);
+                    localStorage.setItem('principal', principal);
                     const agent = new HttpAgent({ identity });
                     const actor = createBackendActor(process.env.BACKEND_CANISTER_ID!, { agent });
                     setDaoActor(actor);
+                    console.log(principal);
                     console.log(daoActor);
                     login();
-                    navigate('/dealProgress_3');
+                    navigate('/dealProgress_1');
                 },
                 onError: (error?: string | undefined) => {
                     console.error("Login error:", error);

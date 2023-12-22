@@ -1,4 +1,8 @@
-const DealProgress_2 = () => {
+interface DealProgressProps {
+    onNext: () => void;
+}
+
+const DealProgress_2 = ({onNext} : DealProgressProps) => {
     return (
         <div className="card p-5 mx-auto my-5" style={{width: '75%'}}>
         <div className="card-body text-center">
@@ -42,7 +46,7 @@ const DealProgress_2 = () => {
             </div>
 
             <div>
-                <button className="btn return-dashboard-btn">Return to Dashboard</button>
+                <button onClick={onNext} className="btn return-dashboard-btn">Return to Dashboard</button>
             </div>
 
         </div>
