@@ -1,10 +1,13 @@
 import { useState,useEffect } from 'react';
 import { AuthClient } from "@dfinity/auth-client";
 import { useNavigate } from 'react-router';
+import { useAuth } from '../contexts/AuthContext';
 import '../App.css';
 
 
 const Navbar = () => {
+    const { logout } = useAuth();
+
     const navigate = useNavigate();
 
     const [authClient, setAuthClient] = useState<AuthClient | null>(null);
@@ -25,6 +28,7 @@ const Navbar = () => {
        try {
         await authClient?.logout();
         console.log("Logout successful");
+        logout();
         navigate('/');
        } catch (error) {
            console.error("Error in handleLogout:", error);

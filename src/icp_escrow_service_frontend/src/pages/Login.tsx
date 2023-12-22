@@ -7,8 +7,10 @@ import { createActor as createBackendActor } from "../../../declarations/backend
 // import './Login.css'; 
 import { createActor } from "../../../declarations/backend";
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const Login = () => {
+    const { login } = useAuth();
     const navigate = useNavigate();
     const [authClient, setAuthClient] = useState<AuthClient | null>(null);
     const [principal, setPrincipal] = useState<string | null>(null);
@@ -43,6 +45,7 @@ const Login = () => {
                     const actor = createBackendActor(process.env.BACKEND_CANISTER_ID!, { agent });
                     setDaoActor(actor);
                     console.log(daoActor);
+                    login();
                     navigate('/dashboard');
                 },
                 onError: (error?: string | undefined) => {
