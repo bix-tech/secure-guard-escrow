@@ -46,7 +46,7 @@ const Login = () => {
                     setDaoActor(actor);
                     console.log(daoActor);
                     login();
-                    navigate('/dashboard');
+                    navigate('/dealProgress_3');
                 },
                 onError: (error?: string | undefined) => {
                     console.error("Login error:", error);
@@ -59,20 +59,22 @@ const Login = () => {
 
 
     return (
-        <div className="card p-5">
-            <div className="card-body">
-                <div className="avatar mb-5">
-                    {/* <img src={minionLogo} alt="Logo" /> */}
-                </div>
-                <h5 className="card-title text-center">ESCROW SERVICE</h5>
-                <button className="loginBtn btn btn-primary d-block mx-auto mt-5 px-4 align-items-center" onClick={handleLogin}>
-                    Login / Create
-                    {/* <img className="login-logo" src={loginIcon} alt="" /> */}
-                </button>
-                {principal && <p className="text-center mt-5">Hi {principal}</p>}
-
-            </div>
+        <div className="d-flex align-items-center justify-content-center" style={{ height: '100vh' }}>
+      <div className="card p-5" style={{ width: '50%' }}>
+        <div className="card-body text-center">
+          <div className="avatar mb-5 mx-auto login-avatar">
+            {/* <img src={minionLogo} alt="Logo" /> */}
+            <img src="src/assets/images/minion.jpeg" alt="User Avatar" />
+          </div>
+          <h5 className="card-title">ESCROW SERVICE</h5>
+          <button className="loginBtn btn btn-primary d-block mx-auto mt-5 px-4 align-items-center" onClick={handleLogin}>
+            Login / Create
+            {/* <img className="login-logo" src={loginIcon} alt="" /> */}
+          </button>
+          {principal && <p className="text-center mt-5">Hi {principal}</p>}
         </div>
+      </div>
+    </div>
     );
 };
 

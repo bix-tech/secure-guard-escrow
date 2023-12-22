@@ -43,19 +43,18 @@ const Navbar = () => {
             <div className="ms-auto"></div>
 
             <div className="notification-avatar ms-3 d-flex align-items-center justify-content-center">
-                <img src="assets/images/notification.png" className="notification-icon" alt="Notification Avatar"/>
+                <img src="src/assets/images/notification.png" className="notification-icon" alt="Notification Avatar"/>
             </div>
 
             <div className="vertical-divider mx-4"></div>
 
             <div className="d-flex align-items-center">
                 <div className="avatar me-3">
-                    <img src="assets/images/minion.jpeg" alt="User Avatar"/>
+                    <img src="src/assets/images/minion.jpeg" alt="User Avatar"/>
                 </div>
                 <div>
                     <p className="mb-0">John Doe</p>
                     <small>johndoe@example.com</small>
-                    <button id ="logout" className="dropdown-item" onClick={handleLogout}>Logout</button>
                 </div>
 
                 <div className="dropdown">
@@ -65,6 +64,7 @@ const Navbar = () => {
                         <a className="dropdown-item" href="#">Profile</a>
                         <a className="dropdown-item" href="#">Settings</a>
                         <div className="dropdown-divider"></div>
+                        <button id ="logout" className="dropdown-item" onClick={handleLogout}>Logout</button>
                     </div>
                 </div>
             </div>
