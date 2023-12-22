@@ -8,9 +8,6 @@ import { createActor as createBackendActor } from "../../../declarations/backend
 import { createActor } from "../../../declarations/backend";
 import { useNavigate } from 'react-router-dom';
 
-
-
-
 const Login = () => {
     const navigate = useNavigate();
     const [authClient, setAuthClient] = useState<AuthClient | null>(null);

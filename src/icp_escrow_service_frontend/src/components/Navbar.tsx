@@ -51,6 +51,7 @@ const Navbar = () => {
                 <div>
                     <p className="mb-0">John Doe</p>
                     <small>johndoe@example.com</small>
+                    <button id ="logout" className="dropdown-item" onClick={handleLogout}>Logout</button>
                 </div>
 
                 <div className="dropdown">
@@ -60,7 +61,6 @@ const Navbar = () => {
                         <a className="dropdown-item" href="#">Profile</a>
                         <a className="dropdown-item" href="#">Settings</a>
                         <div className="dropdown-divider"></div>
-                        <button id ="logout" className="dropdown-item" onClick={handleLogout}>Logout</button>
                     </div>
                 </div>
             </div>
