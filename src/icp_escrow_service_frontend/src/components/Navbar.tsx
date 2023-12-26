@@ -25,7 +25,7 @@ const Navbar = () => {
         if (principal) {
             navigator.clipboard.writeText(principal);
             setCopied(true);
-            setTimeout(()=> setCopied(false), 2000);
+            setTimeout(() => setCopied(false), 2000);
         }
     };
 
@@ -86,11 +86,12 @@ const Navbar = () => {
                         <img src="src/assets/images/minion.jpeg" alt="User Avatar" />
                     </div>
                     <div>
-                        <p className="mb-0">{formatPrincipal(principal)}</p>
-                        <small>johndoe@example.com</small>
+                        <p className="mb-0">
+                        <FaCopy className="copy-icon" onClick={handleCopy} />
+                            {formatPrincipal(principal)}
+                        </p>
+                        {copied && <span>Copied to clipboard</span>}
                     </div>
-                    <FaCopy onClick={handleCopy} /> 
-                    {copied && <span>Copied to clipboard</span>}
                     <Dropdown>
                         <Dropdown.Toggle variant="default" id="dropdown-basic">
                             {/* Add some text or an icon for the toggle */}
