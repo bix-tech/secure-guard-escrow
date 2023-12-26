@@ -72,7 +72,7 @@ body {
   height: 40px;
   overflow: hidden;
   border-radius: 50%;
-  border: 1px solid grey; /* Border color */
+  border: 1px solid grey; 
 }
 
 .avatar img {
@@ -205,4 +205,16 @@ body {
 
 .copy-icon {
   margin-right: 10px;
+}
+
+.horizontal-divider:active {
+  background-color: #237A88;
+}
+
+.state-bar:active {
+  background-color: #237A88;
+}
+
+.deal-details:active {
+  background-color: #237A88;
 }

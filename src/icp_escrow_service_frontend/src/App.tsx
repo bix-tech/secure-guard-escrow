@@ -8,7 +8,6 @@ import Navbar from './components/Navbar';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { useNavigate } from 'react-router-dom';
-
 import './App.css';
 import { useEffect, useState } from 'react';
 import localforage from 'localforage';
