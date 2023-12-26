@@ -5,11 +5,29 @@ import { useAuth } from '../contexts/AuthContext';
 import { Dropdown } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../App.css';
+import localForage from "localforage";
+import { FaCopy } from 'react-icons/fa';
+
 
 const Navbar = () => {
     const { logout } = useAuth();
     const navigate = useNavigate();
     const [authClient, setAuthClient] = useState<AuthClient | null>(null);
+    const [principal, setPrincipal] = useState<string | null>(null);
+    const [copied, setCopied] = useState(false);
+
+    const formatPrincipal = (principal: string | null) => {
+        if (!principal) return null;
+        return `${principal?.slice(0, 5)}......${principal?.slice(-5)}`;
+    };
+
+    const handleCopy = () => {
+        if (principal) {
+            navigator.clipboard.writeText(principal);
+            setCopied(true);
+            setTimeout(()=> setCopied(false), 2000);
+        }
+    };
 
     useEffect(() => {
         const initAuth = async () => {
@@ -23,16 +41,32 @@ const Navbar = () => {
         initAuth();
     }, []);
 
+    useEffect(() => {
+        const fetchPrincipal = async () => {
+            const storedPrincipal = await localForage.getItem<string | null>('principal');
+            setPrincipal(storedPrincipal);
+        };
+
+        fetchPrincipal();
+    }, []);
+
     const handleLogout = async () => {
         try {
-            await authClient?.logout();
-            console.log("Logout successful");
+            if (authClient) {
+                await authClient.logout();
+            }
             logout();
+
+            await localForage.removeItem('principal');
+
             navigate('/');
+
+            console.log("Logout successful");
         } catch (error) {
             console.error("Error in handleLogout:", error);
         }
     }
+
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -52,10 +86,11 @@ const Navbar = () => {
                         <img src="src/assets/images/minion.jpeg" alt="User Avatar" />
                     </div>
                     <div>
-                        <p className="mb-0">John Doe</p>
+                        <p className="mb-0">{formatPrincipal(principal)}</p>
                         <small>johndoe@example.com</small>
                     </div>
-
+                    <FaCopy onClick={handleCopy} /> 
+                    {copied && <span>Copied to clipboard</span>}
                     <Dropdown>
                         <Dropdown.Toggle variant="default" id="dropdown-basic">
                             {/* Add some text or an icon for the toggle */}

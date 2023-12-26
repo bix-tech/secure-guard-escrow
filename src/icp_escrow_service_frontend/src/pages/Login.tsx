@@ -2,51 +2,64 @@ import { useState, useEffect } from 'react';
 import { AuthClient } from "@dfinity/auth-client";
 import { HttpAgent } from "@dfinity/agent";
 import { createActor as createBackendActor } from "../../../declarations/backend";
-import { createActor } from "../../../declarations/backend";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import localForage from "localforage";
+
 
 const Login = () => {
     const { login } = useAuth();
     const navigate = useNavigate();
     const [authClient, setAuthClient] = useState<AuthClient | null>(null);
     const [principal, setPrincipal] = useState<string | null>(null);
-    const [daoActor, setDaoActor] = useState<ReturnType<typeof createActor> | null>(null);
+    const [daoActor, setDaoActor] = useState<ReturnType<typeof createBackendActor> | null>(null);
 
     useEffect(() => {
-        const initAuth = async () => {
-          try {
-            const authClient = await AuthClient.create();
-            setAuthClient(authClient);
-      
-            const storedPrincipal = localStorage.getItem('principal');
-            if (storedPrincipal) {
-              setPrincipal(storedPrincipal);
-              login();
-              navigate('/dealProgress_1');
-            } else if (await authClient.isAuthenticated()) {
-              reinitializeSession(authClient);
+      const initAuth = async () => {
+        try {
+          const authClient = await AuthClient.create({
+            idleOptions: {
+              idleTimeout: 1000 * 60 * 30, 
+              disableDefaultIdleCallback: true 
             }
-          } catch (error) {
-            console.error("Failed to initialize authentication:", error);
+          });
+          setAuthClient(authClient);
+    
+          const storedPrincipal = await localForage.getItem<string | null>('principal');
+          if (storedPrincipal) {
+            setPrincipal(storedPrincipal);
+            login();
+            console.log("Stored principal:", principal);
+            navigate('/dealProgress_1');
+          } else if (await authClient.isAuthenticated()) {
+            reinitializeSession(authClient);
           }
-        };
-      
-        const reinitializeSession = async (authClient: AuthClient) => {
-          const identity = authClient.getIdentity();
-          const principal = identity.getPrincipal().toString();
-          setPrincipal(principal);
-          localStorage.setItem('principal', principal);
-          login();
-          navigate('/dealProgress_1');
+        } catch (error) {
+          console.error("Failed to initialize authentication:", error);
         }
+      };
+
+      const reinitializeSession = async (authClient: AuthClient) => {
+        const identity = authClient.getIdentity();
+        const newPrincipal = identity.getPrincipal().toString();
+        setPrincipal(newPrincipal);
+
+        await localForage.setItem('principal', newPrincipal);
+        
+        login();
+        navigate('/dealProgress_1');
+      }
       
-        initAuth();
-      }, []);
+      initAuth();
+    }, []);
+
     
 
     const handleLogin = async () => {
         try {
+          console.log("DFX_NETWORK:", process.env.DFX_NETWORK);
+          console.log("INTERNET_IDENTITY_CANISTER_ID:", process.env.INTERNET_IDENTITY_CANISTER_ID);
+          console.log("BACKEND_CANISTER_ID:", process.env.BACKEND_CANISTER_ID);
             const identityProvider = process.env.DFX_NETWORK === 'ic'
                 ? 'https://identity.ic0.app'
                 : `http://127.0.0.1:4943/?canisterId=${process.env.INTERNET_IDENTITY_CANISTER_ID}`;
@@ -59,7 +72,6 @@ const Login = () => {
                     const identity = authClient.getIdentity();
                     const principal = identity.getPrincipal().toString();
                     setPrincipal(principal);
-                    localStorage.setItem('principal', principal);
                     const agent = new HttpAgent({ identity });
                     const actor = createBackendActor(process.env.BACKEND_CANISTER_ID!, { agent });
                     setDaoActor(actor);
@@ -91,7 +103,6 @@ const Login = () => {
             Login / Create
             {/* <img className="login-logo" src={loginIcon} alt="" /> */}
           </button>
-          {principal && <p className="text-center mt-5">Hi {principal}</p>}
         </div>
       </div>
     </div>

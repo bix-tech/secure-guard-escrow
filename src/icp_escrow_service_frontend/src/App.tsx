@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Login from '../src/pages/Login';
 import Dashboard from './pages/Dashboard';
 import DealProgress_1 from './pages/DealProgress_1';
@@ -10,6 +10,8 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { useNavigate } from 'react-router-dom';
 
 import './App.css';
+import { useEffect, useState } from 'react';
+import localforage from 'localforage';
 
 const NavbarWrapper = () => {
   const location = useLocation();
@@ -42,6 +44,32 @@ const DealProgress2 = ({ onNext }: { onNext: string }) => {
 };
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      const storedPrincipal = await localforage.getItem<string | null>('principal');
+      const isUserAuthenticated = !!storedPrincipal; 
+      setIsAuthenticated(isUserAuthenticated);
+      if (isUserAuthenticated) {
+        setIsLoading(true);
+      }
+      setIsLoading(false);
+    };
+    
+
+    checkAuthentication();
+  }, []);
+
+  useEffect(() => {
+    console.log(isAuthenticated); 
+  }, [isAuthenticated]);
+  
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
   return (
     <Router>
       <AuthProvider>
