@@ -8,7 +8,7 @@ import localForage from "localforage";
 
 
 const Login = () => {
-    const { login } = useAuth();
+    const { login, setIsAuthenticated } = useAuth();
     const navigate = useNavigate();
     const [authClient, setAuthClient] = useState<AuthClient | null>(null);
     const [principal, setPrincipal] = useState<string | null>(null);
@@ -30,7 +30,9 @@ const Login = () => {
             setPrincipal(storedPrincipal);
             login();
             console.log("Stored principal:", principal);
-            navigate('/dealProgress_1');
+            setIsAuthenticated(true);
+            const lastVisitedRoute = await localForage.getItem<string>('lastVisitedRoute');
+            navigate(lastVisitedRoute || '/dealProgress_1');
           } else if (await authClient.isAuthenticated()) {
             reinitializeSession(authClient);
           }
