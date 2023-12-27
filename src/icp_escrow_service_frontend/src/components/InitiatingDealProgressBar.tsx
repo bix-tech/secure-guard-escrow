@@ -1,11 +1,11 @@
 import React from 'react';
 import '../App.css';
 
-interface CreateDealProgressBarProps {
+interface InitiateDealProgressBarProps {
     currentStep: number;
 }
 
-const CreateDealProgressBar: React.FC<CreateDealProgressBarProps> = ({ currentStep }) => {
+const CreateDealProgressBar: React.FC<InitiateDealProgressBarProps> = ({ currentStep }) => {
     return (
         <div className="mb-4">
             <div className="d-flex justify-content-between align-items-center">
