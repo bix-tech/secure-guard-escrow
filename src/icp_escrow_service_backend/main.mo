@@ -8,6 +8,7 @@ import Text "mo:base/Text";
 import Hash "mo:base/Hash";
 import Array "mo:base/Array";
 import Float "mo:base/Float";
+import Bool "mo:base/Bool";
 import Account "account";
 import Wallet "wallet";
 import Deal "deal";
@@ -25,9 +26,15 @@ actor {
 
   let activityLogs : TrieMap.TrieMap<Nat, [ActivityLog]> = TrieMap.TrieMap(Nat.equal, Hash.hash);
 
+  let notifications : TrieMap.TrieMap<Principal, [Notification]> = TrieMap.TrieMap(Principal.equal, Principal.hash);
   public type User = {
     #Buyer;
     #Seller;
+  };
+
+  public type Notification = {
+    dealId : Nat;
+    message : Text;
   };
   public type DealStatus = {
     #Pending;
@@ -101,6 +108,35 @@ actor {
     activityTime : Time;
   };
 
+  public query func getNotification(user : Principal) : async [Notification] {
+    let notificationsOpt = notifications.get(user);
+    switch (notificationsOpt) {
+      case (null) { return [] };
+      case (?n) { return n };
+    };
+  };
+
+  private func addNotification(user : Principal, notification : Notification) {
+    let currentNotifications = switch (notifications.get(user)) {
+      case (null) { [] };
+      case (?n) { n };
+    };
+    notifications.put(user, Array.append(currentNotifications, [notification]));
+  };
+
+  public func clearNotifications(user : Principal, dealId : Nat) : async Bool {
+    let currentNotifications = switch (notifications.get(user)) {
+      case (null) { return false };
+      case (?n) { n };
+    };
+    let newNotifications = Array.filter(currentNotifications, func(n : Notification) : Bool {
+        n.dealId != dealId;
+      },
+    );
+    notifications.put(user, newNotifications);
+    return true;
+  };
+
   public shared ({ caller }) func createDeal(newDeal : Deal) : async Deal.createDealResult {
     let dealToCreate = {
       id = nextDealId;
@@ -125,6 +161,8 @@ actor {
     deals.put(nextDealId, dealToCreate);
 
     nextDealId += 1;
+
+    addNotification(newDeal.to, { dealId = nextDealId; message = "You have a new deal"});
 
     return #ok(#CreateDealOk);
   };
