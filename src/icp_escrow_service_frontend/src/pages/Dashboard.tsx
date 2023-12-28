@@ -54,7 +54,7 @@ const Dashboard = () => {
             amount: Number(log.amount),
             activityTime: Number(log.activityTime),
             user: log.user.toString(),
-            status: Object.keys(log.status)[0] 
+            status: Object.keys(log.status)[0]
           }));
           setActivityLogs(mappedLogs);
           setIsLoading(false);
@@ -74,45 +74,49 @@ const Dashboard = () => {
     <div>
       <div className="d-flex flex-row justify-content-between p-5">
         <div className="card p-5 mx-auto my-5" style={{ width: '80%' }}>
-        <h2>Activity Logs</h2>
-        <table className="table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Description</th>
-              <th>Type</th>
-              <th>Amount</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
+          <h2>Activity Logs</h2>
+          <table className="table">
+            <thead>
               <tr>
-                <td colSpan={5}>Loading...</td>
+                <th>ID</th>
+                <th>Description</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Status</th>
               </tr>
-            ) : (
-              activityLogs.map((log, index) => (
-                <tr key={index}>
-                  <td>{log.dealId}</td>
-                  <td>{log.description}</td>
-                  <td>{log.activityType}</td>
-                  <td>{log.amount}</td>
-                  <td>{log.status}</td>
+            </thead>
+            <tbody>
+              {isLoading ? (
+                <tr>
+                  <td colSpan={5} style={{ textAlign: 'center', padding: '20px' }}> 
+                    <div className="spinner-border text-primary" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  </td>
                 </tr>
-              ))
-            )}
-          </tbody>
+              ) : (
+                activityLogs.map((log, index) => (
+                  <tr key={index}>
+                    <td>{log.dealId}</td>
+                    <td>{log.description}</td>
+                    <td>{log.activityType}</td>
+                    <td>{log.amount}</td>
+                    <td>{log.status}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
 
-        </table>
-        <div className="pagination">
-          <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 0}>Previous</button>
-          {Array.from({ length: totalPages }, (_, i) => (
-            <button key={i} onClick={() => handlePageClick(i)} className={currentPage === i ? 'active' : ''}>
-              {i + 1}
-            </button>
-          ))}
-          <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages - 1}>Next</button>
-        </div>
+          </table>
+          <div className="pagination justify-content-center">
+            <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 0}>Previous</button>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button key={i} onClick={() => handlePageClick(i)} className={currentPage === i ? 'active' : ''}>
+                {i + 1}
+              </button>
+            ))}
+            <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages - 1}>Next</button>
+          </div>
         </div>
       </div>
     </div>
