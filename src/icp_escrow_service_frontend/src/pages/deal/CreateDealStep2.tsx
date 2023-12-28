@@ -3,8 +3,19 @@ import { Editor } from '@tinymce/tinymce-react';
 import '@tinymce/tinymce-react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import CreateDealProgressBar from '../../components/CreateDealProgressBar';
 
-const DealInformation = () => {
+
+type CreateDealProps = {
+    onNext: () => void;
+  };
+  
+
+  const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
+    const handleSubmit = (event: React.FormEvent) => {
+      event.preventDefault();
+      onNext();
+    };
 
     const [editorContent, setEditorContent] = React.useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -50,7 +61,7 @@ const DealInformation = () => {
         }
     };
 
-    const handleEditorChange = (content : any, editor : any) => {
+    const handleEditorChange = (content : any) => {
         setEditorContent(content);
     };
 
@@ -58,40 +69,9 @@ const DealInformation = () => {
     <div className="card p-5 mx-auto my-5 mb-5" style={{width: '75%'}}>
         <div className="card-body text-center">
             
-            <div className="mb-4">
-                <div className="d-flex justify-content-between align-items-center">
-                    <div className="state-bar d-flex flex-column align-items-center" style={{width: '20%'}}>
-                        <div className="avatar state-avatar">
-                            <img src="../../src/assets/images/create_deal_icon.png" alt="State Avatar 1"/>
-                        </div>
-                        <div className="mt-2">Create Deal</div>
-                    </div>
-
-                    <div className="horizontal-divider">
-                        <img src="../../src/assets/images/line-green.png" className="divider-image" alt="Divider Image 1"/>
-                    </div>
-
-                    <div className="state-bar d-flex flex-column align-items-center" style={{width: '20%'}}>
-                        <div className="avatar state-avatar">
-                            <img src="../../src/assets/images/deal-details-icon.png" alt="State Avatar 2"/>
-                        </div>
-                        <div className="mt-2">Buyer Lock Payment</div>
-                    </div>
-
-                    <div className="horizontal-divider">
-                        <img src="../../src/assets/images/line-green.png" className="divider-image" alt="Divider Image 2"/>
-                    </div>
-
-                    <div className="state-bar d-flex flex-column align-items-center" style={{width: '20%'}}>
-                        <div className="avatar state-avatar">
-                            <img src="../../src/assets/images/verify.png" alt="State Avatar 3"/>
-                        </div>
-                        <div className="mt-2">Deliverables</div>
-                    </div>
-                </div>
-            </div>
+            <CreateDealProgressBar currentStep={2} />
             
-            <form className="mt-5">
+            <form className="mt-5" onSubmit={handleSubmit}>
                 <div className="mb-3">
                     <div className="form-row col-md-9 text-start mx-auto">
                         <label htmlFor="projectName" className="form-label text-start">Upload Pictures</label>
@@ -218,4 +198,4 @@ const DealInformation = () => {
     )
 }
 
-export default DealInformation
+export default CreateDealStep2

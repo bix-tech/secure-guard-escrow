@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import '@tinymce/tinymce-react';
+import InitiatingDealProgressBar from '../../../components/InitiatingDealProgressBar';
 
 const CreateDeal = () => {
 
@@ -38,7 +39,7 @@ const CreateDeal = () => {
         }
     };
 
-    const handleEditorChange = (content : any, editor : any) => {
+    const handleEditorChange = (content : any) => {
         setEditorContent(content);
       };
 
@@ -46,38 +47,7 @@ const CreateDeal = () => {
     <div className="card p-5 mx-auto my-5 mb-5" style={{width: '75%'}}>
         <div className="card-body text-center">
             
-            <div className="mb-4">
-                <div className="d-flex justify-content-between align-items-center">
-                    <div className="state-bar d-flex flex-column align-items-center" style={{width: '20%'}}>
-                        <div className="avatar state-avatar">
-                            <img src="../../src/assets/images/create_deal_icon.png" alt="State Avatar 1"/>
-                        </div>
-                        <div className="mt-2">Create Deal</div>
-                    </div>
-
-                    <div className="horizontal-divider">
-                        <img src="../../src/assets/images/line-green.png" className="divider-image" alt="Divider Image 1"/>
-                    </div>
-
-                    <div className="state-bar d-flex flex-column align-items-center" style={{width: '20%'}}>
-                        <div className="avatar state-avatar">
-                            <img src="../../src/assets/images/deal-details-icon.png" alt="State Avatar 2"/>
-                        </div>
-                        <div className="mt-2">Buyer Lock Payment</div>
-                    </div>
-
-                    <div className="horizontal-divider">
-                        <img src="../../src/assets/images/line-green.png" className="divider-image" alt="Divider Image 2"/>
-                    </div>
-
-                    <div className="state-bar d-flex flex-column align-items-center" style={{width: '20%'}}>
-                        <div className="avatar state-avatar">
-                            <img src="../../src/assets/images/verify.png" alt="State Avatar 3"/>
-                        </div>
-                        <div className="mt-2">Deliverables</div>
-                    </div>
-                </div>
-            </div>
+            <InitiatingDealProgressBar currentStep={3} />
             
             <form className="mt-5">
                 <div className="mb-3">

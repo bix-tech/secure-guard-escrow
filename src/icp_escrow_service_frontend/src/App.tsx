@@ -1,15 +1,10 @@
 import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Login from '../src/pages/Login';
 import Dashboard from './pages/Dashboard';
-import BuyerOrSeller from './pages/deal/BuyerOrSeller';
-import CreateDealSuccessful from './pages/deal/CreateDealSuccessful';
+import CreateDealSuccessful from './pages/deal/CreateDealStep3';
 import WaitingBuyerLockToken from './pages/deal/seller/WaitingBuyerLockToken';
-import CreateDeal from './pages/deal/seller/CreateDeal';
-import LockToken from './pages/deal/buyer/LockToken';
-import DealInformation from './pages/deal/DealInformation';
-import DealProgress_1 from './pages/DealProgress_1';
-import DealProgress_2 from './pages/DealProgress_2';
-import DealProgress_3 from './pages/DealProgress_3';
+import CreateDeal from './pages/deal/seller/SubmitDeliverables';
+import LockToken from './pages/deal/buyer/InitiateDealLockToken';
 import Navbar from './components/Navbar';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -18,6 +13,10 @@ import './App.css';
 import { useEffect, useState } from 'react';
 import DealOverview from './pages/DealOverview';
 import localforage from 'localforage';
+import CreateDealStep1 from './pages/deal/CreateDealStep1';
+import CreateDealStep2 from './pages/deal/CreateDealStep2';
+import CreateDealStep3 from './pages/deal/CreateDealStep3';
+
 
 const NavbarWrapper = () => {
   const location = useLocation();
@@ -33,24 +32,24 @@ const NavbarWrapper = () => {
   return <Navbar />;
 };
 
-const DealProgress1 = ({ onNext }: { onNext: string }) => {
+const CreateStep1 = ({ onNext }: { onNext: string }) => {
   const navigate = useNavigate();
 
   const handleNext = () => {
     navigate(onNext);
   };
 
-  return <DealProgress_1 onNext={handleNext} />;
+  return <CreateDealStep1 onNext={handleNext} />;
 };
 
-const DealProgress2 = ({ onNext }: { onNext: string }) => {
+const CreateStep2 = ({ onNext }: { onNext: string }) => {
   const navigate = useNavigate();
 
   const handleNext = () => {
     navigate(onNext);
   };
 
-  return <DealProgress_2 onNext={handleNext} />;
+  return <CreateDealStep2 onNext={handleNext} />;
 };
 
 function App() {
@@ -83,15 +82,14 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/deal-overview" element={<ProtectedRoute><DealOverview /></ProtectedRoute>} />
-          <Route path="/deal/BuyerOrSeller" element={<ProtectedRoute><BuyerOrSeller /></ProtectedRoute>} />
           <Route path="/deal/CreateDealSuccessful" element={<ProtectedRoute><CreateDealSuccessful /></ProtectedRoute>} />
           <Route path="/deal/seller/WaitingBuyerLockToken" element={<ProtectedRoute><WaitingBuyerLockToken/></ProtectedRoute>} />
           <Route path="/deal/seller/CreateDeal" element={<ProtectedRoute><CreateDeal/></ProtectedRoute>} />
           <Route path="/deal/buyer/LockToken" element={<ProtectedRoute><LockToken/></ProtectedRoute>} />
-          <Route path="/deal/DealInformation" element={<ProtectedRoute><DealInformation/></ProtectedRoute>} />
-          <Route path="/dealProgress_1" element={<ProtectedRoute><DealProgress1 onNext='/dealProgress_2' /></ProtectedRoute>} />
-          <Route path="/dealProgress_2" element={<ProtectedRoute><DealProgress2 onNext='/dealProgress_3' /></ProtectedRoute>} />
-          <Route path="/dealProgress_3" element={<ProtectedRoute><DealProgress_3 /></ProtectedRoute>} />
+          <Route path="/createDealStep1" element={<ProtectedRoute><CreateStep1 onNext='/createDealStep2' /></ProtectedRoute>} />
+          <Route path="/createDealStep2" element={<ProtectedRoute><CreateStep2 onNext='/createDealStep3' /></ProtectedRoute>} />
+          <Route path="/createDealStep3" element={<ProtectedRoute><CreateDealStep3 /></ProtectedRoute>} />
+
         </Routes>
       </AuthProvider>
     </Router>

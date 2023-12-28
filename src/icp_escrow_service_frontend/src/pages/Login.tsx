@@ -80,7 +80,7 @@ const Login = () => {
                     console.log(principal);
                     console.log(daoActor);
                     login();
-                    navigate('/dealProgress_1');
+                    navigate('/dashboard');
                 },
                 onError: (error?: string | undefined) => {
                     console.error("Login error:", error);
