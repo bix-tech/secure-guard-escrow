@@ -32,7 +32,7 @@ const Login = () => {
             console.log("Stored principal:", principal);
             setIsAuthenticated(true);
             const lastVisitedRoute = await localForage.getItem<string>('lastVisitedRoute');
-            navigate(lastVisitedRoute || '/dealProgress_1');
+            navigate(lastVisitedRoute || '/deal/DealInformation');
           } else if (await authClient.isAuthenticated()) {
             reinitializeSession(authClient);
           }

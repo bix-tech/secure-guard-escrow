@@ -1,6 +1,12 @@
 import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Login from '../src/pages/Login';
 import Dashboard from './pages/Dashboard';
+import BuyerOrSeller from './pages/deal/BuyerOrSeller';
+import CreateDealSuccessful from './pages/deal/CreateDealSuccessful';
+import WaitingBuyerLockToken from './pages/deal/seller/WaitingBuyerLockToken';
+import CreateDeal from './pages/deal/seller/CreateDeal';
+import LockToken from './pages/deal/buyer/LockToken';
+import DealInformation from './pages/deal/DealInformation';
 import DealProgress_1 from './pages/DealProgress_1';
 import DealProgress_2 from './pages/DealProgress_2';
 import DealProgress_3 from './pages/DealProgress_3';
@@ -77,6 +83,12 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/deal-overview" element={<ProtectedRoute><DealOverview /></ProtectedRoute>} />
+          <Route path="/deal/BuyerOrSeller" element={<ProtectedRoute><BuyerOrSeller /></ProtectedRoute>} />
+          <Route path="/deal/CreateDealSuccessful" element={<ProtectedRoute><CreateDealSuccessful /></ProtectedRoute>} />
+          <Route path="/deal/seller/WaitingBuyerLockToken" element={<ProtectedRoute><WaitingBuyerLockToken/></ProtectedRoute>} />
+          <Route path="/deal/seller/CreateDeal" element={<ProtectedRoute><CreateDeal/></ProtectedRoute>} />
+          <Route path="/deal/buyer/LockToken" element={<ProtectedRoute><LockToken/></ProtectedRoute>} />
+          <Route path="/deal/DealInformation" element={<ProtectedRoute><DealInformation/></ProtectedRoute>} />
           <Route path="/dealProgress_1" element={<ProtectedRoute><DealProgress1 onNext='/dealProgress_2' /></ProtectedRoute>} />
           <Route path="/dealProgress_2" element={<ProtectedRoute><DealProgress2 onNext='/dealProgress_3' /></ProtectedRoute>} />
           <Route path="/dealProgress_3" element={<ProtectedRoute><DealProgress_3 /></ProtectedRoute>} />
