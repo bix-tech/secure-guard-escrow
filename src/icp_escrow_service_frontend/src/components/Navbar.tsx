@@ -76,14 +76,14 @@ const Navbar = () => {
                 <div className="ms-auto"></div>
 
                 <div className="notification-avatar ms-3 d-flex align-items-center justify-content-center">
-                    <img src="src/assets/images/notification.png" className="notification-icon" alt="Notification Avatar" />
+                    <img src="/notification.png" className="notification-icon" alt="Notification Avatar" />
                 </div>
 
                 <div className="vertical-divider mx-4"></div>
 
                 <div className="d-flex align-items-center">
                     <div className="avatar me-3">
-                        <img src="src/assets/images/minion.jpeg" alt="User Avatar" />
+                        <img src="/minion.jpeg" alt="User Avatar" />
                     </div>
                     <div>
                         <p className="mb-0">

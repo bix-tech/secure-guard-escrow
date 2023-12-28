@@ -98,7 +98,7 @@ const Login = () => {
         <div className="card-body text-center">
           <div className="avatar mb-5 mx-auto login-avatar">
             {/* <img src={minionLogo} alt="Logo" /> */}
-            <img src="src/assets/images/minion.jpeg" alt="User Avatar" />
+            <img src="/minion.jpeg" alt="User Avatar" />
           </div>
           <h5 className="card-title">ESCROW SERVICE</h5>
           <button className="loginBtn btn btn-primary d-block mx-auto mt-5 px-4 align-items-center" onClick={handleLogin}>

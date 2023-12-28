@@ -205,6 +205,20 @@ body {
 
 .copy-icon {
   margin-right: 10px;
+  animation: pulse 2s infinite;
+  border-radius: 50%;
+}
+
+@keyframes pulse {
+	0%, 100% { 
+		transform: scale(0.95);
+		box-shadow: 0 0 0 0 #D6D6D6; 
+	}
+
+	50% { 
+		transform: scale(1);
+		box-shadow: 0 0 0 3px #237A88; 
+	}
 }
 
 .horizontal-divider:active {

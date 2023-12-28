@@ -9,6 +9,7 @@ import Hash "mo:base/Hash";
 import Array "mo:base/Array";
 import Float "mo:base/Float";
 import Bool "mo:base/Bool";
+import Iter "mo:base/Iter";
 import Account "account";
 import Wallet "wallet";
 import Deal "deal";
@@ -105,7 +106,9 @@ actor {
     description : Text;
     activityType : Text;
     amount : Nat;
+    status : DealStatus;
     activityTime : Time;
+    user : Principal;
   };
 
   public query func getNotification(user : Principal) : async [Notification] {
@@ -129,7 +132,9 @@ actor {
       case (null) { return false };
       case (?n) { n };
     };
-    let newNotifications = Array.filter(currentNotifications, func(n : Notification) : Bool {
+    let newNotifications = Array.filter(
+      currentNotifications,
+      func(n : Notification) : Bool {
         n.dealId != dealId;
       },
     );
@@ -160,9 +165,32 @@ actor {
 
     deals.put(nextDealId, dealToCreate);
 
+    let buyerLog = {
+      dealId = nextDealId;
+      description = "Deal created";
+      activityType = "DealCreated";
+      status = newDeal.status;
+      amount = newDeal.amount;
+      activityTime = Time.now();
+      user = newDeal.from;
+    };
+
+    let sellerLog = {
+      dealId = nextDealId;
+      description = "Deal created";
+      activityType = "DealCreated";
+      status = newDeal.status;
+      amount = newDeal.amount;
+      activityTime = Time.now();
+      user = newDeal.to;
+    };
+
+    await createActivityLog(buyerLog, newDeal.to);
+    await createActivityLog(sellerLog, newDeal.from);
+
     nextDealId += 1;
 
-    addNotification(newDeal.to, { dealId = nextDealId; message = "You have a new deal"});
+    addNotification(newDeal.to, { dealId = nextDealId; message = "You have a new deal" });
 
     return #ok(#CreateDealOk);
   };
@@ -276,15 +304,6 @@ actor {
             };
 
             deals.put(dealId, updatedDeal);
-
-            let log = {
-              dealId = dealId;
-              description = "Deal confirmed";
-              activityType = "DealConfirmed";
-              amount = deal.amount;
-              activityTime = Time.now();
-            };
-            await createActivityLog(log);
 
             return #ok(());
           };
@@ -410,20 +429,29 @@ actor {
       };
     };
   };
-
-  public func getActivityLogs(dealId : Nat) : async [ActivityLog] {
-    let logsOpt = activityLogs.get(dealId);
-    switch (logsOpt) {
-      case (null) {
-        return [];
-      };
-      case (?logs) {
-        return logs;
-      };
-    };
+  
+  public func getActivityLogsForUser(user : Principal) : async [ActivityLog] {
+    let allLogs = Array.flatten(Iter.toArray(activityLogs.vals()));
+    return Array.filter(
+      allLogs,
+      func(log : ActivityLog) : Bool {
+        log.user == user;
+      },
+    );
   };
 
-  public func createActivityLog(newLog : ActivityLog) : async () {
+  public func getActivityLogsCountForUser(user : Principal) : async Nat {
+    let allLogs = Array.flatten(Iter.toArray(activityLogs.vals()));
+    let userLogs = Array.filter(
+      allLogs,
+      func(log : ActivityLog) : Bool {
+        log.user == user;
+      },
+    );
+    return Array.size(userLogs);
+  };
+
+  public func createActivityLog(newLog : ActivityLog, additionalUser : Principal) : async () {
     let existingLogs = switch (activityLogs.get(newLog.dealId)) {
       case (null) {
         [];
@@ -438,10 +466,31 @@ actor {
       description = newLog.description;
       activityType = newLog.activityType;
       amount = newLog.amount;
+      status = newLog.status;
       activityTime = Time.now();
+      user = newLog.user;
     };
 
-    activityLogs.put(newLog.dealId, Array.append(existingLogs, [createLog]));
+    let additionalLog = {
+    dealId = newLog.dealId;
+    description = newLog.description;
+    activityType = newLog.activityType;
+    amount = newLog.amount;
+    status = newLog.status;
+    activityTime = Time.now();
+    user = additionalUser; 
+  };
+
+  let existingAdditionalLogs = switch (activityLogs.get(additionalLog.dealId)) {
+    case (null) {
+      [];
+    };
+    case (?logs) {
+      logs;
+    };
+  };
+
+  activityLogs.put(additionalLog.dealId, Array.append(existingAdditionalLogs, [additionalLog]));
   };
 
   public func mintTokens(principal : Principal, amount : Nat) : async () {
