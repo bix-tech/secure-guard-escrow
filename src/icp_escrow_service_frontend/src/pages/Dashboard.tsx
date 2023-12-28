@@ -29,7 +29,6 @@ const Dashboard = () => {
         setPrincipal(Principal.fromText(storedPrincipalText));
         const itemCount = await backend.getActivityLogsCountForUser(Principal.fromText(storedPrincipalText));
         setTotalItems(Number(itemCount));
-
       }
     };
     loadPrincipal();
@@ -55,7 +54,7 @@ const Dashboard = () => {
             amount: Number(log.amount),
             activityTime: Number(log.activityTime),
             user: log.user.toString(),
-            status: log.status.toString()
+            status: Object.keys(log.status)[0] 
           }));
           setActivityLogs(mappedLogs);
           setIsLoading(false);
@@ -74,7 +73,7 @@ const Dashboard = () => {
   return (
     <div>
       <div className="d-flex flex-row justify-content-between p-5">
-        <div className="card p-5 mx-auto my-5" style={{ width: '45%' }}>
+        <div className="card p-5 mx-auto my-5" style={{ width: '80%' }}>
         <h2>Activity Logs</h2>
         <table className="table">
           <thead>
