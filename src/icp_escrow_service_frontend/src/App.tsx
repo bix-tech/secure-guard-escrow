@@ -86,7 +86,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/deal-overview" element={<ProtectedRoute><DealOverview /></ProtectedRoute>} />
+            <Route path="/deal-overview/:dealId" element={<ProtectedRoute><DealOverview /></ProtectedRoute>} />
             <Route path="/deal/CreateDealSuccessful" element={<ProtectedRoute><CreateDealSuccessful /></ProtectedRoute>} />
             <Route path="/deal/seller/WaitingBuyerLockToken" element={<ProtectedRoute><WaitingBuyerLockToken /></ProtectedRoute>} />
             <Route path="/deal/seller/CreateDeal" element={<ProtectedRoute><CreateDeal /></ProtectedRoute>} />

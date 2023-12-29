@@ -94,7 +94,7 @@ body {
 
 .notification-avatar img {
   width: auto;
-  height: 75%;
+  height: 100%;
   object-fit: cover;
   border-radius: 50%;
 }
