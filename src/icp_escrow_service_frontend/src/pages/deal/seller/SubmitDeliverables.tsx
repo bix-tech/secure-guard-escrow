@@ -1,7 +1,6 @@
 import React, { useRef } from 'react';
-import { Editor } from '@tinymce/tinymce-react';
-import '@tinymce/tinymce-react';
 import InitiatingDealProgressBar from '../../../components/InitiatingDealProgressBar';
+import MyEditor from '../../../components/MyEditor';
 
 const CreateDeal = () => {
 
@@ -69,15 +68,9 @@ const CreateDeal = () => {
                     <div className="form-row col-md-9 text-start mx-auto">
                         <label htmlFor="deal-description" className="form-label text-start">Deal Description</label>
                         {/* <textarea id="editor" className="form-control"></textarea> */}
-                        <Editor
+                        <MyEditor
                             initialValue=""
                             value={editorContent}
-                            init={{
-                                height: 250,
-                                menubar: false,
-                                plugins: ['paste', 'link'],
-                                toolbar: 'undo redo | bold italic | paste link',
-                            }}
                             onEditorChange={handleEditorChange}
                             />
                     </div>

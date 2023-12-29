@@ -1,49 +1,189 @@
-import React, { useRef } from 'react';
-import { Editor } from '@tinymce/tinymce-react';
-import '@tinymce/tinymce-react';
+import React, { useRef, useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import CreateDealProgressBar from '../../components/CreateDealProgressBar';
-
+import { backend } from '../../../../declarations/backend';
+import { DealCategory, DealStatus, useDealData } from '../../contexts/DealContext';
+import MyEditor from '../../components/MyEditor';
+import { Principal } from '@dfinity/principal';
+import localForage from 'localforage';
 
 type CreateDealProps = {
     onNext: () => void;
-  };
-  
+};
 
-  const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
-    const handleSubmit = (event: React.FormEvent) => {
-      event.preventDefault();
-      onNext();
+type DocumentFile = {
+    id: string;
+    name: string;
+  };
+
+type PaymentSchedule = {
+    packageName: string;
+    packageDescription: string;
+};
+
+type PaymentSchedules = PaymentSchedule[];
+
+
+
+const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
+    const [selectedCategory, setSelectedCategory] = useState<DealCategory>(DealCategory.NFT);
+    const [recipientPrincipal, setRecipientPrincipal] = useState<string>('');
+    const [selectedStatus, setSelectedStatus] = useState<DealStatus>(DealStatus.Pending);
+    const [principal, setPrincipal] = useState<string>('');
+    const { dealData } = useDealData();
+    const [amount, setAmount] = useState<number>(0);
+    const pictureInputRef = useRef<HTMLInputElement>(null);
+    const documentInputRef = useRef<HTMLInputElement>(null);
+    const [dealStart, setOpenDate] = useState<Date | null>(null);
+    const [dealEnd, setCloseDate] = useState<Date | null>(null);
+    const [uploadedPictures, setUploadedPictures] = useState<File[]>([]);
+    const [editorContent, setEditorContent] = useState('');
+    const [uploadedDocuments, setUploadedDocuments] = useState<DocumentFile[]>([]);
+
+    const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedCategory(event.target.value as DealCategory);
     };
 
-    const [editorContent, setEditorContent] = React.useState('');
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const [openDate, setOpenDate] = React.useState(null);
-    const [closeDate, setCloseDate] = React.useState(null);
+    const handleStatusChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedStatus(event.target.value as DealStatus);
+    };
 
-    const triggerFileInput = () => {
-        if (fileInputRef.current) {
-            fileInputRef.current.click();
+    const [paymentSchedules, setPaymentSchedules] = useState<PaymentSchedules>([
+        { packageName: "", packageDescription: "" }
+    ]);
+
+    const addSchedule = () => {
+        const newSchedule = { packageName: "", packageDescription: "" };
+        setPaymentSchedules([...paymentSchedules, newSchedule]);
+    };
+
+    const removeSchedule = (index: number) => {
+        if (paymentSchedules.length > 1) {
+            const filteredSchedules = paymentSchedules.filter((_, i) => i !== index);
+            setPaymentSchedules(filteredSchedules);
         }
     };
 
-    const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const files = event.target.files;
-        const maxFileSizeMB = 50;
+    const handleScheduleChange = (event: React.ChangeEvent<HTMLInputElement>, index: number, field: keyof PaymentSchedule) => {
+        const newSchedules = [...paymentSchedules];
+        newSchedules[index][field] = event.target.value as never;
+        setPaymentSchedules(newSchedules);
+    };
 
-        if (files) {
-            for (const file of Array.from(files)) {
-                if (file.size <= maxFileSizeMB * 1024 * 1024) {
-                    displayFileBadge(file);
-                } else {
-                    alert(`File ${file.name} exceeds the maximum allowed size of ${maxFileSizeMB} MB.`);
-                }
+    const onSubmit = async (event: any) => {
+        event.preventDefault();
+        try {
+            const formattedDealStart = dealStart ? dealStart.getTime() : null;
+            const formattedDealEnd = dealEnd ? dealEnd.getTime() : null;
+            const supportingDocuments = uploadedDocuments.map((file, index) => ({
+                id: index, 
+                name: file.name,
+            }));
+            const picture = uploadedPictures.map((file, index) => ({
+                id: index, 
+                name: file.name,
+            }));
+
+            const deal = {
+                ...event,
+                name: dealData.dealName,
+                dealType: dealData.dealType === "Buyer" ? { "Buyer": null } : { "Seller": null },
+                description: editorContent,
+                status: { "Pending": null },
+                dealCategory: { "NFT": null },
+                dealTimeline: [{
+                    dealStart: formattedDealStart,
+                    dealEnd: formattedDealEnd
+                }], deliverables: [],
+                to: Principal.fromText(recipientPrincipal),
+                picture: picture,
+                supportingDocuments: supportingDocuments,
+                paymentScheduleInfo: paymentSchedules.map(schedule => ({
+                    ...schedule,
+                    packageName: schedule.packageName,
+                    description: schedule.packageDescription,
+                })),
+                initiator: Principal.fromText(principal),
+                acceptor: Principal.fromText(recipientPrincipal),
+                from: Principal.fromText(principal),
+                amount: amount,
+                sellerCancelRequest: false,
+                buyerCancelRequest: false,
+            };
+            console.log("Submitting with recipient principal: ", recipientPrincipal);
+            console.log("Deal data being submitted: ", deal);
+            console.log('uploadedPictures:', uploadedPictures);
+            console.log('picture:', picture);
+
+            const response = await backend.createDeal(deal);
+
+            if (response) {
+                onNext();
+            } else {
+                console.error('Failed to create deal');
+            }
+        } catch (error) {
+            console.error('Failed to create deal', error);
+        }
+    };
+
+    const triggerPictureInput = () => {
+        if (pictureInputRef.current) {
+            pictureInputRef.current.click();
+        }
+    };
+
+    const triggerDocumentInput = () => {
+        if (documentInputRef.current) {
+            documentInputRef.current.click();
+        }
+    };
+
+    const handlePictureSelect = async (event: any) => {
+        const file = event.target.files[0];
+        if (file) {
+            const binaryData = await file.arrayBuffer();
+            const pictureBinary = new Uint8Array(binaryData);
+            await uploadPicture(pictureBinary);
+            setUploadedPictures([...uploadedPictures, file]);
+        }
+        displayPictureBadge(file);
+    };
+
+    const handleDocumentSelect = async (event: any) => {
+        const files = event.target.files;
+        console.log("Files:", files);
+        if (files.length > 0) {
+            for (const file of files) {
+                const binaryData = await file.arrayBuffer();
+                const documentBinary = new Uint8Array(binaryData);
+                await uploadSupportingDocument(documentBinary);
+                setUploadedDocuments([...uploadedDocuments, file]);
             }
         }
+        displayDocumentBadge(files[0]);
     };
 
-    const displayFileBadge = (file: File) => {
+    const uploadPicture = async (binaryFile: any) => {
+        try {
+            const response = await backend.uploadPicture(binaryFile);
+            console.log("Picture uploaded:", response);
+        } catch (error) {
+            console.error("Failed to upload picture:", error);
+        }
+    };
+
+    const uploadSupportingDocument = async (binaryFile: any) => {
+        try {
+            const response = await backend.uploadSupportingDocument(binaryFile);
+            console.log("Document uploaded:", response);
+        } catch (error) {
+            console.error("Failed to upload document:", error);
+        }
+    };
+
+    const displayPictureBadge = (file: File) => {
         const badgeContainer = document.getElementById('fileDropArea');
         if (badgeContainer) {
             const badge = document.createElement('span');
@@ -51,74 +191,85 @@ type CreateDealProps = {
             badge.textContent = file.name;
             badgeContainer.appendChild(badge);
         }
+    };
 
-        const badgeContainer2 = document.getElementById('fileDropArea2');
-        if (badgeContainer2) {
+    const displayDocumentBadge = (file: File) => {
+        const badgeContainer = document.getElementById('fileDropArea2');
+        if (badgeContainer) {
             const badge = document.createElement('span');
             badge.className = 'file-badge';
             badge.textContent = file.name;
-            badgeContainer2.appendChild(badge);
+            badgeContainer.appendChild(badge);
         }
     };
 
-    const handleEditorChange = (content : any) => {
+    const handleEditorChange = (content: string) => {
         setEditorContent(content);
-    };
+    }
+
+    useEffect(() => {
+        const fetchPrincipal = async () => {
+            const storedPrincipal = await localForage.getItem<string | null>('principal');
+            if (storedPrincipal) {
+                setPrincipal(storedPrincipal);
+            }
+        };
+    
+        fetchPrincipal();
+    }, []);
 
     return (
-    <div className="card p-5 mx-auto my-5 mb-5" style={{width: '75%'}}>
-        <div className="card-body text-center">
-            
-            <CreateDealProgressBar currentStep={2} />
-            
-            <form className="mt-5" onSubmit={handleSubmit}>
-                <div className="mb-3">
-                    <div className="form-row col-md-9 text-start mx-auto">
-                        <label htmlFor="projectName" className="form-label text-start">Upload Pictures</label>
-                        <br/>
-                        <label htmlFor="projectName" className="form-label text-start">Recommended size 1500 x 600 (px)</label>
-                        <br/>
+        <div className="card p-5 mx-auto my-5 mb-5" style={{ width: '75%' }}>
+            <div className="card-body text-center">
+                <CreateDealProgressBar currentStep={2} />
+                <form className="mt-5" onSubmit={onSubmit}>
+                    <div className="mb-3">
+                        <div className="form-row col-md-9 text-start mx-auto">
+                            <label htmlFor="projectName" className="form-label text-start">Upload Pictures</label>
+                            <br />
+                            <label htmlFor="projectName" className="form-label text-start">Recommended size 1500 x 600 (px)</label>
+                            <br />
 
-                        <div className="file-drop-area" id="fileDropArea" onClick={triggerFileInput}>
-                            <p>Click here or drag and drop files to upload</p>
-                            <p>Max File Size: 50 MB</p>
-                        <input type="file" id="fileInput" multiple style={{ display: 'none' }} onChange={handleFileSelect} ref={fileInputRef}/>
+                            <div className="file-drop-area" id="fileDropArea" onClick={triggerPictureInput}>
+                                <p>Click here or drag and drop files to upload</p>
+                                <p>Max File Size: 50 MB</p>
+                                <input type="file" id="pictureInput" style={{ display: 'none' }} onChange={handlePictureSelect} ref={pictureInputRef} />
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div className="mb-3">
-                    <div className="form-row col-md-9 text-start mx-auto">
-                        <label htmlFor="deal-description" className="form-label text-start">Deal Description</label>
-                        {/* <textarea id="editor" className="form-control"></textarea> */}
-                        <Editor
-                            initialValue=""
-                            value={editorContent}
-                            init={{
-                                height: 250,
-                                menubar: false,
-                                plugins: ['paste', 'link'],
-                                toolbar: 'undo redo | bold italic | paste link',
-                            }}
-                            onEditorChange={handleEditorChange}
+                    <div className="mb-3">
+                        <div className="form-row col-md-9 text-start mx-auto">
+                            <label htmlFor="deal-description" className="form-label text-start">Deal Description</label>
+                            <MyEditor
+                                initialValue=""
+                                value={editorContent}
+                                onEditorChange={handleEditorChange}
                             />
+                        </div>
                     </div>
-                </div>
 
-                <div className="mb-3">
-                    <div className='form-row col-md-9 text-start mx-auto'>
+                    <div className="mb-3">
+                        <div className='form-row col-md-9 text-start mx-auto'>
                             <label htmlFor="deal-category" className='form-label text-start'>Deal Category</label>
-                            <br/>
-                            <span className='badge badge-green'>Services</span>
-                            <br/>
-                            <span className='badge badge-grey mt-3 me-2'>Physical Product</span>
-                            <span className='badge badge-grey me-2'>Digital Products</span>
-                            <span className='badge badge-grey me-2'>Domain Name</span>
-                            <span className='badge badge-grey me-2'>NFT</span>
-                            <span className='badge badge-grey me-2'>Tokens</span>
-
+                            <select id="deal-category" className="form-control" onChange={handleCategoryChange}>
+                                {Object.values(DealCategory).map((category, index) => (
+                                    <option key={index} value={category}>{category}</option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
-                </div>
+
+                    <div className="mb-3">
+                        <div className='form-row col-md-9 text-start mx-auto'>
+                            <label htmlFor="deal-status" className='form-label text-start'>Deal Status</label>
+                            <select id="deal-status" className="form-control" onChange={handleStatusChange}>
+                                {Object.values(DealStatus).map((status, index) => (
+                                    <option key={index} value={status}>{selectedStatus}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
 
                     <div className="mb-3">
                         <div className="form-row col-md-9 text-start mx-auto">
@@ -132,8 +283,8 @@ type CreateDealProps = {
                                     </label>
                                     <div className="input-group">
                                         <DatePicker
-                                            selected={openDate}
-                                            onChange={(date : any) => setOpenDate(date)}
+                                            selected={dealStart}
+                                            onChange={(date: any) => setOpenDate(date)}
                                             dateFormat="MMMM d, yyyy"
                                             className="form-control"
                                         />
@@ -145,8 +296,8 @@ type CreateDealProps = {
                                     </label>
                                     <div className="input-group">
                                         <DatePicker
-                                            selected={closeDate}
-                                            onChange={(date : any) => setCloseDate(date)}
+                                            selected={dealEnd}
+                                            onChange={(date: any) => setCloseDate(date)}
                                             dateFormat="MMMM d, yyyy h:mm aa"
                                             className="form-control"
                                         />
@@ -159,11 +310,11 @@ type CreateDealProps = {
                     <div className="mb-3">
                         <div className="form-row col-md-9 text-start mx-auto">
                             <label htmlFor="projectName" className="form-label text-start">Supporting Documents</label>
-                            <br/>
+                            <br />
 
-                            <div className="file-drop-area-2" id="fileDropArea2" onClick={triggerFileInput}>
+                            <div className="file-drop-area-2" id="fileDropArea2" onClick={triggerDocumentInput}>
                                 <p>Click here or drag and drop files to upload</p>
-                            <input type="file" id="fileInput" multiple style={{ display: 'none' }} onChange={handleFileSelect} ref={fileInputRef}/>
+                                <input type="file" id="documentInput" multiple style={{ display: 'none' }} onChange={handleDocumentSelect} ref={documentInputRef} />
                             </div>
                         </div>
                     </div>
@@ -171,30 +322,74 @@ type CreateDealProps = {
                     <div className="mb-3">
                         <div className="form-row col-md-9 text-start mx-auto">
                             <label htmlFor="projectName" className="form-label text-start">Payment Schedule Information</label>
-                            <br/>
+                            <br />
                             <div className="border rounded py-3 px-3">
                                 <label htmlFor="projectName" className="h6 form-label text-start">Payment Schedule 1</label>
                                 <br />
-                                <label htmlFor="projectName" className="form-label text-start mt-3">Package Name</label>
-                                <input type="text" className="form-control deal-name-text" placeholder="Deposit"/>
+                                {paymentSchedules.map((schedule, index) => (
+                                    <div key={index} className="border rounded py-3 px-3 mb-3">
+                                        <div className="form-group">
+                                            {/* Package Name */}
+                                            <label htmlFor={`packageName-${index}`} className="form-label text-start mt-3">Package Name</label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                id="packageName"
+                                                placeholder="Package Name"
+                                                value={schedule.packageName}
+                                                onChange={e => handleScheduleChange(e, index, 'packageName')}
+                                            />
 
-                                <label htmlFor="projectName" className="form-label text-start mt-3">Description</label>
-                                <input type="text" className="form-control deal-name-text" placeholder="150"/>
+                                            {/* Description */}
+                                            <label htmlFor={`description-${index}`} className="form-label text-start mt-3">Description</label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                id="description"
+                                                placeholder="Description"
+                                                value={schedule.packageDescription}
+                                                onChange={e => handleScheduleChange(e, index, 'packageDescription')}
+                                            />
 
-                                <label htmlFor="projectName" className="form-label text-start mt-3">Total Token</label>
-                                <input type="text" className="form-control deal-name-text" placeholder="1000"/>
+                                            {/* To */}
+                                            <label htmlFor={`to-${index}`} className="form-label text-start mt-3">To</label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                id="recipientPrincipal"
+                                                placeholder="Enter recipient Principal ID"
+                                                value={recipientPrincipal}
+                                                onChange={(e) => setRecipientPrincipal(e.target.value)}
+                                            />
 
-                                <button type="button" className="btn mx-auto col-md-12 remove-payment-btn mt-4">Remove Payment Schedule</button>
+                                            {/* Total Token */}
+                                            <label htmlFor={`amount-${index}`} className="form-label text-start mt-3">Total Token</label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                id="amount"
+                                                placeholder="Total Token"
+                                                value={amount}
+                                                onChange={e => setAmount(parseInt(e.target.value))}
+                                            />
+
+                                            {/* Remove Button */}
+                                            <button type="button" className="btn remove-payment-btn mt-4" onClick={() => removeSchedule(index)}>Remove Payment Schedule</button>
+                                        </div>
+                                    </div>
+                                ))}
+                                {/* Button to add more schedules */}
+                                <button type="button" className="btn add-payment-btn mt-4" onClick={addSchedule}>Add More Schedules</button>
                             </div>
                         </div>
                     </div>
-                
-                
-                <button type="submit" className="btn mx-auto col-md-9 submit-deal-btn mt-3">Create Deal</button>
-            </form>
 
+
+                    <button type="submit" className="btn mx-auto col-md-9 submit-deal-btn mt-3">Create Deal</button>
+                </form>
+
+            </div>
         </div>
-    </div>
     )
 }
 

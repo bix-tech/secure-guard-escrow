@@ -10,12 +10,17 @@ import Array "mo:base/Array";
 import Float "mo:base/Float";
 import Bool "mo:base/Bool";
 import Iter "mo:base/Iter";
+import Blob "mo:base/Blob";
 import Account "account";
 import Wallet "wallet";
 import Deal "deal";
 
 actor {
   public type Result<A, B> = Result.Result<A, B>;
+
+  var pictures : HashMap.HashMap<Nat, Blob> = HashMap.HashMap(10, Nat.equal, Hash.hash);
+
+  var documents : HashMap.HashMap<Nat, Blob> = HashMap.HashMap(10, Nat.equal, Hash.hash);
 
   let ledger : TrieMap.TrieMap<Account.Account, Nat> = TrieMap.TrieMap(Account.accountsEqual, Account.accountsHash);
 
@@ -70,7 +75,6 @@ actor {
   public type PaymentScheduleInfo = {
     packageName : Text;
     packageDescription : Text;
-    packagePrice : Nat;
   };
 
   public type DealCategory = {
@@ -82,13 +86,19 @@ actor {
     #Tokens;
   };
 
+  public type FileReference = {
+    id : Nat;
+    name : Text;
+  };
+
   public type Deal = {
     status : DealStatus;
     name : Text;
     from : Principal; //buyer
     to : Principal; //seller
     amount : Nat;
-    picture : Text;
+    picture : [FileReference];
+    supportingDocuments : [FileReference];
     description : Text;
     dealCategory : DealCategory;
     dealType : User;
@@ -142,12 +152,32 @@ actor {
     return true;
   };
 
+  public func uploadPicture( blob : Blob) : async Nat {
+    let id = pictures.size();
+     pictures.put(id, blob);
+    return id;
+  };
+
+  public func uploadSupportingDocument(blob : Blob) : async Nat {
+    let id = documents.size();
+    documents.put(id, blob);
+    return id;
+  };
+
+  public func getPicture(fileRef : FileReference) : async ?Blob {
+    return pictures.get(fileRef.id);
+  };
+
+  public func getSupportingDocument(fileRef : FileReference) : async ?Blob {
+    return documents.get(fileRef.id);
+  };
+
   public shared ({ caller }) func createDeal(newDeal : Deal) : async Deal.createDealResult {
     let dealToCreate = {
       id = nextDealId;
       status = newDeal.status;
       name = newDeal.name;
-      from = newDeal.from;
+      from = caller;
       to = newDeal.to;
       amount = newDeal.amount;
       picture = newDeal.picture;
@@ -157,6 +187,7 @@ actor {
       paymentScheduleInfo = [];
       dealTimeline = [];
       deliverables = [];
+      supportingDocuments = newDeal.supportingDocuments;
       buyerCancelRequest = false;
       sellerCancelRequest = false;
       initiator = caller;
@@ -294,6 +325,7 @@ actor {
               description = deal.description;
               dealCategory = deal.dealCategory;
               dealType = deal.dealType;
+              supportingDocuments = deal.supportingDocuments;
               paymentScheduleInfo = deal.paymentScheduleInfo;
               dealTimeline = deal.dealTimeline;
               deliverables = deal.deliverables;
@@ -335,6 +367,7 @@ actor {
           paymentScheduleInfo = deal.paymentScheduleInfo;
           dealTimeline = deal.dealTimeline;
           deliverables = updatedDeliverables;
+          supportingDocuments = deal.supportingDocuments;
           buyerCancelRequest = deal.buyerCancelRequest;
           sellerCancelRequest = deal.sellerCancelRequest;
           initiator = deal.initiator;
@@ -369,6 +402,7 @@ actor {
           dealCategory = deal.dealCategory;
           dealType = deal.dealType;
           paymentScheduleInfo = deal.paymentScheduleInfo;
+          supportingDocuments = deal.supportingDocuments;
           dealTimeline = deal.dealTimeline;
           deliverables = deal.deliverables;
           buyerCancelRequest = if (isBuyer) { true } else {
@@ -415,6 +449,7 @@ actor {
             paymentScheduleInfo = deal.paymentScheduleInfo;
             dealTimeline = deal.dealTimeline;
             deliverables = deal.deliverables;
+            supportingDocuments = deal.supportingDocuments;
             buyerCancelRequest = false;
             sellerCancelRequest = false;
             initiator = deal.initiator;
@@ -429,7 +464,7 @@ actor {
       };
     };
   };
-  
+
   public func getActivityLogsForUser(user : Principal) : async [ActivityLog] {
     let allLogs = Array.flatten(Iter.toArray(activityLogs.vals()));
     return Array.filter(
@@ -472,25 +507,25 @@ actor {
     };
 
     let additionalLog = {
-    dealId = newLog.dealId;
-    description = newLog.description;
-    activityType = newLog.activityType;
-    amount = newLog.amount;
-    status = newLog.status;
-    activityTime = Time.now();
-    user = additionalUser; 
-  };
-
-  let existingAdditionalLogs = switch (activityLogs.get(additionalLog.dealId)) {
-    case (null) {
-      [];
+      dealId = newLog.dealId;
+      description = newLog.description;
+      activityType = newLog.activityType;
+      amount = newLog.amount;
+      status = newLog.status;
+      activityTime = Time.now();
+      user = additionalUser;
     };
-    case (?logs) {
-      logs;
-    };
-  };
 
-  activityLogs.put(additionalLog.dealId, Array.append(existingAdditionalLogs, [additionalLog]));
+    let existingAdditionalLogs = switch (activityLogs.get(additionalLog.dealId)) {
+      case (null) {
+        [];
+      };
+      case (?logs) {
+        logs;
+      };
+    };
+
+    activityLogs.put(additionalLog.dealId, Array.append(existingAdditionalLogs, [additionalLog]));
   };
 
   public func mintTokens(principal : Principal, amount : Nat) : async () {

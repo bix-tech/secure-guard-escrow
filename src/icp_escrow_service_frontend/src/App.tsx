@@ -16,15 +16,15 @@ import localforage from 'localforage';
 import CreateDealStep1 from './pages/deal/CreateDealStep1';
 import CreateDealStep2 from './pages/deal/CreateDealStep2';
 import CreateDealStep3 from './pages/deal/CreateDealStep3';
-
+import { DealDataProvider } from './contexts/DealContext';
 
 const NavbarWrapper = () => {
   const location = useLocation();
 
-  useEffect(()=> {
+  useEffect(() => {
     localforage.setItem('lastVisitedRoute', location.pathname);
   }, [location]);
-  
+
   if (location.pathname === "/") {
     return null;
   }
@@ -32,44 +32,48 @@ const NavbarWrapper = () => {
   return <Navbar />;
 };
 
-const CreateStep1 = ({ onNext }: { onNext: string }) => {
-  const navigate = useNavigate();
-
-  const handleNext = () => {
-    navigate(onNext);
-  };
-
-  return <CreateDealStep1 onNext={handleNext} />;
-};
-
-const CreateStep2 = ({ onNext }: { onNext: string }) => {
-  const navigate = useNavigate();
-
-  const handleNext = () => {
-    navigate(onNext);
-  };
-
-  return <CreateDealStep2 onNext={handleNext} />;
-};
 
 function App() {
+  const [dealDetails, setDealDetails] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const auth = useAuth();
   const isAuthenticated = auth ? auth.isAuthenticated : false;
 
-  useEffect(() => {
-    const checkAuthentication = async () => {
-      setIsLoading(false);  
+  const CreateStep1 = ({ onNext, onFormSubmit }: { onNext: string, onFormSubmit: (data: any) => void }) => {
+    const navigate = useNavigate();
+
+    const handleNext = () => {
+      onFormSubmit(dealDetails);
+      navigate(onNext);
     };
-  
-    checkAuthentication();
-  }, []);
-  
+
+    return <CreateDealStep1 onNext={handleNext} />;
+  };
+
+  const CreateStep2 = ({ onNext, onFormSubmit }: { onNext: string, onFormSubmit: (data: any) => void }) => {
+    const navigate = useNavigate();
+
+    const handleNext = () => {
+      onFormSubmit(dealDetails);
+      navigate(onNext);
+    };
+
+    return <CreateDealStep2 onNext={handleNext} />;
+  };
 
   useEffect(() => {
-    console.log(isAuthenticated); 
+    const checkAuthentication = async () => {
+      setIsLoading(false);
+    };
+
+    checkAuthentication();
+  }, []);
+
+
+  useEffect(() => {
+    console.log(isAuthenticated);
   }, [isAuthenticated]);
-  
+
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -77,20 +81,23 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <NavbarWrapper />
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/deal-overview" element={<ProtectedRoute><DealOverview /></ProtectedRoute>} />
-          <Route path="/deal/CreateDealSuccessful" element={<ProtectedRoute><CreateDealSuccessful /></ProtectedRoute>} />
-          <Route path="/deal/seller/WaitingBuyerLockToken" element={<ProtectedRoute><WaitingBuyerLockToken/></ProtectedRoute>} />
-          <Route path="/deal/seller/CreateDeal" element={<ProtectedRoute><CreateDeal/></ProtectedRoute>} />
-          <Route path="/deal/buyer/LockToken" element={<ProtectedRoute><LockToken/></ProtectedRoute>} />
-          <Route path="/createDealStep1" element={<ProtectedRoute><CreateStep1 onNext='/createDealStep2' /></ProtectedRoute>} />
-          <Route path="/createDealStep2" element={<ProtectedRoute><CreateStep2 onNext='/createDealStep3' /></ProtectedRoute>} />
-          <Route path="/createDealStep3" element={<ProtectedRoute><CreateDealStep3 /></ProtectedRoute>} />
+        <DealDataProvider>
+          <NavbarWrapper />
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/deal-overview" element={<ProtectedRoute><DealOverview /></ProtectedRoute>} />
+            <Route path="/deal/CreateDealSuccessful" element={<ProtectedRoute><CreateDealSuccessful /></ProtectedRoute>} />
+            <Route path="/deal/seller/WaitingBuyerLockToken" element={<ProtectedRoute><WaitingBuyerLockToken /></ProtectedRoute>} />
+            <Route path="/deal/seller/CreateDeal" element={<ProtectedRoute><CreateDeal /></ProtectedRoute>} />
+            <Route path="/deal/buyer/LockToken" element={<ProtectedRoute><LockToken /></ProtectedRoute>} />
+            <Route path="/createDealStep1" element={<ProtectedRoute><CreateStep1 onNext='/createDealStep2' onFormSubmit={setDealDetails} /></ProtectedRoute>} />
+            <Route path="/createDealStep2" element={<ProtectedRoute><CreateStep2 onNext='/createDealStep3' onFormSubmit={setDealDetails} /></ProtectedRoute>} />
+            <Route path="/createDealStep3" element={<ProtectedRoute><CreateDealStep3 /></ProtectedRoute>} />
 
-        </Routes>
+          </Routes>
+        </DealDataProvider>
+
       </AuthProvider>
     </Router>
   );
