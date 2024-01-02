@@ -11,6 +11,7 @@ import Float "mo:base/Float";
 import Bool "mo:base/Bool";
 import Iter "mo:base/Iter";
 import Blob "mo:base/Blob";
+import Debug "mo:base/Debug";
 import Account "account";
 import Wallet "wallet";
 import Deal "deal";
@@ -21,6 +22,8 @@ actor {
   var pictures : HashMap.HashMap<Nat, Blob> = HashMap.HashMap(10, Nat.equal, Hash.hash);
 
   var documents : HashMap.HashMap<Nat, Blob> = HashMap.HashMap(10, Nat.equal, Hash.hash);
+
+  var deliverableDocuments : HashMap.HashMap<Nat, Blob> = HashMap.HashMap(10, Nat.equal, Hash.hash);
 
   let ledger : TrieMap.TrieMap<Account.Account, Nat> = TrieMap.TrieMap(Account.accountsEqual, Account.accountsHash);
 
@@ -42,14 +45,6 @@ actor {
     dealId : Nat;
     message : Text;
   };
-  public type DealStatus = {
-    #Pending;
-    #InProgress;
-    #SubmittedDeliverables;
-    #Completed;
-    #Cancelled;
-  };
-
   public type DealFee = {
     percent : Float;
   };
@@ -60,9 +55,9 @@ actor {
   };
 
   public type Deliverable = {
-    deliverableId : Nat;
+    id : Nat;
     deliverableDescription : Text;
-    deliverablePicture : Text;
+    deliverablePicture : [FileReference];
   };
 
   type Time = Int;
@@ -86,6 +81,7 @@ actor {
     #Tokens;
   };
 
+  public type DealStatus = Text;
   public type FileReference = {
     id : Nat;
     name : Text;
@@ -94,8 +90,8 @@ actor {
   public type Deal = {
     status : DealStatus;
     name : Text;
-    from : Principal; //buyer
-    to : Principal; //seller
+    from : Principal;
+    to : Principal;
     amount : Nat;
     picture : [FileReference];
     supportingDocuments : [FileReference];
@@ -152,15 +148,21 @@ actor {
     return true;
   };
 
-  public func uploadPicture( blob : Blob) : async Nat {
+  public func uploadPicture(blob : Blob) : async Nat {
     let id = pictures.size();
-     pictures.put(id, blob);
+    pictures.put(id, blob);
     return id;
   };
 
   public func uploadSupportingDocument(blob : Blob) : async Nat {
     let id = documents.size();
     documents.put(id, blob);
+    return id;
+  };
+
+  public func uploadDeliverableDocument(blob : Blob) : async Nat {
+    let id = documents.size();
+    deliverableDocuments.put(id, blob);
     return id;
   };
 
@@ -172,12 +174,16 @@ actor {
     return documents.get(fileRef.id);
   };
 
+  public func getDeliverableDocument(fileRef : FileReference) : async ?Blob {
+    return deliverableDocuments.get(fileRef.id);
+  };
+
   public shared ({ caller }) func createDeal(newDeal : Deal) : async Deal.createDealResult {
     let dealToCreate = {
       id = nextDealId;
       status = newDeal.status;
       name = newDeal.name;
-      from = caller;
+      from = newDeal.from;
       to = newDeal.to;
       amount = newDeal.amount;
       picture = newDeal.picture;
@@ -193,8 +199,6 @@ actor {
       initiator = caller;
       acceptor = newDeal.to;
     };
-
-    deals.put(nextDealId, dealToCreate);
 
     let buyerLog = {
       dealId = nextDealId;
@@ -219,9 +223,11 @@ actor {
     await createActivityLog(buyerLog, newDeal.to);
     await createActivityLog(sellerLog, newDeal.from);
 
+    deals.put(nextDealId, dealToCreate);
+
     nextDealId += 1;
 
-    addNotification(newDeal.to, { dealId = nextDealId; message = "You have a new deal" });
+    addNotification(newDeal.to, { dealId = nextDealId - 1; message = "You have a new deal" });
 
     return #ok(#CreateDealOk);
   };
@@ -262,7 +268,7 @@ actor {
     return lockedTokens.get(defaultAccount);
   };
 
-  public shared ({ caller }) func lockToken(principal : Principal, amount : Nat) : async Wallet.LockTokenResult {
+  public shared ({ caller }) func lockToken(principal : Principal, amount : Nat, dealId : Nat) : async Wallet.LockTokenResult {
     let buyerAccount = { owner = principal; subaccount = null };
     let balance = ledger.get(buyerAccount);
 
@@ -276,7 +282,76 @@ actor {
         } else {
           ledger.put(buyerAccount, balance - amount);
           lockedTokens.put(buyerAccount, amount);
-          return #TokenLocked;
+
+          let dealOpt = deals.get(dealId);
+          switch (dealOpt) {
+            case (null) {
+              ledger.put(buyerAccount, balance);
+              let _ = lockedTokens.remove(buyerAccount);
+              return #TokenNotLocked;
+            };
+            case (?deal) {
+              if (principal != deal.to) {
+                ledger.put(buyerAccount, balance);
+                let _ = lockedTokens.remove(buyerAccount);
+                return #NotAuthorized;
+              };
+
+              if (deal.status != "Pending") {
+                ledger.put(buyerAccount, balance);
+                let _ = lockedTokens.remove(buyerAccount);
+                return #DealNotPending;
+              };
+
+              let updatedDeal = {
+                status = "InProgress";
+                name = deal.name;
+                from = deal.from;
+                to = deal.to;
+                amount = deal.amount;
+                picture = deal.picture;
+                description = deal.description;
+                dealCategory = deal.dealCategory;
+                dealType = deal.dealType;
+                paymentScheduleInfo = deal.paymentScheduleInfo;
+                dealTimeline = deal.dealTimeline;
+                deliverables = deal.deliverables;
+                supportingDocuments = deal.supportingDocuments;
+                buyerCancelRequest = deal.buyerCancelRequest;
+                sellerCancelRequest = deal.sellerCancelRequest;
+                initiator = deal.initiator;
+                acceptor = deal.acceptor;
+              };
+
+              let buyerLog = {
+                dealId = dealId;
+                description = "Deal in progress";
+                activityType = "DealInProgress";
+                status = "InProgress";
+                amount = deal.amount;
+                activityTime = Time.now();
+                user = deal.from;
+              };
+
+              let sellerLog = {
+                dealId = dealId;
+                description = "Deal in progress";
+                activityType = "DealInProgress";
+                status = "InProgress";
+                amount = deal.amount;
+                activityTime = Time.now();
+                user = deal.to;
+              };
+
+              await createActivityLog(buyerLog, deal.to);
+              await createActivityLog(sellerLog, deal.from);
+
+              addNotification(updatedDeal.from, { dealId = nextDealId - 1; message = "Buyer locked token, you can submit deliverables now." });
+
+              deals.put(dealId, updatedDeal);
+              return #TokenLocked;
+            };
+          };
         };
       };
     };
@@ -293,7 +368,7 @@ actor {
         if (caller != deal.acceptor) {
           return #err("Only the buyer can confirm the deal");
         };
-        if (deal.status != #SubmittedDeliverables) {
+        if (deal.status != "SubmittedDeliverables") {
           return #err("Deal is not in a state that can be confirmed");
         };
 
@@ -316,7 +391,7 @@ actor {
             let _ = lockedTokens.remove(buyerAccount);
 
             let updatedDeal = {
-              status = #Completed;
+              status = "Completed";
               name = deal.name;
               from = deal.from;
               to = deal.to;
@@ -344,7 +419,7 @@ actor {
     };
   };
 
-  public shared ({ caller }) func addDeliverablesToDeal(dealId : Nat, newDeliverable : Deliverable) : async Result<(), Text> {
+  public shared ({ caller }) func addDeliverablesToDeal(dealId : Nat, newDeliverable : Deliverable) : async Result<Nat, Text> {
     let dealOpt = deals.get(dealId);
 
     switch (dealOpt) {
@@ -355,7 +430,7 @@ actor {
         let updatedDeliverables = Array.append(deal.deliverables, [newDeliverable]);
 
         let updatedDeal = {
-          status = deal.status;
+          status = "SubmittedDeliverables";
           name = deal.name;
           from = deal.from;
           to = deal.to;
@@ -374,8 +449,33 @@ actor {
           acceptor = deal.acceptor;
         };
 
+        let buyerLog = {
+          dealId = dealId;
+          description = "Seller submitted deliverables,";
+          activityType = "SubmittedDeliverables";
+          status = "InProgress";
+          amount = deal.amount;
+          activityTime = Time.now();
+          user = deal.from;
+        };
+
+        let sellerLog = {
+          dealId = dealId;
+          description = "You submitted deliverables.";
+          activityType = "DealInProgress";
+          status = "InProgress";
+          amount = deal.amount;
+          activityTime = Time.now();
+          user = deal.to;
+        };
+
+        await createActivityLog(buyerLog, deal.to);
+        await createActivityLog(sellerLog, deal.from);
+
+        addNotification(updatedDeal.to, { dealId = nextDealId - 1; message = "Seller submitted deliverables. Please check and confirm the deal if everything is" });
+
         deals.put(dealId, updatedDeal);
-        return #ok(());
+        return #ok(dealId);
       };
     };
   };
@@ -437,7 +537,7 @@ actor {
           };
 
           let finalDeal = {
-            status = #Cancelled;
+            status = "Cancelled";
             name = deal.name;
             from = deal.from;
             to = deal.to;

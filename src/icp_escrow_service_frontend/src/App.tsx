@@ -1,10 +1,7 @@
 import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Login from '../src/pages/Login';
 import Dashboard from './pages/Dashboard';
-import CreateDealSuccessful from './pages/deal/CreateDealStep3';
 import WaitingBuyerLockToken from './pages/deal/seller/WaitingBuyerLockToken';
-import CreateDeal from './pages/deal/seller/SubmitDeliverables';
-import LockToken from './pages/deal/buyer/InitiateDealLockToken';
 import Navbar from './components/Navbar';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -17,6 +14,10 @@ import CreateDealStep1 from './pages/deal/CreateDealStep1';
 import CreateDealStep2 from './pages/deal/CreateDealStep2';
 import CreateDealStep3 from './pages/deal/CreateDealStep3';
 import { DealDataProvider } from './contexts/DealContext';
+import InitiateDealLockToken from './pages/deal/buyer/InitiateDealLockToken';
+import SubmitDeliverables from './pages/deal/seller/SubmitDeliverables';
+import LockTokenSuccessfully from './pages/deal/buyer/LockTokenSuccessfully';
+import SubmitDeliverablesSuccessfully from './pages/deal/seller/SubmitDeliverablesSuccessfully';
 
 const NavbarWrapper = () => {
   const location = useLocation();
@@ -87,17 +88,17 @@ function App() {
             <Route path="/" element={<Login />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/deal-overview/:dealId" element={<ProtectedRoute><DealOverview /></ProtectedRoute>} />
-            <Route path="/deal/CreateDealSuccessful" element={<ProtectedRoute><CreateDealSuccessful /></ProtectedRoute>} />
-            <Route path="/deal/seller/WaitingBuyerLockToken" element={<ProtectedRoute><WaitingBuyerLockToken /></ProtectedRoute>} />
-            <Route path="/deal/seller/CreateDeal" element={<ProtectedRoute><CreateDeal /></ProtectedRoute>} />
-            <Route path="/deal/buyer/LockToken" element={<ProtectedRoute><LockToken /></ProtectedRoute>} />
             <Route path="/createDealStep1" element={<ProtectedRoute><CreateStep1 onNext='/createDealStep2' onFormSubmit={setDealDetails} /></ProtectedRoute>} />
             <Route path="/createDealStep2" element={<ProtectedRoute><CreateStep2 onNext='/createDealStep3' onFormSubmit={setDealDetails} /></ProtectedRoute>} />
             <Route path="/createDealStep3" element={<ProtectedRoute><CreateDealStep3 /></ProtectedRoute>} />
+            <Route path="/deal/seller/waiting-buyer/:dealId" element={<ProtectedRoute><WaitingBuyerLockToken /></ProtectedRoute>} />
+            <Route path="/deal/buyer/lock-token/:dealId" element={<ProtectedRoute><InitiateDealLockToken /></ProtectedRoute>} />
+            <Route path="/deal/buyer/lock-successfully/:dealId" element={<ProtectedRoute><LockTokenSuccessfully /></ProtectedRoute>} />
+            <Route path="/deal/seller/submit-deliverables/:dealId" element={<ProtectedRoute><SubmitDeliverables /></ProtectedRoute>} />
+            <Route path="/deal/seller/submit-deliverables-successfully/:dealId" element={<ProtectedRoute><SubmitDeliverablesSuccessfully /></ProtectedRoute>} />
 
           </Routes>
         </DealDataProvider>
-
       </AuthProvider>
     </Router>
   );

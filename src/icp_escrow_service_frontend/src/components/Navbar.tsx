@@ -9,6 +9,7 @@ import localForage from "localforage";
 import { FaCopy } from 'react-icons/fa';
 import { Principal } from '@dfinity/principal';
 import { backend } from "../../../declarations/backend";
+import { usePrincipal } from '../hooks/usePrincipal';
 
 type Notification = {
     dealId: bigint;
@@ -18,8 +19,8 @@ type Notification = {
 const Navbar = () => {
     const { logout } = useAuth();
     const navigate = useNavigate();
+    const principal = usePrincipal();
     const [authClient, setAuthClient] = useState<AuthClient | null>(null);
-    const [principal, setPrincipal] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [showNotification, setShowNotification] = useState(false);
@@ -66,14 +67,10 @@ const Navbar = () => {
         initAuth();
     }, []);
 
-    useEffect(() => {
-        const fetchPrincipal = async () => {
-            const storedPrincipal = await localForage.getItem<string | null>('principal');
-            setPrincipal(storedPrincipal);
-        };
 
-        fetchPrincipal();
-    }, []);
+    const handleNotificationClick = (dealId: bigint) => {
+        navigate(`/initiate-deal-lock-token/${dealId}`);
+    };
 
     const handleLogout = async () => {
         try {
@@ -110,7 +107,7 @@ const Navbar = () => {
                             <Dropdown.Item>No notifications</Dropdown.Item>
                         ) : (
                             notifications.map(notification => (
-                                <Dropdown.Item key={notification.dealId.toString()} className="notification-item">
+                                <Dropdown.Item key={notification.dealId.toString()} className="notification-item" onClick={() => handleNotificationClick(notification.dealId)}>
                                     {notification.message}
                                 </Dropdown.Item>
                             ))
@@ -122,7 +119,7 @@ const Navbar = () => {
 
                 <div className="d-flex align-items-center">
                     <div className="avatar me-3">
-                        <img src="src/assets/images/minion.jpeg" alt="User Avatar" />
+                        <img src="/minion.jpeg" alt="User Avatar" />
                     </div>
                     <div>
                         <p className="mb-0">

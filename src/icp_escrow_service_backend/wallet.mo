@@ -12,6 +12,9 @@ module {
         #TokenLocked;
         #InsufficientBalance;
         #TokenReleased : Nat;
+        #TokenNotLocked;
+        #NotAuthorized;
+        #DealNotPending;
     };
 
 };

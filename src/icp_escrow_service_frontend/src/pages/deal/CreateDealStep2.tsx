@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import CreateDealProgressBar from '../../components/CreateDealProgressBar';
@@ -6,7 +6,7 @@ import { backend } from '../../../../declarations/backend';
 import { DealCategory, DealStatus, useDealData } from '../../contexts/DealContext';
 import MyEditor from '../../components/MyEditor';
 import { Principal } from '@dfinity/principal';
-import localForage from 'localforage';
+import { usePrincipal } from '../../hooks/usePrincipal';
 
 type CreateDealProps = {
     onNext: () => void;
@@ -30,8 +30,8 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
     const [selectedCategory, setSelectedCategory] = useState<DealCategory>(DealCategory.NFT);
     const [recipientPrincipal, setRecipientPrincipal] = useState<string>('');
     const [selectedStatus, setSelectedStatus] = useState<DealStatus>(DealStatus.Pending);
-    const [principal, setPrincipal] = useState<string>('');
-    const { dealData } = useDealData();
+    const principal = usePrincipal();
+    const { dealData, setDealData } = useDealData();
     const [amount, setAmount] = useState<number>(0);
     const pictureInputRef = useRef<HTMLInputElement>(null);
     const documentInputRef = useRef<HTMLInputElement>(null);
@@ -90,7 +90,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                 name: dealData.dealName,
                 dealType: dealData.dealType === "Buyer" ? { "Buyer": null } : { "Seller": null },
                 description: editorContent,
-                status: { "Pending": null },
+                status: "Pending",
                 dealCategory: { "NFT": null },
                 dealTimeline: [{
                     dealStart: formattedDealStart,
@@ -104,9 +104,9 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                     packageName: schedule.packageName,
                     description: schedule.packageDescription,
                 })),
-                initiator: Principal.fromText(principal),
+                initiator: Principal.fromText(principal || ''),
                 acceptor: Principal.fromText(recipientPrincipal),
-                from: Principal.fromText(principal),
+                from: Principal.fromText(principal || ''),
                 amount: amount,
                 sellerCancelRequest: false,
                 buyerCancelRequest: false,
@@ -115,10 +115,13 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
             console.log("Deal data being submitted: ", deal);
             console.log('uploadedPictures:', uploadedPictures);
             console.log('picture:', picture);
+            console.log("Creating deal with principal: ", principal); 
+
 
             const response = await backend.createDeal(deal);
 
             if (response) {
+                setDealData(deal);
                 onNext();
             } else {
                 console.error('Failed to create deal');
@@ -207,16 +210,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
         setEditorContent(content);
     }
 
-    useEffect(() => {
-        const fetchPrincipal = async () => {
-            const storedPrincipal = await localForage.getItem<string | null>('principal');
-            if (storedPrincipal) {
-                setPrincipal(storedPrincipal);
-            }
-        };
     
-        fetchPrincipal();
-    }, []);
 
     return (
         <div className="card p-5 mx-auto my-5 mb-5" style={{ width: '75%' }}>
@@ -254,7 +248,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                             <label htmlFor="deal-category" className='form-label text-start'>Deal Category</label>
                             <select id="deal-category" className="form-control" onChange={handleCategoryChange}>
                                 {Object.values(DealCategory).map((category, index) => (
-                                    <option key={index} value={category}>{category}</option>
+                                    <option key={index} value={category}>{selectedCategory}</option>
                                 ))}
                             </select>
                         </div>

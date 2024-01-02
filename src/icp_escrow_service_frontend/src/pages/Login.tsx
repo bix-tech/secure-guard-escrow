@@ -5,13 +5,14 @@ import { createActor as createBackendActor } from "../../../declarations/backend
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import localForage from "localforage";
+import { usePrincipal } from '../hooks/usePrincipal';
 
 
 const Login = () => {
+    const  principal  = usePrincipal(); // Use the updated usePrincipal hook
     const { login, setIsAuthenticated } = useAuth();
     const navigate = useNavigate();
     const [authClient, setAuthClient] = useState<AuthClient | null>(null);
-    const [principal, setPrincipal] = useState<string | null>(null);
     const [daoActor, setDaoActor] = useState<ReturnType<typeof createBackendActor> | null>(null);
 
     useEffect(() => {
@@ -24,10 +25,7 @@ const Login = () => {
             }
           });
           setAuthClient(authClient);
-    
-          const storedPrincipal = await localForage.getItem<string | null>('principal');
-          if (storedPrincipal) {
-            setPrincipal(storedPrincipal);
+            if (principal) {
             login();
             console.log("Stored principal:", principal);
             setIsAuthenticated(true);
@@ -44,12 +42,11 @@ const Login = () => {
       const reinitializeSession = async (authClient: AuthClient) => {
         const identity = authClient.getIdentity();
         const newPrincipal = identity.getPrincipal().toString();
-        setPrincipal(newPrincipal);
 
         await localForage.setItem('principal', newPrincipal);
         
         login();
-        navigate('/dealProgress_1');
+        navigate('/dashboard');
       }
       
       initAuth();
@@ -72,10 +69,10 @@ const Login = () => {
                 onSuccess: async () => {
                     console.log("Login successful");
                     const identity = authClient.getIdentity();
-                    const principal = identity.getPrincipal().toString();
-                    setPrincipal(principal);
+                    const newPrincipal = identity.getPrincipal().toString();
                     const agent = new HttpAgent({ identity });
                     const actor = createBackendActor(process.env.BACKEND_CANISTER_ID!, { agent });
+                    await localForage.setItem('principal', newPrincipal);
                     setDaoActor(actor);
                     console.log(principal);
                     console.log(daoActor);
