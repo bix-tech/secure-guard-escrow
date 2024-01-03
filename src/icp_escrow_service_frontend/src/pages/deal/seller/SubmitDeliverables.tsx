@@ -8,7 +8,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 type DocumentFile = {
     id: string;
     name: string;
-  };
+};
 
 
 const CreateDeal = () => {
@@ -35,11 +35,10 @@ const CreateDeal = () => {
                 const documentBinary = new Uint8Array(binaryData);
                 await uploadDeliverableDocuments(documentBinary);
                 setUploadedDocuments([...uploadedDocuments, file]);
+                displayDocumentBadge(file);
             }
         }
-        displayDocumentBadge(files[0]);
     };
-
 
     const uploadDeliverableDocuments = async (binaryFile: any) => {
         try {
@@ -62,13 +61,13 @@ const CreateDeal = () => {
 
     const onSubmit = async (event: any) => {
         event.preventDefault();
-        console.log("Deal ID:", dealId); 
-        console.log("Uploaded Documents:", uploadedDocuments); 
-        try {    
+        console.log("Deal ID:", dealId);
+        console.log("Uploaded Documents:", uploadedDocuments);
+        try {
             const newDeliverable = {
                 id: BigInt(0),
-                deliverablePicture: uploadedDocuments.map((doc, index) => ({
-                    id: BigInt(doc.id || index), 
+                deliverableDocuments: uploadedDocuments.map((doc, index) => ({
+                    id: BigInt(doc.id || index),
                     name: doc.name
                 })),
                 deliverableDescription: editorContent,
@@ -83,49 +82,49 @@ const CreateDeal = () => {
         }
     };
 
-    const handleEditorChange = (content : any) => {
+    const handleEditorChange = (content: any) => {
         setEditorContent(content);
-      };
+    };
 
     return (
-    <div className="card p-5 mx-auto my-5 mb-5" style={{width: '75%'}}>
-        <div className="card-body text-center">
-            
-            <InitiatingDealProgressBar currentStep={3} />
-            
-            <form className="mt-5" onSubmit={onSubmit}>
-                <div className="mb-3">
-                    <div className="form-row col-md-9 text-start mx-auto">
-                        <label htmlFor="projectName" className="form-label text-start">Upload Pictures</label>
-                        <br/>
-                        <label htmlFor="projectName" className="form-label text-start">Recommended size 1500 x 600 (px)</label>
-                        <br/>
+        <div className="card p-5 mx-auto my-5 mb-5" style={{ width: '75%' }}>
+            <div className="card-body text-center">
 
-                        <div className="file-drop-area" id="fileDropArea" onClick={triggerFileInput}>
-                            <p>Click here or drag and drop files to upload</p>
-                            <p>Max File Size: 50 MB</p>
-                        <input type="file" id="fileInput" multiple style={{ display: 'none' }} onChange={handleDocumentSelect} ref={fileInputRef}/>
+                <InitiatingDealProgressBar currentStep={3} />
+
+                <form className="mt-5" onSubmit={onSubmit}>
+                    <div className="mb-3">
+                        <div className="form-row col-md-9 text-start mx-auto">
+                            <label htmlFor="projectName" className="form-label text-start">Upload Pictures</label>
+                            <br />
+                            <label htmlFor="projectName" className="form-label text-start">Recommended size 1500 x 600 (px)</label>
+                            <br />
+
+                            <div className="file-drop-area" id="fileDropArea" onClick={triggerFileInput}>
+                                <p>Click here or drag and drop files to upload</p>
+                                <p>Max File Size: 50 MB</p>
+                                <input type="file" id="fileInput" multiple style={{ display: 'none' }} onChange={handleDocumentSelect} ref={fileInputRef} />
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div className="mb-3">
-                    <div className="form-row col-md-9 text-start mx-auto">
-                        <label htmlFor="deal-description" className="form-label text-start">Deal Description</label>
-                        {/* <textarea id="editor" className="form-control"></textarea> */}
-                        <MyEditor
-                            initialValue=""
-                            value={editorContent}
-                            onEditorChange={handleEditorChange}
+                    <div className="mb-3">
+                        <div className="form-row col-md-9 text-start mx-auto">
+                            <label htmlFor="deal-description" className="form-label text-start">Deal Description</label>
+                            {/* <textarea id="editor" className="form-control"></textarea> */}
+                            <MyEditor
+                                initialValue=""
+                                value={editorContent}
+                                onEditorChange={handleEditorChange}
                             />
+                        </div>
                     </div>
-                </div>
-                
-                <button type="submit" className="btn mx-auto col-md-9 submit-deal-btn mt-3">Submit Deliverables</button>
-            </form>
 
+                    <button type="submit" className="btn mx-auto col-md-9 submit-deal-btn mt-3">Submit Deliverables</button>
+                </form>
+
+            </div>
         </div>
-    </div>
     )
 }
 

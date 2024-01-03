@@ -57,7 +57,7 @@ actor {
   public type Deliverable = {
     id : Nat;
     deliverableDescription : Text;
-    deliverablePicture : [FileReference];
+    deliverableDocuments : [FileReference];
   };
 
   type Time = Int;
@@ -93,7 +93,7 @@ actor {
     from : Principal;
     to : Principal;
     amount : Nat;
-    picture : [FileReference];
+    picture : FileReference;
     supportingDocuments : [FileReference];
     description : Text;
     dealCategory : DealCategory;
@@ -160,21 +160,79 @@ actor {
   };
 
   public func uploadDeliverableDocument(blob : Blob) : async Nat {
-    let id = documents.size();
+    let id = deliverableDocuments.size();
     deliverableDocuments.put(id, blob);
     return id;
   };
 
-  public func getPicture(fileRef : FileReference) : async ?Blob {
-    return pictures.get(fileRef.id);
+  public func getPicture(fileRef : FileReference, dealId : Nat) : async ?Blob {
+    let dealOpt = deals.get(dealId);
+    switch (dealOpt) {
+      case (null) {
+        return null;
+      };
+      case (?deal) {
+        if (deal.picture.id == fileRef.id) {
+          return pictures.get(fileRef.id);
+        } else {
+          return null;
+        };
+      };
+    };
   };
 
-  public func getSupportingDocument(fileRef : FileReference) : async ?Blob {
-    return documents.get(fileRef.id);
+  public func getSupportingDocument(fileRef : FileReference, dealId : Nat) : async ?Blob {
+    let dealOpt = deals.get(dealId);
+    switch (dealOpt) {
+      case (null) {
+        return null;
+      };
+      case (?deal) {
+        let supportingDocuments = deal.supportingDocuments;
+        let documentOpt = Array.find(
+          supportingDocuments,
+          func(doc : FileReference) : Bool {
+            doc.id == fileRef.id;
+          },
+        );
+        switch (documentOpt) {
+          case (null) {
+            return null;
+          };
+          case (?document) {
+            return documents.get(document.id);
+          };
+        };
+      };
+    };
   };
 
-  public func getDeliverableDocument(fileRef : FileReference) : async ?Blob {
-    return deliverableDocuments.get(fileRef.id);
+  public func getAllDeliverableDocuments(dealId : Nat) : async [Blob] {
+    let dealOpt = deals.get(dealId);
+    var allDocuments : [Blob] = [];
+
+    switch (dealOpt) {
+      case (null) {
+        return allDocuments;
+      };
+      case (?deal) {
+        let deliverables = Array.vals(deal.deliverables);
+
+        for (deliv in deliverables) {
+          let docOpt = deliverableDocuments.get(deliv.id);
+          switch (docOpt) {
+            case (null) {
+              //do nothing
+            };
+            case (?doc) {
+              allDocuments := Array.append<Blob>(allDocuments, [doc]);
+            };
+          };
+        };
+      };
+    };
+
+    return allDocuments;
   };
 
   public shared ({ caller }) func createDeal(newDeal : Deal) : async Deal.createDealResult {
@@ -650,7 +708,6 @@ actor {
 
     activityLogs.put(additionalLog.dealId, Array.append(existingAdditionalLogs, [additionalLog]));
   };
-  
 
   public func mintTokens(principal : Principal, amount : Nat) : async () {
     let defaultAccount = { owner = principal; subaccount = null };

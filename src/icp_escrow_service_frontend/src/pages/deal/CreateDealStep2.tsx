@@ -15,6 +15,12 @@ type CreateDealProps = {
     onNext: () => void;
 };
 
+type UploadedPictureType = {
+    file: File;
+    id: bigint; 
+};
+
+
 type DocumentFile = {
     id: string;
     name: string;
@@ -42,7 +48,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
     const documentInputRef = useRef<HTMLInputElement>(null);
     const [dealStart, setOpenDate] = useState<Date | null>(null);
     const [dealEnd, setCloseDate] = useState<Date | null>(null);
-    const [uploadedPictures, setUploadedPictures] = useState<File[]>([]);
+    const [uploadedPicture, setUploadedPicture] = useState<UploadedPictureType | null>(null);
     const [editorContent, setEditorContent] = useState('');
     const [uploadedDocuments, setUploadedDocuments] = useState<DocumentFile[]>([]);
 
@@ -92,18 +98,21 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                 id: index,
                 name: file.name,
             }));
-            const picture = uploadedPictures.map((file, index) => ({
-                id: index,
-                name: file.name,
-            }));
-
+            let picture = null; 
+            if (uploadedPicture) {
+                picture = {
+                    id: uploadedPicture.id, 
+                    name: uploadedPicture.file.name
+                };
+            }
+            
             let to, from;
             if (dealData.dealType === "Buyer") {
-                to = Principal.fromText(principal || ''); 
+                to = Principal.fromText(principal || '');
                 from = Principal.fromText(recipientPrincipal);
-            } else { 
-                from = Principal.fromText(principal || ''); 
-                to = Principal.fromText(recipientPrincipal); 
+            } else {
+                from = Principal.fromText(principal || '');
+                to = Principal.fromText(recipientPrincipal);
             }
 
             const deal = {
@@ -130,7 +139,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                 amount: amount,
                 sellerCancelRequest: false,
                 buyerCancelRequest: false,
-            };            
+            };
 
             const response = await backend.createDeal(deal);
 
@@ -165,11 +174,12 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
         if (file) {
             const binaryData = await file.arrayBuffer();
             const pictureBinary = new Uint8Array(binaryData);
-            await uploadPicture(pictureBinary);
-            setUploadedPictures([...uploadedPictures, file]);
+            const pictureId = await uploadPicture(pictureBinary);
+            setUploadedPicture({ file, id: pictureId });  
         }
         displayPictureBadge(file);
     };
+    
 
     const handleDocumentSelect = async (event: any) => {
         const files = event.target.files;
@@ -185,23 +195,28 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
         displayDocumentBadge(files[0]);
     };
 
-    const uploadPicture = async (binaryFile: any) => {
+    const uploadPicture = async (binaryFile: any): Promise<bigint> => {
         try {
-            const response = await backend.uploadPicture(binaryFile);
-            console.log("Picture uploaded:", response);
+            const id = await backend.uploadPicture(binaryFile);  
+            console.log("Picture uploaded with ID:", id);
+            return id; 
         } catch (error) {
             console.error("Failed to upload picture:", error);
+            throw error;  
         }
     };
+    
 
     const uploadSupportingDocument = async (binaryFile: any) => {
         try {
             const response = await backend.uploadSupportingDocument(binaryFile);
             console.log("Document uploaded:", response);
+            return response;
         } catch (error) {
             console.error("Failed to upload document:", error);
         }
     };
+
 
     const displayPictureBadge = (file: File) => {
         const badgeContainer = document.getElementById('fileDropArea');

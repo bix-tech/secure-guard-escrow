@@ -83,6 +83,7 @@ const MyEditor: React.FC<MyEditorProps> = ({ initialValue, value, onEditorChange
   const toggleInlineStyle = (inlineStyle: string) => {
     setEditorState(applyInlineStyle(editorState, inlineStyle));
   };
+  
 
   const renderInlineStyleButtons = () => {
     const currentStyle = editorState.getCurrentInlineStyle();
