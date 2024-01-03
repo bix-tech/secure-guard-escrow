@@ -72,6 +72,10 @@ const Navbar = () => {
         navigate(`/initiate-deal-lock-token/${dealId}`);
     };
 
+    const handleHomeClick = () => {
+        navigate('/dashboard');
+    }
+
     const handleLogout = async () => {
         try {
             if (authClient) {
@@ -93,7 +97,7 @@ const Navbar = () => {
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
             <div className="container-fluid">
-                <a className="navbar-brand" href="login.html">Your Logo</a>
+                <div className="navbar-brand" onClick={handleHomeClick}>ICP Escrow Service</div>
 
                 <div className="ms-auto"></div>
 
