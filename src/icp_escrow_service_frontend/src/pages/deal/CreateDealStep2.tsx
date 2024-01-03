@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useContext, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import CreateDealProgressBar from '../../components/CreateDealProgressBar';
@@ -7,6 +7,9 @@ import { DealCategory, DealStatus, useDealData } from '../../contexts/DealContex
 import MyEditor from '../../components/MyEditor';
 import { Principal } from '@dfinity/principal';
 import { usePrincipal } from '../../hooks/usePrincipal';
+import { DealFlowContext } from '../../contexts/InitiateDealFlowContext';
+import '../../App.css';
+import { useNavigate } from 'react-router-dom';
 
 type CreateDealProps = {
     onNext: () => void;
@@ -15,7 +18,7 @@ type CreateDealProps = {
 type DocumentFile = {
     id: string;
     name: string;
-  };
+};
 
 type PaymentSchedule = {
     packageName: string;
@@ -27,10 +30,12 @@ type PaymentSchedules = PaymentSchedule[];
 
 
 const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
+    const context = useContext(DealFlowContext);
+    const navigate = useNavigate();
     const [selectedCategory, setSelectedCategory] = useState<DealCategory>(DealCategory.NFT);
     const [recipientPrincipal, setRecipientPrincipal] = useState<string>('');
     const [selectedStatus, setSelectedStatus] = useState<DealStatus>(DealStatus.Pending);
-    const principal = usePrincipal();
+    const { principal } = usePrincipal();
     const { dealData, setDealData } = useDealData();
     const [amount, setAmount] = useState<number>(0);
     const pictureInputRef = useRef<HTMLInputElement>(null);
@@ -40,6 +45,13 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
     const [uploadedPictures, setUploadedPictures] = useState<File[]>([]);
     const [editorContent, setEditorContent] = useState('');
     const [uploadedDocuments, setUploadedDocuments] = useState<DocumentFile[]>([]);
+
+    useEffect(() => {
+        if (!context || !context.stepCompleted.step1) {
+            navigate('/createDealStep1');
+        }
+    }, [context, navigate]);
+
 
     const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedCategory(event.target.value as DealCategory);
@@ -77,17 +89,27 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
             const formattedDealStart = dealStart ? dealStart.getTime() : null;
             const formattedDealEnd = dealEnd ? dealEnd.getTime() : null;
             const supportingDocuments = uploadedDocuments.map((file, index) => ({
-                id: index, 
+                id: index,
                 name: file.name,
             }));
             const picture = uploadedPictures.map((file, index) => ({
-                id: index, 
+                id: index,
                 name: file.name,
             }));
+
+            let to, from;
+            if (dealData.dealType === "Buyer") {
+                to = Principal.fromText(principal || ''); 
+                from = Principal.fromText(recipientPrincipal);
+            } else { 
+                from = Principal.fromText(principal || ''); 
+                to = Principal.fromText(recipientPrincipal); 
+            }
 
             const deal = {
                 ...event,
                 name: dealData.dealName,
+                label: label,
                 dealType: dealData.dealType === "Buyer" ? { "Buyer": null } : { "Seller": null },
                 description: editorContent,
                 status: "Pending",
@@ -96,7 +118,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                     dealStart: formattedDealStart,
                     dealEnd: formattedDealEnd
                 }], deliverables: [],
-                to: Principal.fromText(recipientPrincipal),
+                to: to,
                 picture: picture,
                 supportingDocuments: supportingDocuments,
                 paymentScheduleInfo: paymentSchedules.map(schedule => ({
@@ -104,24 +126,19 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                     packageName: schedule.packageName,
                     description: schedule.packageDescription,
                 })),
-                initiator: Principal.fromText(principal || ''),
-                acceptor: Principal.fromText(recipientPrincipal),
-                from: Principal.fromText(principal || ''),
+                from: from,
                 amount: amount,
                 sellerCancelRequest: false,
                 buyerCancelRequest: false,
-            };
-            console.log("Submitting with recipient principal: ", recipientPrincipal);
-            console.log("Deal data being submitted: ", deal);
-            console.log('uploadedPictures:', uploadedPictures);
-            console.log('picture:', picture);
-            console.log("Creating deal with principal: ", principal); 
-
+            };            
 
             const response = await backend.createDeal(deal);
 
             if (response) {
                 setDealData(deal);
+                if (context) {
+                    context.completeStep('step2');
+                }
                 onNext();
             } else {
                 console.error('Failed to create deal');
@@ -210,7 +227,8 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
         setEditorContent(content);
     }
 
-    
+
+    const label = dealData.dealType === "Buyer" ? "From" : "To";
 
     return (
         <div className="card p-5 mx-auto my-5 mb-5" style={{ width: '75%' }}>
@@ -346,12 +364,12 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                                             />
 
                                             {/* To */}
-                                            <label htmlFor={`to-${index}`} className="form-label text-start mt-3">To</label>
+                                            <label htmlFor="recipientPrincipal">{label}</label>
                                             <input
                                                 type="text"
                                                 className="form-control"
                                                 id="recipientPrincipal"
-                                                placeholder="Enter recipient Principal ID"
+                                                placeholder={`Enter recipient Principal ID`}
                                                 value={recipientPrincipal}
                                                 onChange={(e) => setRecipientPrincipal(e.target.value)}
                                             />

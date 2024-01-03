@@ -19,7 +19,7 @@ type Notification = {
 const Navbar = () => {
     const { logout } = useAuth();
     const navigate = useNavigate();
-    const principal = usePrincipal();
+    const { principal } = usePrincipal();
     const [authClient, setAuthClient] = useState<AuthClient | null>(null);
     const [copied, setCopied] = useState(false);
     const [notifications, setNotifications] = useState<Notification[]>([]);

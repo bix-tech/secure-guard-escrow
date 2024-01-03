@@ -1,7 +1,8 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import CreateDealProgressBar from "../../components/CreateDealProgressBar";
 import { useForm } from 'react-hook-form';
 import { useDealData, User } from '../../contexts/DealContext';
+import { DealFlowContext } from '../../contexts/InitiateDealFlowContext';
 
 type CreateDealProps = {
     onNext: () => void; 
@@ -15,6 +16,7 @@ type FormData = {
 
 
 const CreateDeal: React.FC<CreateDealProps> = ({ onNext }) => {
+    const context = useContext(DealFlowContext);
     const { dealData, setDealData } = useDealData(); 
     const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
 
@@ -30,6 +32,9 @@ const CreateDeal: React.FC<CreateDealProps> = ({ onNext }) => {
 
         console.log(dealData);
         console.log(formData);
+        if(context) {
+            context.completeStep('step1');
+        }
 
         onNext(); 
     };

@@ -261,3 +261,35 @@ body {
   color: white;
   background-color: #D6D6D6;
 }
+
+.myEditor-container {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.myEditor-toolbar {
+  margin-bottom: 5px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 5px;
+}
+
+.myEditor-button {
+  margin-right: 5px;
+  padding: 5px;
+  border: none;
+  background-color: #f5f5f5;
+  cursor: pointer;
+}
+
+.myEditor-button:hover {
+  background-color: #e8e8e8;
+}
+
+.myEditor-button.active {
+  background-color: #d4d4d4;
+}
+
+.myEditor-content {
+  min-height: 140px;
+}

@@ -18,6 +18,7 @@ import InitiateDealLockToken from './pages/deal/buyer/InitiateDealLockToken';
 import SubmitDeliverables from './pages/deal/seller/SubmitDeliverables';
 import LockTokenSuccessfully from './pages/deal/buyer/LockTokenSuccessfully';
 import SubmitDeliverablesSuccessfully from './pages/deal/seller/SubmitDeliverablesSuccessfully';
+import { DealFlowProvider } from './contexts/InitiateDealFlowContext';
 
 const NavbarWrapper = () => {
   const location = useLocation();
@@ -82,23 +83,24 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <DealDataProvider>
-          <NavbarWrapper />
-          <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/deal-overview/:dealId" element={<ProtectedRoute><DealOverview /></ProtectedRoute>} />
-            <Route path="/createDealStep1" element={<ProtectedRoute><CreateStep1 onNext='/createDealStep2' onFormSubmit={setDealDetails} /></ProtectedRoute>} />
-            <Route path="/createDealStep2" element={<ProtectedRoute><CreateStep2 onNext='/createDealStep3' onFormSubmit={setDealDetails} /></ProtectedRoute>} />
-            <Route path="/createDealStep3" element={<ProtectedRoute><CreateDealStep3 /></ProtectedRoute>} />
-            <Route path="/deal/seller/waiting-buyer/:dealId" element={<ProtectedRoute><WaitingBuyerLockToken /></ProtectedRoute>} />
-            <Route path="/deal/buyer/lock-token/:dealId" element={<ProtectedRoute><InitiateDealLockToken /></ProtectedRoute>} />
-            <Route path="/deal/buyer/lock-successfully/:dealId" element={<ProtectedRoute><LockTokenSuccessfully /></ProtectedRoute>} />
-            <Route path="/deal/seller/submit-deliverables/:dealId" element={<ProtectedRoute><SubmitDeliverables /></ProtectedRoute>} />
-            <Route path="/deal/seller/submit-deliverables-successfully/:dealId" element={<ProtectedRoute><SubmitDeliverablesSuccessfully /></ProtectedRoute>} />
-
-          </Routes>
-        </DealDataProvider>
+        <DealFlowProvider>
+          <DealDataProvider>
+            <NavbarWrapper />
+            <Routes>
+              <Route path="/" element={<Login />} />
+              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/deal-overview/:dealId" element={<ProtectedRoute><DealOverview /></ProtectedRoute>} />
+              <Route path="/createDealStep1" element={<ProtectedRoute><CreateStep1 onNext='/createDealStep2' onFormSubmit={setDealDetails} /></ProtectedRoute>} />
+              <Route path="/createDealStep2" element={<ProtectedRoute><CreateStep2 onNext='/createDealStep3' onFormSubmit={setDealDetails} /></ProtectedRoute>} />
+              <Route path="/createDealStep3" element={<ProtectedRoute><CreateDealStep3 /></ProtectedRoute>} />
+              <Route path="/deal/seller/waiting-buyer/:dealId" element={<ProtectedRoute><WaitingBuyerLockToken /></ProtectedRoute>} />
+              <Route path="/deal/buyer/lock-token/:dealId" element={<ProtectedRoute><InitiateDealLockToken /></ProtectedRoute>} />
+              <Route path="/deal/buyer/lock-successfully/:dealId" element={<ProtectedRoute><LockTokenSuccessfully /></ProtectedRoute>} />
+              <Route path="/deal/seller/submit-deliverables/:dealId" element={<ProtectedRoute><SubmitDeliverables /></ProtectedRoute>} />
+              <Route path="/deal/seller/submit-deliverables-successfully/:dealId" element={<ProtectedRoute><SubmitDeliverablesSuccessfully /></ProtectedRoute>} />
+            </Routes>
+          </DealDataProvider>
+        </DealFlowProvider>
       </AuthProvider>
     </Router>
   );

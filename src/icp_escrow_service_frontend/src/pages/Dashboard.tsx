@@ -1,7 +1,7 @@
 import { backend } from "../../../declarations/backend";
 import { useState, useEffect } from 'react';
-import localforage from "localforage";
 import { Principal } from "@dfinity/principal";
+import { usePrincipal } from "../hooks/usePrincipal";
 
 
 interface ActivityLog {
@@ -12,63 +12,64 @@ interface ActivityLog {
   activityTime: number;
   user: string;
   status: string;
+  deal: {
+    to: Principal;
+  }
 }
 const itemsPerPage = 10;
 
 const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
-  const [principal, setPrincipal] = useState<Principal | null>(null);
+  const {principal} = usePrincipal();
   const [currentPage, setCurrentPage] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
-
-  useEffect(() => {
-    const loadPrincipal = async () => {
-      const storedPrincipalText = await localforage.getItem<string>('principal');
-      if (storedPrincipalText) {
-        setPrincipal(Principal.fromText(storedPrincipalText));
-        const itemCount = await backend.getActivityLogsCountForUser(Principal.fromText(storedPrincipalText));
-        setTotalItems(Number(itemCount));
-      }
-    };
-    loadPrincipal();
-  }, []);
-
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   const handlePageClick = (page: number) => {
     setCurrentPage(page);
   };
 
-  useEffect(() => {
-    async function fetchActivityLogs() {
-      setIsLoading(true);
-      if (principal) {
-        try {
-          const logs = await backend.getActivityLogsForUser(principal);
-          console.log("Activity logs:", logs);
-          const mappedLogs = logs.map(log => ({
-            ...log,
-            dealId: Number(log.dealId),
-            description: log.description.toString(),
-            amount: Number(log.amount),
-            activityTime: Number(log.activityTime),
-            user: log.user.toString(),
-            status: Object.keys(log.status)[0]
-          }));
-          setActivityLogs(mappedLogs);
-          setIsLoading(false);
-        } catch (error) {
-          console.error("Failed to fetch activity logs:", error);
-        }
+
+  const fetchActivityLogs = async () => {
+    setIsLoading(true);
+    if (principal) {
+      try {
+        const logs = await backend.getActivityLogsForUser(Principal.fromText(principal));
+        console.log("Activity logs:", logs);
+        const mappedLogs = logs.map(log => ({
+          ...log,
+          dealId: Number(log.dealId),
+          description: log.description.toString(),
+          amount: Number(log.amount),
+          activityTime: Number(log.activityTime),
+          user: log.user.toString(),
+          status: log.status.toString(),
+        }));
+        setActivityLogs(mappedLogs);
+        setTotalItems(logs.length);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Failed to fetch activity logs:", error);
       }
     }
+  };
 
+  useEffect(() => {
     if (principal) {
       fetchActivityLogs();
     }
   }, [principal, currentPage]);
 
+  const handleConfirmDeal = async (dealId: number) => {
+    try {
+      const result = await backend.confirmDeal(BigInt(dealId), Principal.fromText(principal || ''));
+      console.log("Confirm deal result:", result);
+      fetchActivityLogs();
+    } catch (error) {
+      console.error("Failed to confirm deal:", error);
+    }
+  }
 
   return (
     <div>
@@ -88,7 +89,7 @@ const Dashboard = () => {
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={5} style={{ textAlign: 'center', padding: '20px' }}> 
+                  <td colSpan={5} style={{ textAlign: 'center', padding: '20px' }}>
                     <div className="spinner-border text-primary" role="status">
                       <span className="visually-hidden">Loading...</span>
                     </div>
@@ -102,6 +103,11 @@ const Dashboard = () => {
                     <td>{log.activityType}</td>
                     <td>{log.amount}</td>
                     <td>{log.status}</td>
+                    <td>
+                      {log.status === "Submitted Deliverables" && log.user === log.deal.to.toText() && (
+                        <button onClick={() => handleConfirmDeal(log.dealId)}>Confirm Deal</button>
+                      )}
+                    </td>
                   </tr>
                 ))
               )}

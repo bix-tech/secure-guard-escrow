@@ -103,8 +103,6 @@ actor {
     deliverables : [Deliverable];
     buyerCancelRequest : Bool;
     sellerCancelRequest : Bool;
-    initiator : Principal;
-    acceptor : Principal;
   };
 
   public type ActivityLog = {
@@ -115,6 +113,7 @@ actor {
     status : DealStatus;
     activityTime : Time;
     user : Principal;
+    deal : Deal;
   };
 
   public query func getNotification(user : Principal) : async [Notification] {
@@ -196,28 +195,29 @@ actor {
       supportingDocuments = newDeal.supportingDocuments;
       buyerCancelRequest = false;
       sellerCancelRequest = false;
-      initiator = caller;
-      acceptor = newDeal.to;
     };
 
     let buyerLog = {
       dealId = nextDealId;
-      description = "Deal created";
-      activityType = "DealCreated";
-      status = newDeal.status;
-      amount = newDeal.amount;
-      activityTime = Time.now();
-      user = newDeal.from;
-    };
-
-    let sellerLog = {
-      dealId = nextDealId;
-      description = "Deal created";
-      activityType = "DealCreated";
+      description = "Successfully create a deal";
+      activityType = "Deal Created";
       status = newDeal.status;
       amount = newDeal.amount;
       activityTime = Time.now();
       user = newDeal.to;
+      deal = dealToCreate;
+
+    };
+
+    let sellerLog = {
+      dealId = nextDealId;
+      description = "Successfully create a deal";
+      activityType = "Deal Created";
+      status = newDeal.status;
+      amount = newDeal.amount;
+      activityTime = Time.now();
+      user = newDeal.from;
+      deal = dealToCreate;
     };
 
     await createActivityLog(buyerLog, newDeal.to);
@@ -304,7 +304,7 @@ actor {
               };
 
               let updatedDeal = {
-                status = "InProgress";
+                status = "In Progress";
                 name = deal.name;
                 from = deal.from;
                 to = deal.to;
@@ -319,28 +319,28 @@ actor {
                 supportingDocuments = deal.supportingDocuments;
                 buyerCancelRequest = deal.buyerCancelRequest;
                 sellerCancelRequest = deal.sellerCancelRequest;
-                initiator = deal.initiator;
-                acceptor = deal.acceptor;
               };
 
               let buyerLog = {
                 dealId = dealId;
                 description = "Deal in progress";
-                activityType = "DealInProgress";
-                status = "InProgress";
+                activityType = "DealIn Progress";
+                status = "In Progress";
                 amount = deal.amount;
                 activityTime = Time.now();
-                user = deal.from;
+                user = deal.to;
+                deal = updatedDeal;
               };
 
               let sellerLog = {
                 dealId = dealId;
                 description = "Deal in progress";
-                activityType = "DealInProgress";
-                status = "InProgress";
+                activityType = "Deal In Progress";
+                status = "In Progress";
                 amount = deal.amount;
                 activityTime = Time.now();
-                user = deal.to;
+                user = deal.from;
+                deal = updatedDeal;
               };
 
               await createActivityLog(buyerLog, deal.to);
@@ -357,7 +357,7 @@ actor {
     };
   };
 
-  public shared ({ caller }) func confirmDeal(dealId : Nat) : async Result<(), Text> {
+  public shared ({ caller }) func confirmDeal(dealId : Nat, principal : Principal) : async Result<(), Text> {
     let dealOpt = deals.get(dealId);
 
     switch (dealOpt) {
@@ -365,15 +365,15 @@ actor {
         return #err("Deal not found");
       };
       case (?deal) {
-        if (caller != deal.acceptor) {
+        if (principal != deal.to) {
           return #err("Only the buyer can confirm the deal");
         };
-        if (deal.status != "SubmittedDeliverables") {
+        if (deal.status != "Submitted Deliverables") {
           return #err("Deal is not in a state that can be confirmed");
         };
 
-        let sellerAccount = { owner = deal.to; subaccount = null };
-        let buyerAccount = { owner = deal.from; subaccount = null };
+        let sellerAccount = { owner = deal.from; subaccount = null };
+        let buyerAccount = { owner = deal.to; subaccount = null };
         let lockedAmountOpt = lockedTokens.get(buyerAccount);
 
         switch (lockedAmountOpt) {
@@ -406,9 +406,34 @@ actor {
               deliverables = deal.deliverables;
               buyerCancelRequest = false;
               sellerCancelRequest = false;
-              initiator = deal.initiator;
-              acceptor = deal.acceptor;
             };
+
+            let sellerLog = {
+              dealId = dealId;
+              description = "Deal completed";
+              activityType = "Deal Completed";
+              status = "Completed";
+              amount = deal.amount;
+              activityTime = Time.now();
+              user = deal.from;
+              deal = updatedDeal;
+            };
+
+            let buyerLog = {
+              dealId = dealId;
+              description = "Deal completed";
+              activityType = "Deal Completed";
+              status = "Completed";
+              amount = deal.amount;
+              activityTime = Time.now();
+              user = deal.to;
+              deal = updatedDeal;
+            };
+
+            await createActivityLog(buyerLog, deal.to);
+            await createActivityLog(sellerLog, deal.from);
+
+            addNotification(updatedDeal.from, { dealId = nextDealId - 1; message = "Buyer confirmed the deal. Please check if you've received the token." });
 
             deals.put(dealId, updatedDeal);
 
@@ -430,7 +455,7 @@ actor {
         let updatedDeliverables = Array.append(deal.deliverables, [newDeliverable]);
 
         let updatedDeal = {
-          status = "SubmittedDeliverables";
+          status = "Submitted Deliverables";
           name = deal.name;
           from = deal.from;
           to = deal.to;
@@ -445,28 +470,28 @@ actor {
           supportingDocuments = deal.supportingDocuments;
           buyerCancelRequest = deal.buyerCancelRequest;
           sellerCancelRequest = deal.sellerCancelRequest;
-          initiator = deal.initiator;
-          acceptor = deal.acceptor;
         };
 
         let buyerLog = {
           dealId = dealId;
           description = "Seller submitted deliverables,";
-          activityType = "SubmittedDeliverables";
-          status = "InProgress";
+          activityType = "Submitted Deliverables";
+          status = "Submitted Deliverables";
           amount = deal.amount;
           activityTime = Time.now();
-          user = deal.from;
+          user = deal.to;
+          deal = updatedDeal;
         };
 
         let sellerLog = {
           dealId = dealId;
           description = "You submitted deliverables.";
-          activityType = "DealInProgress";
-          status = "InProgress";
+          activityType = "Submitted Deliverables";
+          status = "Submitted Deliverables";
           amount = deal.amount;
           activityTime = Time.now();
-          user = deal.to;
+          user = deal.from;
+          deal = updatedDeal;
         };
 
         await createActivityLog(buyerLog, deal.to);
@@ -511,8 +536,6 @@ actor {
           sellerCancelRequest = if (isSeller) { true } else {
             deal.sellerCancelRequest;
           };
-          initiator = deal.initiator;
-          acceptor = deal.acceptor;
         };
 
         if (updatedDeal.buyerCancelRequest and updatedDeal.sellerCancelRequest) {
@@ -552,8 +575,6 @@ actor {
             supportingDocuments = deal.supportingDocuments;
             buyerCancelRequest = false;
             sellerCancelRequest = false;
-            initiator = deal.initiator;
-            acceptor = deal.acceptor;
           };
           deals.put(dealId, finalDeal);
           return #ok(finalDeal);
@@ -596,7 +617,7 @@ actor {
       };
     };
 
-    let createLog = {
+    let createLog : ActivityLog = {
       dealId = newLog.dealId;
       description = newLog.description;
       activityType = newLog.activityType;
@@ -604,9 +625,10 @@ actor {
       status = newLog.status;
       activityTime = Time.now();
       user = newLog.user;
+      deal = newLog.deal;
     };
 
-    let additionalLog = {
+    let additionalLog : ActivityLog = {
       dealId = newLog.dealId;
       description = newLog.description;
       activityType = newLog.activityType;
@@ -614,6 +636,7 @@ actor {
       status = newLog.status;
       activityTime = Time.now();
       user = additionalUser;
+      deal = newLog.deal;
     };
 
     let existingAdditionalLogs = switch (activityLogs.get(additionalLog.dealId)) {
@@ -627,6 +650,7 @@ actor {
 
     activityLogs.put(additionalLog.dealId, Array.append(existingAdditionalLogs, [additionalLog]));
   };
+  
 
   public func mintTokens(principal : Principal, amount : Nat) : async () {
     let defaultAccount = { owner = principal; subaccount = null };

@@ -9,29 +9,33 @@ const WaitingBuyerLockToken = () => {
     const { dealId } = useParams();
     const navigate = useNavigate();
     const { dealData } = useDealData();
-    const principal = usePrincipal();
-
+    const { principal, isLoading: isPrincipalLoading } = usePrincipal();
 
     useEffect(() => {
-        if (principal && dealData && dealData.from !== principal) {
-            navigate('/dashboard');
-        } else {
-            const intervalId = setInterval(async () => {
-                try {
-                    const result = await backend.getDealStatus(BigInt(dealId || 0));
-                    if ('ok' in result) {
-                        if (result.ok === "InProgress") {
-                            clearInterval(intervalId);
-                            navigate(`/deal/seller/submit-deliverables/${dealId}`);
+        if (!isPrincipalLoading) {
+            if (dealData.from && dealData.from != principal) {
+                console.log("Deal data:", dealData);
+                console.log("Deal from:", dealData.from);
+                console.log("Principal:", principal);
+                navigate('/dashboard');
+            } else {
+                const intervalId = setInterval(async () => {
+                    try {
+                        const result = await backend.getDealStatus(BigInt(dealId || 0));
+                        if ('ok' in result) {
+                            if (result.ok === "In Progress") {
+                                clearInterval(intervalId);
+                                navigate(`/deal/seller/submit-deliverables/${dealId}`);
+                            }
                         }
+                    } catch (error) {
+                        console.error("Failed to get deal status:", error);
                     }
-                } catch (error) {
-                    console.error("Failed to get deal status:", error);
-                }
-            }, 3000);
-            return () => clearInterval(intervalId);
+                }, 3000);
+                return () => clearInterval(intervalId);
+            }
         }
-    }, [dealData, dealId, navigate]);
+    }, [dealData, dealId, navigate, principal, isPrincipalLoading]);
 
 
     return (

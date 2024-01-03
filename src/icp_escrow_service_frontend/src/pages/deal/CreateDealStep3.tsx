@@ -1,10 +1,19 @@
 import CreateDealProgressBar from "../../components/CreateDealProgressBar"
 import { useNavigate } from 'react-router-dom'
 import { useParams } from "react-router-dom";
+import { useContext, useEffect } from "react";
+import { DealFlowContext } from "../../contexts/InitiateDealFlowContext";
 
 const CreateDealSuccessful = () => {
+    const context = useContext(DealFlowContext);
     const { dealId } = useParams(); 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!context || !context.stepCompleted.step2) {
+            navigate('/createDealStep1');
+        }
+    }, [context, navigate]);
 
     const handleDashboard = () => {
         navigate('/dashboard');

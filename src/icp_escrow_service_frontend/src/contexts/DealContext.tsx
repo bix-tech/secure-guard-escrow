@@ -17,8 +17,6 @@ type DealData = {
     supportDocuments: string[];
     buyerCancelRequest: boolean;
     sellerCancelRequest: boolean;
-    initiator: string;
-    acceptor: string;
 }
 
 export enum DealStatus {
@@ -58,8 +56,6 @@ const initiateDealData: DealData = {
     supportDocuments: [],
     buyerCancelRequest: false,
     sellerCancelRequest: false,
-    initiator: '',
-    acceptor: '',
 }
 
 const DealDataContext = createContext<{
