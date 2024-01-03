@@ -8,7 +8,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { useNavigate } from 'react-router-dom';
 import './App.css';
 import { useEffect, useState } from 'react';
-import DealOverview from './pages/DealOverview';
+import DealOverview from './pages/deal/DealOverview';
 import localforage from 'localforage';
 import CreateDealStep1 from './pages/deal/CreateDealStep1';
 import CreateDealStep2 from './pages/deal/CreateDealStep2';

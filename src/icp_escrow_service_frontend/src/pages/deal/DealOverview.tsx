@@ -1,7 +1,7 @@
-import { backend } from "../../../declarations/backend";
+import { backend } from "../../../../declarations/backend";
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Deal } from "../../../declarations/backend/backend.did";
+import { Deal } from "../../../../declarations/backend/backend.did";
 
 const DealOverview = () => {
     const [deal, setDeal] = useState<Deal | null>(null);
