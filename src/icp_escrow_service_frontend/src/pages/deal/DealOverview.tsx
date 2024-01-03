@@ -1,38 +1,49 @@
 import { backend } from "../../../../declarations/backend";
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Deal } from "../../../../declarations/backend/backend.did";
 import '../../App.css';
+import { usePrincipal } from "../../hooks/usePrincipal";
+import { useDealData } from "../../contexts/DealContext";
 
 const DealOverview = () => {
     const [deal, setDeal] = useState<Deal | null>(null);
+    const { principal, isLoading: isPrincipalLoading } = usePrincipal();
     const [error, setError] = useState('');
     const { dealId } = useParams();
     const [pictureUrls, setPictureUrls] = useState<string[]>([]);
     const [deliverableUrls, setDeliverableUrls] = useState<{ [id: string]: string }>({});
     const [isLoading, setIsLoading] = useState(true);
+    const { dealData } = useDealData();
+    const navigate = useNavigate();
     // const [supportingDocUrls, setSupportingDocUrls] = useState<string[]>([]);
 
 
     useEffect(() => {
         const fetchDealData = async () => {
-            try {
-                const dealResult = await backend.getDeal(BigInt(dealId || 0));
-                if ('ok' in dealResult) {
-                    const deal = dealResult.ok;
-                    setDeal(deal);
-                    await Promise.all([fetchPictures(deal), fetchDeliverables(deal)]);
+            if (isPrincipalLoading) {
+                if (dealData.to && dealData.from !== principal) {
+                    try {
+                        const dealResult = await backend.getDeal(BigInt(dealId || 0));
+                        if ('ok' in dealResult) {
+                            const deal = dealResult.ok;
+                            setDeal(deal);
+                            await Promise.all([fetchPictures(deal), fetchDeliverables(deal)]);
+                        } else {
+                            throw new Error('An error occurred while fetching the deal.');
+                        }
+                    } catch (err) {
+                        setError(error);
+                        console.error(err);
+                    } finally {
+                        setIsLoading(false);
+                    }
                 } else {
-                    throw new Error('An error occurred while fetching the deal.');
+                    navigate('/dashboard');
                 }
-            } catch (err) {
-                setError(error);
-                console.error(err);
-            } finally {
-                setIsLoading(false);
             }
         };
-    
+
         const fetchPictures = async (deal: Deal) => {
             const pictureId = deal.picture;
             const blob = await backend.getPicture(pictureId, BigInt(dealId || 0));
@@ -47,7 +58,7 @@ const DealOverview = () => {
                 }
             }
         };
-    
+
         const fetchDeliverables = async (deal: Deal) => {
             const urls: { [id: string]: string } = {};
             for (const deliverable of deal.deliverables) {
@@ -67,11 +78,11 @@ const DealOverview = () => {
             }
             setDeliverableUrls(urls);
         };
-    
+
         setIsLoading(true);
         fetchDealData();
     }, [dealId]);
-    
+
 
     const extractText = (rawDescription: any) => {
         try {
@@ -96,7 +107,7 @@ const DealOverview = () => {
         return <div className="loader"></div>;
     }
 
-        // useEffect(() => {
+    // useEffect(() => {
     //     const fetchSupportingDocuments = async () => {
     //         if (deal !== null) {
     //             const pictureIds = deal.supportingDocuments;
