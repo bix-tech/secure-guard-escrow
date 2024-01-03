@@ -17,7 +17,7 @@ type CreateDealProps = {
 
 type UploadedPictureType = {
     file: File;
-    id: bigint; 
+    id: bigint;
 };
 
 
@@ -32,6 +32,7 @@ type PaymentSchedule = {
 };
 
 type PaymentSchedules = PaymentSchedule[];
+
 
 
 
@@ -98,14 +99,14 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                 id: index,
                 name: file.name,
             }));
-            let picture = null; 
+            let picture = null;
             if (uploadedPicture) {
                 picture = {
-                    id: uploadedPicture.id, 
+                    id: uploadedPicture.id,
                     name: uploadedPicture.file.name
                 };
             }
-            
+
             let to, from;
             if (dealData.dealType === "Buyer") {
                 to = Principal.fromText(principal || '');
@@ -175,11 +176,11 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
             const binaryData = await file.arrayBuffer();
             const pictureBinary = new Uint8Array(binaryData);
             const pictureId = await uploadPicture(pictureBinary);
-            setUploadedPicture({ file, id: pictureId });  
+            setUploadedPicture({ file, id: pictureId });
         }
         displayPictureBadge(file);
     };
-    
+
 
     const handleDocumentSelect = async (event: any) => {
         const files = event.target.files;
@@ -197,15 +198,15 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
 
     const uploadPicture = async (binaryFile: any): Promise<bigint> => {
         try {
-            const id = await backend.uploadPicture(binaryFile);  
+            const id = await backend.uploadPicture(binaryFile);
             console.log("Picture uploaded with ID:", id);
-            return id; 
+            return id;
         } catch (error) {
             console.error("Failed to upload picture:", error);
-            throw error;  
+            throw error;
         }
     };
-    
+
 
     const uploadSupportingDocument = async (binaryFile: any) => {
         try {
@@ -279,9 +280,14 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                     <div className="mb-3">
                         <div className='form-row col-md-9 text-start mx-auto'>
                             <label htmlFor="deal-category" className='form-label text-start'>Deal Category</label>
-                            <select id="deal-category" className="form-control" onChange={handleCategoryChange}>
+                            <select
+                                id="deal-category"
+                                className="form-control"
+                                value={selectedCategory}
+                                onChange={handleCategoryChange}
+                            >
                                 {Object.values(DealCategory).map((category, index) => (
-                                    <option key={index} value={category}>{selectedCategory}</option>
+                                    <option key={index} value={category}>{category}</option>
                                 ))}
                             </select>
                         </div>
@@ -290,9 +296,14 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                     <div className="mb-3">
                         <div className='form-row col-md-9 text-start mx-auto'>
                             <label htmlFor="deal-status" className='form-label text-start'>Deal Status</label>
-                            <select id="deal-status" className="form-control" onChange={handleStatusChange}>
+                            <select
+                                id="deal-status"
+                                className="form-control"
+                                onChange={handleStatusChange}
+                                value={selectedStatus}
+                            >
                                 {Object.values(DealStatus).map((status, index) => (
-                                    <option key={index} value={status}>{selectedStatus}</option>
+                                    <option key={index} value={status}>{status}</option>
                                 ))}
                             </select>
                         </div>
