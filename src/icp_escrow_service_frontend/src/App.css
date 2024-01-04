@@ -201,7 +201,7 @@ body {
   text-align: center;
   color: #237A88;
   background-color: #f4f4f4;
-  height: 200px;
+  height: auto;
   border-radius: 10px;
 }
 
@@ -295,15 +295,28 @@ body {
 }
 
 .deliverables-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  /* display: grid; */
+  /* grid-template-columns: repeat(2, 1fr); */
+  /* gap: 20px; */
 }
 
 .deliverable-item {
   border: 1px solid #ddd;
   padding: 20px;
   text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.deliverable-download > a {
+  text-decoration: none;
+  color: black;
+}
+
+.deliverable-download:hover {
+  text-decoration: none;
+  color: black;
+  opacity: 0.5;
 }
 
 .loader {

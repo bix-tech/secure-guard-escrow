@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Deal } from "../../../../declarations/backend/backend.did";
 import '../../App.css';
 import { usePrincipal } from "../../hooks/usePrincipal";
+import Sidebar from '../../components/Sidebar';
 // import { Principal } from "@dfinity/principal";
 
 const DealOverview = () => {
@@ -130,38 +131,116 @@ const DealOverview = () => {
     // }, [deal]);
 
     return (
-        <div>
-            <div>
-                <h1>Deal Overview: {deal.name}</h1>
-            </div>
-            <div className="d-flex flex-row justify-content-between p-5">
-                <div className="card p-5 mx-auto my-5" style={{ width: '45%' }}>
-                    Buyer {deal.to.toString()}
-                    Seller {deal.from.toString()}
-                    {pictureUrls.map((url) => (
-                        <img key={url} src={url} alt={`Picture`} />
-                    ))}
-                </div>
-                <div className="card p-5 mx-auto my-5" style={{ width: '45%' }}>
-                    Deal Description<br />
-                    {deal.description && extractText(deal.description)}
-                </div>
-            </div>
-            <div className="card p-5 mx-auto my-5" style={{ width: '100%' }}>
-                <h2>Deliverables</h2>
-                <div className="deliverables-grid">
-                    {deal.deliverables.map((deliverable, index) => (
-                        <div key={deliverable.id || index} className="deliverable-item">
-                            {deliverable.deliverableDocuments.map((document) => (
-                                <a key={document.id} href={deliverableUrls[document.id.toString()]} download={document.name}>
-                                    <div className="deliverable-download">
-                                        <span>{document.name}</span>
+        <div className="container-fluid mt-1">
+            <div className="row">
+                <Sidebar />
+
+                <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                    <div className="mt-4">
+                        <h4>Deal Overview : {deal.name}</h4>
+                        <p>SSM / Company</p>
+                    </div>
+
+                    <div className="row mb-3">
+                        <div className="col-md-6">
+                            <div className="card p-3 my-5" style={{ width: "100%;", height: "100%" }}>
+                                <div className="card-body text-center">
+                                    <div className="d-flex align-items-center">
+                                        <div className="avatar me-3">
+                                            {/* <img src="/minion.jpeg" alt="User Avatar" /> */}
+                                            {pictureUrls.map((url) => (
+                                                <img key={url} src={url} alt={`Picture`} />
+                                            ))}
+                                        </div>
+                                        <div className="text-start">
+                                            <h4 className="mb-0">Renovation Contract for Condo</h4>
+                                            <small>Apartment Assets</small>
+                                        </div>
                                     </div>
-                                </a>
+
+                                    <hr />
+
+
+                                    <div className="contract-info">
+                                        <div className="row">
+                                            <div className="d-flex align-items-center">
+                                                <div className="avatar me-3">
+                                                    <img src="/minion.jpeg" alt="User Avatar" />
+                                                </div>
+                                                <div className="text-start">
+                                                    <h6 className="mb-0">Buyer</h6>
+                                                    <small>{deal.to.toString()}</small>
+                                                </div>
+                                            </div>
+                                            <div className="d-flex align-items-center mt-3">
+                                                <div className="avatar me-3">
+                                                    <img src="/minion.jpeg" alt="User Avatar" />
+                                                </div>
+                                                <div className="text-start">
+                                                    <h6 className="mb-0">Seller</h6>
+                                                    <small>{deal.from.toString()}</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="col-md-6">
+                            <div className="card p-3 my-5" style={{ width: "100%;", height: "100%" }}>
+                                <div className="card-body ">
+                                    <div className="text-start">
+                                        <h4>Deal Description</h4>
+                                        <p>
+                                            {/* {deal.description && extractText(deal.description)} */}
+                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Et fugiat autem voluptatibus voluptas perferendis dicta dolore? Maiores dolorum, iusto veniam id porro quis optio animi totam, similique cumque voluptatem? Eligendi?
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* <div className="d-flex flex-row justify-content-between p-5">
+                        <div className="card p-5 mx-auto my-5" style={{ width: '45%' }}>
+                            Buyer {deal.to.toString()}
+                            Seller {deal.from.toString()}
+                            {pictureUrls.map((url) => (
+                                <img key={url} src={url} alt={`Picture`} />
                             ))}
                         </div>
-                    ))}
-                </div>
+                        <div className="card p-5 mx-auto my-5" style={{ width: '45%' }}>
+                            Deal Description<br />
+                            {deal.description && extractText(deal.description)}
+                        </div>
+                    </div> */}
+                    
+                    <div className="row mb-3">
+                        <div className="col-md-12">
+                            <div className="card p-5 mx-auto my-5">
+                                <h4>Deliverables</h4>
+                                <div className="deliverables-grid">
+                                    {deal.deliverables.map((deliverable, index) => (
+                                        <div key={deliverable.id || index} className="deliverable-item justify-content-between">
+                                            {deliverable.deliverableDocuments.map((document) => (
+                                                <div className="d-flex align-items-center m-3" style={{width: "45%"}}>
+                                                    <div className="avatar me-3" style={{border: "none"}}>
+                                                        <img src="/document-download.png" alt="User Avatar" />
+                                                    </div>
+                                                        <div className="deliverable-download">
+                                                            <a key={document.id} href={deliverableUrls[document.id.toString()]} download={document.name}>
+                                                                <span>{document.name}</span>
+                                                            </a>
+                                                        </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
             </div>
         </div>
     )
