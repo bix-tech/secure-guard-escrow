@@ -294,12 +294,6 @@ body {
   min-height: 140px;
 }
 
-.deliverables-grid {
-  /* display: grid; */
-  /* grid-template-columns: repeat(2, 1fr); */
-  /* gap: 20px; */
-}
-
 .deliverable-item {
   border: 1px solid #ddd;
   padding: 20px;
@@ -350,4 +344,8 @@ body {
 
 .nav-link {
   color: black !important;
+}
+
+.ltr-class {
+  direction: ltr; 
 }

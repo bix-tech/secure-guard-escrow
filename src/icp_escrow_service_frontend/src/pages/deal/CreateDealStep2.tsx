@@ -4,12 +4,12 @@ import 'react-datepicker/dist/react-datepicker.css';
 import CreateDealProgressBar from '../../components/CreateDealProgressBar';
 import { backend } from '../../../../declarations/backend';
 import { DealCategory, DealStatus, useDealData } from '../../contexts/DealContext';
-import MyEditor from '../../components/MyEditor';
 import { Principal } from '@dfinity/principal';
 import { usePrincipal } from '../../hooks/usePrincipal';
 import { DealFlowContext } from '../../contexts/InitiateDealFlowContext';
 import '../../App.css';
 import { useNavigate } from 'react-router-dom';
+import TiptapEditor from '../../components/TipTapEditor';
 
 type CreateDealProps = {
     onNext: () => void;
@@ -52,6 +52,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
     const [uploadedPicture, setUploadedPicture] = useState<UploadedPictureType | null>(null);
     const [editorContent, setEditorContent] = useState('');
     const [uploadedDocuments, setUploadedDocuments] = useState<DocumentFile[]>([]);
+
 
     useEffect(() => {
         if (!context || !context.stepCompleted.step1) {
@@ -241,10 +242,10 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
         }
     };
 
-    const handleEditorChange = (content: string) => {
+    const handleEditorContentChange = (content: string) => {
         setEditorContent(content);
-    }
-
+    };
+    
 
     const label = dealData.dealType === "Buyer" ? "From" : "To";
 
@@ -271,11 +272,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                     <div className="mb-3">
                         <div className="form-row col-md-9 text-start mx-auto">
                             <label htmlFor="deal-description" className="form-label text-start">Deal Description</label>
-                            <MyEditor
-                                initialValue=""
-                                value={editorContent}
-                                onEditorChange={handleEditorChange}
-                            />
+                            <TiptapEditor onContentChange={handleEditorContentChange}/>
                         </div>
                     </div>
 

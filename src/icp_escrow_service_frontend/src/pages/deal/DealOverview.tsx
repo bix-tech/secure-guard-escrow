@@ -83,15 +83,7 @@ const DealOverview = () => {
         fetchDealData();
     }, [dealId, principal, isPrincipalLoading]);
 
-    const extractText = (rawDescription: any) => {
-        try {
-            const parsed = JSON.parse(rawDescription);
-            return parsed.blocks.map((block: { text: any; }) => block.text).join('\n');
-        } catch (error) {
-            console.error('Error parsing deal description:', error);
-            return '';
-        }
-    }
+
 
 
     if (error) {
@@ -192,8 +184,8 @@ const DealOverview = () => {
                                     <div className="text-start">
                                         <h4>Deal Description</h4>
                                         <p>
-                                            {/* {deal.description && extractText(deal.description)} */}
-                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Et fugiat autem voluptatibus voluptas perferendis dicta dolore? Maiores dolorum, iusto veniam id porro quis optio animi totam, similique cumque voluptatem? Eligendi?
+                                            {deal.description}
+                                            {/* Lorem ipsum dolor sit amet consectetur adipisicing elit. Et fugiat autem voluptatibus voluptas perferendis dicta dolore? Maiores dolorum, iusto veniam id porro quis optio animi totam, similique cumque voluptatem? Eligendi? */}
                                         </p>
                                     </div>
                                 </div>

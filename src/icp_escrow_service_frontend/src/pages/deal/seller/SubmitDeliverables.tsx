@@ -1,8 +1,8 @@
 import React, { useRef, useState } from 'react';
 import InitiatingDealProgressBar from '../../../components/InitiatingDealProgressBar';
-import MyEditor from '../../../components/MyEditor';
 import { backend } from '../../../../../declarations/backend';
 import { useParams, useNavigate } from 'react-router-dom';
+import TiptapEditor from '../../../components/TipTapEditor';
 
 
 type DocumentFile = {
@@ -82,9 +82,10 @@ const CreateDeal = () => {
         }
     };
 
-    const handleEditorChange = (content: any) => {
-        setEditorContent(content);
-    };
+        const handleEditorContentChange = (content : string) => {
+            setEditorContent(content);
+        };
+
 
     return (
         <div className="card p-5 mx-auto my-5 mb-5" style={{ width: '75%' }}>
@@ -111,12 +112,7 @@ const CreateDeal = () => {
                     <div className="mb-3">
                         <div className="form-row col-md-9 text-start mx-auto">
                             <label htmlFor="deal-description" className="form-label text-start">Deal Description</label>
-                            {/* <textarea id="editor" className="form-control"></textarea> */}
-                            <MyEditor
-                                initialValue=""
-                                value={editorContent}
-                                onEditorChange={handleEditorChange}
-                            />
+                            <TiptapEditor onContentChange={handleEditorContentChange}/>
                         </div>
                     </div>
 
