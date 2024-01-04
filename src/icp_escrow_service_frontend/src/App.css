@@ -346,6 +346,15 @@ body {
   color: black !important;
 }
 
-.ltr-class {
-  direction: ltr; 
+.badge-option {
+  padding: 5px 10px;
+  margin: 5px;
+  border-radius: 15px;
+  background-color: #e7e7e7;
+  cursor: pointer;
+}
+
+.badge-option.selected {
+  background-color: #3498db;
+  color: white;
 }

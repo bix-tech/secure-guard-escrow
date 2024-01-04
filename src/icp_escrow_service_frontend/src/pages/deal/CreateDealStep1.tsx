@@ -1,11 +1,12 @@
-import React, {useContext} from 'react';
+import React, { useContext, useState } from 'react';
 import CreateDealProgressBar from "../../components/CreateDealProgressBar";
 import { useForm } from 'react-hook-form';
 import { useDealData, User } from '../../contexts/DealContext';
 import { DealFlowContext } from '../../contexts/InitiateDealFlowContext';
+import '../../App.css';
 
 type CreateDealProps = {
-    onNext: () => void; 
+    onNext: () => void;
 };
 
 
@@ -17,9 +18,16 @@ type FormData = {
 
 const CreateDeal: React.FC<CreateDealProps> = ({ onNext }) => {
     const context = useContext(DealFlowContext);
-    const { dealData, setDealData } = useDealData(); 
-    const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
+    const { dealData, setDealData } = useDealData();
+    const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormData>();
+    const [selectedDealType, setSelectedDealType] = useState<User | ''>('');
 
+    register("dealType");
+
+    const selectDealType = (dealType: User) => {
+        setSelectedDealType(dealType);
+        setValue('dealType', dealType);
+    };
 
     const onSubmit = (formData: FormData) => {
         const userType: User = formData.dealType === 'Buyer' ? User.Buyer : User.Seller;
@@ -27,17 +35,18 @@ const CreateDeal: React.FC<CreateDealProps> = ({ onNext }) => {
         setDealData({
             ...dealData,
             dealName: formData.dealName,
-            dealType: userType, 
+            dealType: userType,
         });
 
         console.log(dealData);
         console.log(formData);
-        if(context) {
+        if (context) {
             context.completeStep('step1');
         }
 
-        onNext(); 
+        onNext();
     };
+
 
     return (
         <div className="card p-5 mx-auto my-5" style={{ width: '75%' }}>
@@ -59,12 +68,9 @@ const CreateDeal: React.FC<CreateDealProps> = ({ onNext }) => {
                             <div className="form-group col-md-9 text-start mx-auto">
                                 <label htmlFor="dealType" className="form-label">Are you a buyer or seller in this deal?</label>
                                 <div className="btn-group d-flex">
-                                    <label>
-                                        <input type="radio" {...register("dealType", { required: true })} value="Buyer" /> Buyer
-                                    </label>
-                                    <label>
-                                        <input type="radio" {...register("dealType", { required: true })} value="Seller" /> Seller
-                                    </label>
+                                <input type="hidden" {...register("dealType")} value={selectedDealType} />
+                                <span className={`badge-option ${selectedDealType === User.Buyer ? 'selected' : ''}`} onClick={() => selectDealType(User.Buyer)}>Buyer</span>
+                                    <span className={`badge-option ${selectedDealType === User.Seller ? 'selected' : ''}`} onClick={() => selectDealType(User.Seller)}>Seller</span>
                                     {errors.dealType && <p>This field is required</p>}
                                 </div>
                             </div>
