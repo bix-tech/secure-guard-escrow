@@ -145,6 +145,8 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
             const response = await backend.createDeal(deal);
 
             if (response) {
+                console.log(deal.to);
+                console.log(deal.from);
                 setDealData(deal);
                 if (context) {
                     context.completeStep('step2');

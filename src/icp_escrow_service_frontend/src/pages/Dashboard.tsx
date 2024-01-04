@@ -71,6 +71,16 @@ const Dashboard = () => {
     }
   }
 
+  // const handleCancelDeal = async (dealId: number) => {
+  //   try {
+  //     const result = await backend.cancelDeal(BigInt(dealId), Principal.fromText(principal || ''));
+  //     console.log("Cancel deal result:", result);
+  //     fetchActivityLogs();
+  //   } catch (error) {
+  //     console.error("Failed to cancel deal:", error);
+  //   }
+  // }
+
   return (
     <div>
       <div className="d-flex flex-row justify-content-between p-5">

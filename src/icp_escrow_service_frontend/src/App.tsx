@@ -83,8 +83,8 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <DealFlowProvider>
-          <DealDataProvider>
+        <DealDataProvider>
+          <DealFlowProvider>
             <NavbarWrapper />
             <Routes>
               <Route path="/" element={<Login />} />
@@ -99,8 +99,9 @@ function App() {
               <Route path="/deal/seller/submit-deliverables/:dealId" element={<ProtectedRoute><SubmitDeliverables /></ProtectedRoute>} />
               <Route path="/deal/seller/submit-deliverables-successfully/:dealId" element={<ProtectedRoute><SubmitDeliverablesSuccessfully /></ProtectedRoute>} />
             </Routes>
-          </DealDataProvider>
-        </DealFlowProvider>
+          </DealFlowProvider>
+        </DealDataProvider>
+
       </AuthProvider>
     </Router>
   );

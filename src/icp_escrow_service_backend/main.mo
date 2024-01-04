@@ -566,7 +566,7 @@ actor {
     };
   };
 
-  public shared ({ caller }) func cancelDeal(dealId : Nat) : async Result<Deal, Text> {
+  public shared ({ caller }) func cancelDeal(dealId : Nat, principal : Principal) : async Result<Deal, Text> {
     let dealOpt = deals.get(dealId);
 
     switch (dealOpt) {
@@ -574,8 +574,21 @@ actor {
         return #err("Deal not found");
       };
       case (?deal) {
-        let isBuyer = caller == deal.from;
-        let isSeller = caller == deal.to;
+        if (deal.status == "Cancelled") {
+          return #err("Deal already cancelled");
+        };
+
+        if (deal.status == "Completed") {
+          return #err("Deal already completed");
+        };
+
+        if (principal != deal.from and principal != deal.to) {
+          return #err("Only the buyer or seller can cancel the deal");
+        };
+
+
+        let isBuyer = principal == deal.to;
+        let isSeller = principal == deal.from;
 
         let updatedDeal = {
           status = deal.status;
@@ -600,7 +613,7 @@ actor {
         };
 
         if (updatedDeal.buyerCancelRequest and updatedDeal.sellerCancelRequest) {
-          let buyerAccount = { owner = deal.from; subaccount = null };
+          let buyerAccount = { owner = deal.to; subaccount = null };
           let lockedAmountOpt = lockedTokens.get(buyerAccount);
           switch (lockedAmountOpt) {
             case (null) {

@@ -7,7 +7,7 @@ import { usePrincipal } from "../../../hooks/usePrincipal";
 import { useDealData } from "../../../contexts/DealContext";
 
 const LockToken = () => {
-    const { dealData } = useDealData();
+    const { dealData, setDealData} = useDealData();
     const [amount, setAmount] = useState<bigint>(BigInt(0));
     const { dealId } = useParams();
     const navigate = useNavigate();
@@ -26,11 +26,13 @@ const LockToken = () => {
                     if ('ok' in result) {
                         if (result.ok.status === "Pending") {
                             setAmount(BigInt(result.ok.amount));
+                            setDealData(prevDealData => ({
+                                ...prevDealData,
+                                to: result.ok.to.toString(),
+                                from: result.ok.from.toString(),
+                            }));
 
-                            if (dealData.to && Principal.from(dealData.to).toText() !== principal) {
-                                console.log("Deal data:", dealData);
-                                console.log("Deal to:", dealData.to);
-                                console.log(principal);
+                            if (dealData && dealData.to && Principal.from(dealData.to).toText() !== principal) {
                                 navigate('/dashboard');
                             }
                         }

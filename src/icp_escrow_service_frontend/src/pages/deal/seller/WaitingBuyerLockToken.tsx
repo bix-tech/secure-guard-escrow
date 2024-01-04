@@ -9,33 +9,48 @@ import { Principal } from "@dfinity/principal"
 const WaitingBuyerLockToken = () => {
     const { dealId } = useParams();
     const navigate = useNavigate();
-    const { dealData } = useDealData();
+    const { dealData, setDealData } = useDealData();
     const { principal, isLoading: isPrincipalLoading } = usePrincipal();
 
     useEffect(() => {
         if (!isPrincipalLoading) {
-            if (dealData.from && Principal.from(dealData.to).toText() != principal) {
-                navigate('/dashboard');
-            } else {
-                const intervalId = setInterval(async () => {
-                    try {
-                        const result = await backend.getDealStatus(BigInt(dealId || 0));
-                        if ('ok' in result) {
-                            if (result.ok === "In Progress") {
+            const intervalId = setInterval(async () => {
+                try {
+                    const result = await backend.getDeal(BigInt(dealId || 0));
+                    if ('ok' in result) {
+                        const deal = result.ok;
+
+                        setDealData(prevDealData => ({
+                            ...prevDealData,
+                            to: deal.to.toString(),
+                            from: deal.from.toString(),
+                        }));
+
+                        if (dealData && dealData.from && Principal.from(dealData.from).toText() != principal) {
+                            clearInterval(intervalId);
+                            navigate('/dashboard');
+                        } else {
+                            if (deal.status === "In Progress") {
                                 clearInterval(intervalId);
                                 navigate(`/deal/seller/submit-deliverables/${dealId}`);
                             }
                         }
-                    } catch (error) {
-                        console.error("Failed to get deal status:", error);
                     }
-                }, 3000);
-                return () => clearInterval(intervalId);
-            }
+                } catch (error) {
+                    console.error("Failed to get deal data:", error);
+                }
+            }, 3000);
+            return () => clearInterval(intervalId);
         }
     }, [dealData, dealId, navigate, principal, isPrincipalLoading]);
 
-    if (!dealId){
+
+    const handleDashboardClick = () => {
+        navigate('/dashboard');
+    }
+
+
+    if (!dealId) {
         return (
             <div>
                 error
@@ -56,7 +71,7 @@ const WaitingBuyerLockToken = () => {
                 </div>
 
                 <div>
-                    <button className="btn return-dashboard-btn">Return to Dashboard</button>
+                    <button className="btn return-dashboard-btn" onClick={handleDashboardClick}>Return to Dashboard</button>
                 </div>
 
             </div>
