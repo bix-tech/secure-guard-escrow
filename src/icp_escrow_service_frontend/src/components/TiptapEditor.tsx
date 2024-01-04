@@ -14,10 +14,11 @@ import { useEffect, useState } from 'react';
 
 interface TiptapEditorProps {
     onContentChange?: (content: string) => void;
+    className?: string;
 }
 
 
-const TiptapEditor: React.FC<TiptapEditorProps> = ({ onContentChange }) => {
+const TiptapEditor: React.FC<TiptapEditorProps> = ({ onContentChange, className }) => {
     const editor = useEditor({
         extensions: [
             StarterKit,
@@ -34,75 +35,75 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({ onContentChange }) => {
             Link,
             Image,
         ],
-        content: '<p>Hello World!</p>',
+        content: '',
     });
 
     const [isEditorReady, setIsEditorReady] = useState(false);
 
 
     const setBold = () => {
-        if (editor){
-        editor.chain().focus().toggleBold().run();
+        if (editor) {
+            editor.chain().focus().toggleBold().run();
         }
     };
 
     const setItalic = () => {
-        if (editor){
-        editor.chain().focus().toggleItalic().run();
+        if (editor) {
+            editor.chain().focus().toggleItalic().run();
         }
     }
 
     const setUnderline = () => {
-        if (editor){
-        editor.chain().focus().toggleUnderline().run();
+        if (editor) {
+            editor.chain().focus().toggleUnderline().run();
         }
     }
 
     const setStrike = () => {
-        if (editor){
-        editor.chain().focus().toggleStrike().run();
+        if (editor) {
+            editor.chain().focus().toggleStrike().run();
         }
     }
 
     const setCode = () => {
-        if (editor){
-        editor.chain().focus().toggleCode().run();
+        if (editor) {
+            editor.chain().focus().toggleCode().run();
         }
     }
 
     const setBlockquote = () => {
-        if (editor){
-        editor.chain().focus().toggleBlockquote().run();
+        if (editor) {
+            editor.chain().focus().toggleBlockquote().run();
         }
     }
 
     const setBulletList = () => {
-        if (editor){
-        editor.chain().focus().toggleBulletList().run();
+        if (editor) {
+            editor.chain().focus().toggleBulletList().run();
         }
     }
 
     const setOrderedList = () => {
-        if (editor){
-        editor.chain().focus().toggleOrderedList().run();
+        if (editor) {
+            editor.chain().focus().toggleOrderedList().run();
         }
     }
 
     const setHorizontalRule = () => {
-        if (editor){
-        editor.chain().focus().setHorizontalRule().run();
+        if (editor) {
+            editor.chain().focus().setHorizontalRule().run();
         }
     }
 
     const setLink = () => {
-        if (editor){
-        editor.chain().focus().toggleLink({ href: 'https://example.com' }).run();
+        if (editor) {
+            editor.chain().focus().toggleLink({ href: 'https://example.com' }).run();
         }
     }
 
     const setImage = () => {
-        if (editor){
-        editor.chain().focus().setImage({ src: 'https://example.com/image.png' }).run();
+        if (editor) {
+            editor.chain().focus().setImage({ src: 'https://example.com/image.png' }).run();
         }
     }
 
@@ -162,7 +163,11 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({ onContentChange }) => {
             ) : (
                 <p>Loading editor...</p>
             )}
-            <EditorContent editor={editor} />
+            <div className={className}>
+
+                <EditorContent editor={editor} />
+            </div>
+
         </>
     );
 };

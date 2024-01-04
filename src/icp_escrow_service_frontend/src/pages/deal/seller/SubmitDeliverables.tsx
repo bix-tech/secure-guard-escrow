@@ -112,7 +112,7 @@ const CreateDeal = () => {
                     <div className="mb-3">
                         <div className="form-row col-md-9 text-start mx-auto">
                             <label htmlFor="deal-description" className="form-label text-start">Deal Description</label>
-                            <TiptapEditor onContentChange={handleEditorContentChange}/>
+                            <TiptapEditor onContentChange={handleEditorContentChange} className="form-control"/>
                         </div>
                     </div>
 
