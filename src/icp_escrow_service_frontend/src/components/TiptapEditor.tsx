@@ -2,12 +2,6 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import TextAlign from '@tiptap/extension-text-align';
 import Underline from '@tiptap/extension-underline';
-import Strike from '@tiptap/extension-strike';
-import Code from '@tiptap/extension-code';
-import Blockquote from '@tiptap/extension-blockquote';
-import BulletList from '@tiptap/extension-bullet-list';
-import OrderedList from '@tiptap/extension-ordered-list';
-import HorizontalRule from '@tiptap/extension-horizontal-rule';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
 import { useEffect, useState } from 'react';
@@ -26,12 +20,6 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({ onContentChange, className 
                 types: ['heading', 'paragraph'],
             }),
             Underline,
-            Strike,
-            Code,
-            Blockquote,
-            BulletList,
-            OrderedList,
-            HorizontalRule,
             Link,
             Image,
         ],
@@ -124,37 +112,37 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({ onContentChange, className 
         <>
             {isEditorReady ? (
                 <div className="editor-toolbar">
-                    <button onClick={setBold} className={editor?.isActive('bold') ? 'is-active' : ''}>
+                    <button type="button" onClick={setBold} className={editor?.isActive('bold') ? 'is-active' : ''}>
                         Bold
                     </button>
-                    <button onClick={setItalic} className={editor?.isActive('italic') ? 'is-active' : ''}>
+                    <button type="button" onClick={setItalic} className={editor?.isActive('italic') ? 'is-active' : ''}>
                         Italic
                     </button>
-                    <button onClick={setUnderline} className={editor?.isActive('underline') ? 'is-active' : ''}>
+                    <button type="button" onClick={setUnderline} className={editor?.isActive('underline') ? 'is-active' : ''}>
                         Underline
                     </button>
-                    <button onClick={setStrike} className={editor?.isActive('strike') ? 'is-active' : ''}>
+                    <button type="button" onClick={setStrike} className={editor?.isActive('strike') ? 'is-active' : ''}>
                         Strike
                     </button>
-                    <button onClick={setCode} className={editor?.isActive('code') ? 'is-active' : ''}>
+                    <button type="button" onClick={setCode} className={editor?.isActive('code') ? 'is-active' : ''}>
                         Code
                     </button>
-                    <button onClick={setBlockquote} className={editor?.isActive('blockquote') ? 'is-active' : ''}>
+                    <button type="button" onClick={setBlockquote} className={editor?.isActive('blockquote') ? 'is-active' : ''}>
                         Blockquote
                     </button>
-                    <button onClick={setBulletList} className={editor?.isActive('bulletList') ? 'is-active' : ''}>
+                    <button type="button" onClick={setBulletList} className={editor?.isActive('bulletList') ? 'is-active' : ''}>
                         Bullet List
                     </button>
-                    <button onClick={setOrderedList} className={editor?.isActive('orderedList') ? 'is-active' : ''}>
+                    <button type="button" onClick={setOrderedList} className={editor?.isActive('orderedList') ? 'is-active' : ''}>
                         Ordered List
                     </button>
-                    <button onClick={setHorizontalRule} className={editor?.isActive('horizontalRule') ? 'is-active' : ''}>
+                    <button type="button" onClick={setHorizontalRule} className={editor?.isActive('horizontalRule') ? 'is-active' : ''}>
                         Horizontal Rule
                     </button>
-                    <button onClick={setLink} className={editor?.isActive('link') ? 'is-active' : ''}>
+                    <button type="button" onClick={setLink} className={editor?.isActive('link') ? 'is-active' : ''}>
                         Link
                     </button>
-                    <button onClick={setImage} className={editor?.isActive('image') ? 'is-active' : ''}>
+                    <button type="button" onClick={setImage} className={editor?.isActive('image') ? 'is-active' : ''}>
                         Image
                     </button>
 
