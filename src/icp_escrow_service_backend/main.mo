@@ -12,12 +12,15 @@ import Bool "mo:base/Bool";
 import Iter "mo:base/Iter";
 import Blob "mo:base/Blob";
 import Debug "mo:base/Debug";
+import Order "mo:base/Order";
 import Account "account";
 import Wallet "wallet";
 import Deal "deal";
 
 actor {
   public type Result<A, B> = Result.Result<A, B>;
+
+  type Order = { #less; #equal; #greater };
 
   var pictures : HashMap.HashMap<Nat, Blob> = HashMap.HashMap(10, Nat.equal, Hash.hash);
 
@@ -646,12 +649,24 @@ actor {
 
   public func getActivityLogsForUser(user : Principal) : async [ActivityLog] {
     let allLogs = Array.flatten(Iter.toArray(activityLogs.vals()));
-    return Array.filter(
+
+    let userLogs = Array.filter(
       allLogs,
       func(log : ActivityLog) : Bool {
         log.user == user;
       },
     );
+
+    let sortedLogs = Array.sort(
+      userLogs,
+      func(a : ActivityLog, b : ActivityLog) : Order {
+        if (a.activityTime > b.activityTime) { return #less };
+        if (a.activityTime < b.activityTime) { return #greater };
+        return #equal;
+      },
+    );
+
+    return sortedLogs;
   };
 
   public func getActivityLogsCountForUser(user : Principal) : async Nat {

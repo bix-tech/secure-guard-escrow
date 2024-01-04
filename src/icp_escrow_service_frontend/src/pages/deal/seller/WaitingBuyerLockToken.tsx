@@ -4,6 +4,7 @@ import { backend } from "../../../../../declarations/backend";
 import { useNavigate, useParams } from "react-router-dom";
 import { usePrincipal } from "../../../hooks/usePrincipal";
 import { useDealData } from "../../../contexts/DealContext";
+import { Principal } from "@dfinity/principal"
 
 const WaitingBuyerLockToken = () => {
     const { dealId } = useParams();
@@ -13,10 +14,7 @@ const WaitingBuyerLockToken = () => {
 
     useEffect(() => {
         if (!isPrincipalLoading) {
-            if (dealData.from && dealData.from != principal) {
-                console.log("Deal data:", dealData);
-                console.log("Deal from:", dealData.from);
-                console.log("Principal:", principal);
+            if (dealData.from && Principal.from(dealData.to).toText() != principal) {
                 navigate('/dashboard');
             } else {
                 const intervalId = setInterval(async () => {
@@ -36,6 +34,14 @@ const WaitingBuyerLockToken = () => {
             }
         }
     }, [dealData, dealId, navigate, principal, isPrincipalLoading]);
+
+    if (!dealId){
+        return (
+            <div>
+                error
+            </div>
+        )
+    }
 
 
     return (

@@ -19,6 +19,9 @@ const LockToken = () => {
         if (!isPrincipalLoading) {
             const fetchDealDetails = async () => {
                 try {
+                    console.log("Deal data:", dealData);
+                    console.log("Deal to:", dealData.to);
+                    console.log(principal);
                     const result = await backend.getDeal(BigInt(dealId || 0));
                     if ('ok' in result) {
                         if (result.ok.status === "Pending") {

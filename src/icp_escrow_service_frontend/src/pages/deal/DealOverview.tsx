@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Deal } from "../../../../declarations/backend/backend.did";
 import '../../App.css';
 import { usePrincipal } from "../../hooks/usePrincipal";
-import { useDealData } from "../../contexts/DealContext";
+// import { Principal } from "@dfinity/principal";
 
 const DealOverview = () => {
     const [deal, setDeal] = useState<Deal | null>(null);
@@ -14,32 +14,31 @@ const DealOverview = () => {
     const [pictureUrls, setPictureUrls] = useState<string[]>([]);
     const [deliverableUrls, setDeliverableUrls] = useState<{ [id: string]: string }>({});
     const [isLoading, setIsLoading] = useState(true);
-    const { dealData } = useDealData();
     const navigate = useNavigate();
     // const [supportingDocUrls, setSupportingDocUrls] = useState<string[]>([]);
 
 
     useEffect(() => {
         const fetchDealData = async () => {
-            if (isPrincipalLoading) {
-                if (dealData.to && dealData.from !== principal) {
-                    try {
-                        const dealResult = await backend.getDeal(BigInt(dealId || 0));
-                        if ('ok' in dealResult) {
-                            const deal = dealResult.ok;
-                            setDeal(deal);
+            if (!isPrincipalLoading) {
+                try {
+                    const dealResult = await backend.getDeal(BigInt(dealId || 0));
+                    if ('ok' in dealResult) {
+                        const deal = dealResult.ok;
+                        setDeal(deal);
+                        if (deal.to.toString() === principal || deal.from.toString() === principal) {
                             await Promise.all([fetchPictures(deal), fetchDeliverables(deal)]);
                         } else {
-                            throw new Error('An error occurred while fetching the deal.');
+                            navigate('/dashboard');
                         }
-                    } catch (err) {
-                        setError(error);
-                        console.error(err);
-                    } finally {
-                        setIsLoading(false);
+                    } else {
+                        throw new Error('An error occurred while fetching the deal.');
                     }
-                } else {
-                    navigate('/dashboard');
+                } catch (err) {
+                    setError(error);
+                    console.error(err);
+                } finally {
+                    setIsLoading(false);
                 }
             }
         };
@@ -81,8 +80,7 @@ const DealOverview = () => {
 
         setIsLoading(true);
         fetchDealData();
-    }, [dealId]);
-
+    }, [dealId, principal, isPrincipalLoading]);
 
     const extractText = (rawDescription: any) => {
         try {

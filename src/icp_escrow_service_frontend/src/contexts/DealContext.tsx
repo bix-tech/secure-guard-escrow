@@ -2,7 +2,7 @@ import { createContext , useContext, useState } from 'react';
 import {  DealTimeline, Deliverable, PaymentScheduleInfo } from '../../../declarations/backend/backend.did';
 
 
-type DealData = {
+export type DealData = {
     dealName: string;
     dealType: User;
     dealStatus: DealStatus;
