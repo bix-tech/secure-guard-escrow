@@ -586,7 +586,6 @@ actor {
           return #err("Only the buyer or seller can cancel the deal");
         };
 
-
         let isBuyer = principal == deal.to;
         let isSeller = principal == deal.from;
 

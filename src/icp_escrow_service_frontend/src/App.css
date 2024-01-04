@@ -358,3 +358,21 @@ body {
   background-color: #237A88;
   color: white;
 }
+
+.btn-confirm {
+  background-color: #237A88 !important;
+  color: white !important;
+  border-radius: 20px !important;
+  padding: 5px 10px;
+  font-size: 14px; 
+}
+
+
+.btn-cancel {
+  background-color: #D6D6D6 !important;
+  color: white !important;
+  border-radius: 20px !important;
+  padding: 5px 10px;
+  font-size: 14px; 
+}
+

@@ -5,6 +5,7 @@ import { Deal } from "../../../../declarations/backend/backend.did";
 import '../../App.css';
 import { usePrincipal } from "../../hooks/usePrincipal";
 import Sidebar from '../../components/Sidebar';
+import { Principal } from "@dfinity/principal";
 // import { Principal } from "@dfinity/principal";
 
 const DealOverview = () => {
@@ -83,9 +84,6 @@ const DealOverview = () => {
         fetchDealData();
     }, [dealId, principal, isPrincipalLoading]);
 
-
-
-
     if (error) {
         return <div>Error: {error}</div>;
     }
@@ -97,6 +95,34 @@ const DealOverview = () => {
     if (isLoading) {
         return <div className="loader"></div>;
     }
+
+    const handleConfirmDeal = async (dealId: number) => {
+        try {
+            const result = await backend.confirmDeal(BigInt(dealId), Principal.fromText(principal || ''));
+            if ('ok' in result) {
+                console.log('Deal confirmed', result);
+            } else {
+                console.error('Deal confirmation failed');
+            }
+        } catch (error) {
+            console.error('Deal confirmation failed', error);
+        }
+    }
+
+    const handleCancelDeal = async (dealId: number) => {
+        try {
+            const result = await backend.cancelDeal(BigInt(dealId), Principal.fromText(principal || ''));
+
+            if ('ok' in result) {
+                console.log('Deal cancelled', result.ok);
+            } else {
+                console.error('Deal cancellation failed', result.err);
+            }
+        } catch (error) {
+            console.error('Deal cancellation failed', error);
+        }
+    }
+
 
     // useEffect(() => {
     //     const fetchSupportingDocuments = async () => {
@@ -126,13 +152,15 @@ const DealOverview = () => {
         <div className="container-fluid mt-1">
             <div className="row">
                 <Sidebar />
-
                 <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                     <div className="mt-4">
                         <h4>Deal Overview : {deal.name}</h4>
                         <p>SSM / Company</p>
+                        <div className="d-flex flex-row justify-content-end p-5">
+                        <button onClick={() => handleConfirmDeal(Number(dealId))} className="btn btn-confirm btn-primary" style={{marginRight: "5px"}}>Confirm Deal</button>
+                        <button onClick={() => handleCancelDeal(Number(dealId))} className="btn btn-cancel btn-primary">Cancel Deal</button>
                     </div>
-
+                    </div>
                     <div className="row mb-3">
                         <div className="col-md-6">
                             <div className="card p-3 my-5" style={{ width: "100%;", height: "100%" }}>
@@ -206,7 +234,7 @@ const DealOverview = () => {
                             {deal.description && extractText(deal.description)}
                         </div>
                     </div> */}
-                    
+
                     <div className="row mb-3">
                         <div className="col-md-12">
                             <div className="card p-5 mx-auto my-5">
@@ -215,15 +243,15 @@ const DealOverview = () => {
                                     {deal.deliverables.map((deliverable, index) => (
                                         <div key={deliverable.id || index} className="deliverable-item justify-content-between">
                                             {deliverable.deliverableDocuments.map((document) => (
-                                                <div className="d-flex align-items-center m-3" style={{width: "45%"}}>
-                                                    <div className="avatar me-3" style={{border: "none"}}>
+                                                <div className="d-flex align-items-center m-3" style={{ width: "45%" }}>
+                                                    <div className="avatar me-3" style={{ border: "none" }}>
                                                         <img src="/document-download.png" alt="User Avatar" />
                                                     </div>
-                                                        <div className="deliverable-download">
-                                                            <a key={document.id} href={deliverableUrls[document.id.toString()]} download={document.name}>
-                                                                <span>{document.name}</span>
-                                                            </a>
-                                                        </div>
+                                                    <div className="deliverable-download">
+                                                        <a key={document.id} href={deliverableUrls[document.id.toString()]} download={document.name}>
+                                                            <span>{document.name}</span>
+                                                        </a>
+                                                    </div>
                                                 </div>
                                             ))}
                                         </div>
@@ -233,8 +261,8 @@ const DealOverview = () => {
                         </div>
                     </div>
                 </main>
-            </div>
-        </div>
+            </div >
+        </div >
     )
 }
 

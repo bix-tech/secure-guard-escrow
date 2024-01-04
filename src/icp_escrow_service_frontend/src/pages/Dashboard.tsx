@@ -15,6 +15,7 @@ interface ActivityLog {
   status: string;
   deal: {
     to: Principal;
+    from: Principal;
   }
 }
 const itemsPerPage = 10;
@@ -62,25 +63,6 @@ const Dashboard = () => {
     }
   }, [principal, currentPage]);
 
-  const handleConfirmDeal = async (dealId: number) => {
-    try {
-      const result = await backend.confirmDeal(BigInt(dealId), Principal.fromText(principal || ''));
-      console.log("Confirm deal result:", result);
-      fetchActivityLogs();
-    } catch (error) {
-      console.error("Failed to confirm deal:", error);
-    }
-  }
-
-  // const handleCancelDeal = async (dealId: number) => {
-  //   try {
-  //     const result = await backend.cancelDeal(BigInt(dealId), Principal.fromText(principal || ''));
-  //     console.log("Cancel deal result:", result);
-  //     fetchActivityLogs();
-  //   } catch (error) {
-  //     console.error("Failed to cancel deal:", error);
-  //   }
-  // }
 
   return (
     <div className="container-fluid mt-1">
@@ -88,7 +70,7 @@ const Dashboard = () => {
         <Sidebar />
 
         <div className="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-          <div className="card p-5 mx-auto my-5" style={{ width: '80%'}}>
+          <div className="card p-5 mx-auto my-5" style={{ width: '80%' }}>
             <h2>Activity Logs</h2>
             <table className="table">
               <thead>
@@ -117,11 +99,6 @@ const Dashboard = () => {
                       <td>{log.activityType}</td>
                       <td>{log.amount}</td>
                       <td>{log.status}</td>
-                      <td>
-                        {log.status === "Submitted Deliverables" && log.user === log.deal.to.toText() && (
-                          <button onClick={() => handleConfirmDeal(log.dealId)}>Confirm Deal</button>
-                        )}
-                      </td>
                     </tr>
                   ))
                 )}
