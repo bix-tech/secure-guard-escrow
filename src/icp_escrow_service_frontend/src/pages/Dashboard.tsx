@@ -106,13 +106,13 @@ const Dashboard = () => {
 
             </table>
             <div className="pagination justify-content-center">
-              <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 0}>Previous</button>
+              <button className="previous-page-button" onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 0}>Previous</button>
               {Array.from({ length: totalPages }, (_, i) => (
-                <button key={i} onClick={() => handlePageClick(i)} className={currentPage === i ? 'active' : ''}>
+                <button key={i} onClick={() => handlePageClick(i)} className={`pages-button ${currentPage === i ? 'active' : ''}`}>
                   {i + 1}
                 </button>
               ))}
-              <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages - 1}>Next</button>
+              <button className="next-page-button" onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages - 1}>Next</button>
             </div>
           </div>
         </div>

@@ -376,3 +376,36 @@ body {
   font-size: 14px; 
 }
 
+.previous-page-button, .next-page-button {
+  padding: 0px 20px;
+}
+
+.pages-button {
+  font-size: 15px;
+  padding: 5px 10px;
+  height: auto;
+  width: 30px;
+}
+
+.pages-button.active{
+  background-color: #237A88;
+  border: none;
+  color: white;
+}
+
+.previous-page-button, .next-page-button, .pages-button {
+  border-radius: 5px;
+  margin: 0px 3px;
+  color: grey;
+  background-color: white;
+  border: 1px solid #ccc;
+}
+
+.previous-page-button, .next-page-button {
+  color: #237A88 !important;
+}
+
+.previous-page-button:disabled, .next-page-button:disabled {
+  color: #ccc !important;
+}
+
