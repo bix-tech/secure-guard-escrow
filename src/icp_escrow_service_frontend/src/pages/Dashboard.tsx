@@ -70,7 +70,7 @@ const Dashboard = () => {
       <div className="row">
         <Sidebar />
 
-        <div className="col-md-9 ms-sm-auto col-lg-10 px-1">
+        <div className="col-md-9 ms-sm-auto col-lg-10 px-1" style={{ position: 'relative' }}>
           <div className="card p-5 mx-auto my-5" style={{ width: '80%' }}>
             <h2>Activity Logs</h2>
             <table className="table">

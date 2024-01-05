@@ -1,7 +1,7 @@
 
 const Sidebar = () => {
     return (
-        <nav id="sidebar" className="pt-3 col-md-3 col-lg-2 d-md-block bg-light sidebar" style={{ height: 'auto' }}>
+        <nav id="sidebar" className="pt-3 col-md-3 col-lg-2 d-md-block bg-light sidebar" style={{ height: 'auto', minHeight: '92vh' }}>
           <div className="position-sticky">
             <ul className="nav flex-column">
               <li className="nav-item">

@@ -102,20 +102,23 @@ const Navbar = () => {
                 <div className="ms-auto"></div>
 
                 <Dropdown show={showNotification} onToggle={toggleNotification} ref={notificationRef}>
-                    <Dropdown.Toggle as="div" id="dropdown-notification" className="notification-avatar ms-3">
+                    <Dropdown.Toggle as="div" id="dropdown-notification" className="notification-avatar ms-3 d-flex align-items-center justify-content-center">
                         <img src="/notification.png" className="notification-icon" alt="Notification Avatar" />
                     </Dropdown.Toggle>
 
-                    <Dropdown.Menu className="notification-list">
+                    <Dropdown.Menu className="notification-list p-0">
                         {notifications.length === 0 ? (
                             <Dropdown.Item>No notifications</Dropdown.Item>
                         ) : (
                             notifications.map(notification => (
-                                <Dropdown.Item key={notification.dealId.toString()} className="notification-item" onClick={() => handleNotificationClick(notification.dealId)}>
+                                <Dropdown.Item key={notification.dealId.toString()} className="notification-item py-2 border-bottom" onClick={() => handleNotificationClick(notification.dealId)}>
                                     {notification.message}
                                 </Dropdown.Item>
                             ))
-                        )}
+                        )
+                        
+                        }
+                        <Dropdown.Item className='clear-notification-btn py-2 rounded-bottom'>Clear Message</Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
 

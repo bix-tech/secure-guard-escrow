@@ -67,13 +67,22 @@ body {
   object-fit: cover;
 }
 
+#dropdown-notification::after {
+  display: none;
+}
+
+.clear-notification-btn {
+  background-color: #237A88 !important;
+  color: white !important;
+  text-align: center !important;
+}
+
 .avatar, .notification-avatar {
   width: 40px;
   height: 40px;
   overflow: hidden;
   border-radius: 50%;
-  border: 1px solid grey; 
-  border: 1px solid grey; 
+  border: 1px solid #ccc; 
 }
 
 .avatar img {
@@ -94,7 +103,7 @@ body {
 
 .notification-avatar img {
   width: auto;
-  height: 100%;
+  height: 60%;
   object-fit: cover;
   border-radius: 50%;
 }
@@ -411,4 +420,25 @@ body {
 
 .bottom-bar {
   background-color: white;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+
+.editor-button {
+  border: none;
+  background-color: white !important;
+  margin: 0px 2px;
+}
+
+.editor-button.is-active {
+  background-color: #adadad !important;
+
+}
+
+.rich-editor {
+  height: auto;
+  border-radius: 0px !important;
+  border: none !important;
+  background-color: #f4f4f4 !important;
 }

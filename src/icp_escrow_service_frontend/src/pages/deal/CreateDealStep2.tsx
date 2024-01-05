@@ -272,7 +272,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                     <div className="mb-3">
                         <div className="form-row col-md-9 text-start mx-auto">
                             <label htmlFor="deal-description" className="form-label text-start">Deal Description</label>
-                            <TiptapEditor onContentChange={handleEditorContentChange} className="form-control"/>                            
+                            <TiptapEditor onContentChange={handleEditorContentChange} className="form-control rich-editor"/>                            
                         </div>
                     </div>
 
