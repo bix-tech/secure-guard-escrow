@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Principal } from "@dfinity/principal";
 import { usePrincipal } from "../hooks/usePrincipal";
 import Sidebar from '../components/Sidebar';
+import Bottombar from '../components/Bottombar';
 
 
 interface ActivityLog {
@@ -69,7 +70,7 @@ const Dashboard = () => {
       <div className="row">
         <Sidebar />
 
-        <div className="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <div className="col-md-9 ms-sm-auto col-lg-10 px-1">
           <div className="card p-5 mx-auto my-5" style={{ width: '80%' }}>
             <h2>Activity Logs</h2>
             <table className="table">
@@ -115,7 +116,12 @@ const Dashboard = () => {
               <button className="next-page-button" onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages - 1}>Next</button>
             </div>
           </div>
+
+          <Bottombar/>
         </div>
+
+
+
       </div>
     </div>
   )
