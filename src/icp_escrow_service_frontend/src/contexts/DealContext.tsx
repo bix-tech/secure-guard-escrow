@@ -15,6 +15,7 @@ export type DealData = {
   dealTimeline: DealTimeline[];
   deliverables: Deliverable[];
   supportDocuments: string[];
+  submissionTime: Date;
   buyerCancelRequest: boolean;
   sellerCancelRequest: boolean;
 }
@@ -54,6 +55,7 @@ const initiateDealData: DealData = {
   dealTimeline: [],
   deliverables: [],
   supportDocuments: [],
+  submissionTime:  new Date(),
   buyerCancelRequest: false,
   sellerCancelRequest: false,
 }

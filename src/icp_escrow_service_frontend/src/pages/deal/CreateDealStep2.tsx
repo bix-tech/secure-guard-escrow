@@ -139,9 +139,13 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                 })),
                 from: from,
                 amount: amount,
+                submissionTime: [],
                 sellerCancelRequest: false,
                 buyerCancelRequest: false,
             };
+
+            console.log(formattedDealEnd);
+            console.log(formattedDealStart);
 
             const response = await backend.createDeal(deal);
 

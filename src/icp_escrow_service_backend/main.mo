@@ -106,6 +106,7 @@ actor {
     paymentScheduleInfo : [PaymentScheduleInfo];
     dealTimeline : [DealTimeline];
     deliverables : [Deliverable];
+    submissionTime : ?Time;
     buyerCancelRequest : Bool;
     sellerCancelRequest : Bool;
   };
@@ -252,10 +253,11 @@ actor {
       description = newDeal.description;
       dealCategory = newDeal.dealCategory;
       dealType = newDeal.dealType;
-      paymentScheduleInfo = [];
-      dealTimeline = [];
+      paymentScheduleInfo = newDeal.paymentScheduleInfo;
+      dealTimeline = newDeal.dealTimeline;
       deliverables = [];
       supportingDocuments = newDeal.supportingDocuments;
+      submissionTime = null;
       buyerCancelRequest = false;
       sellerCancelRequest = false;
     };
@@ -380,6 +382,7 @@ actor {
                 dealTimeline = deal.dealTimeline;
                 deliverables = deal.deliverables;
                 supportingDocuments = deal.supportingDocuments;
+                submissionTime = deal.submissionTime;
                 buyerCancelRequest = deal.buyerCancelRequest;
                 sellerCancelRequest = deal.sellerCancelRequest;
               };
@@ -450,7 +453,7 @@ actor {
               case (null) { 0 };
               case (?balance) { balance };
             };
-            let dealFee = lockedAmount * 1/100;
+            let dealFee = lockedAmount * 1 / 100;
             ledger.put(platformAccount, dealFee);
             ledger.put(sellerAccount, sellerBalance + lockedAmount - dealFee);
             let _ = lockedTokens.remove(buyerAccount);
@@ -469,6 +472,7 @@ actor {
               paymentScheduleInfo = deal.paymentScheduleInfo;
               dealTimeline = deal.dealTimeline;
               deliverables = deal.deliverables;
+              submissionTime = deal.submissionTime;
               buyerCancelRequest = false;
               sellerCancelRequest = false;
             };
@@ -533,6 +537,7 @@ actor {
           dealTimeline = deal.dealTimeline;
           deliverables = updatedDeliverables;
           supportingDocuments = deal.supportingDocuments;
+          submissionTime = deal.submissionTime;
           buyerCancelRequest = deal.buyerCancelRequest;
           sellerCancelRequest = deal.sellerCancelRequest;
         };
@@ -607,6 +612,7 @@ actor {
           supportingDocuments = deal.supportingDocuments;
           dealTimeline = deal.dealTimeline;
           deliverables = deal.deliverables;
+          submissionTime = deal.submissionTime;
           buyerCancelRequest = if (isBuyer) { true } else {
             deal.buyerCancelRequest;
           };
@@ -650,6 +656,7 @@ actor {
             dealTimeline = deal.dealTimeline;
             deliverables = deal.deliverables;
             supportingDocuments = deal.supportingDocuments;
+            submissionTime = deal.submissionTime;
             buyerCancelRequest = false;
             sellerCancelRequest = false;
           };
@@ -740,6 +747,41 @@ actor {
     activityLogs.put(additionalLog.dealId, Array.append(existingAdditionalLogs, [additionalLog]));
   };
 
+  public func autoConfirmDeals() : async () {
+    let currentTime = Time.now();
+    var allDealIds : [Nat] = [];
+    let iter = deals.keys();
+    var maybeKey = iter.next();
+    while (maybeKey != null) {
+      switch (maybeKey) {
+        case (?k) {
+          allDealIds := Array.append(allDealIds, [k]);
+        };
+        case (null) {};
+      };
+      maybeKey := iter.next();
+    };
+
+    for (dealId in allDealIds.vals()) {
+      let dealOpt = deals.get(dealId);
+      switch (dealOpt) {
+        case (?deal) {
+          switch (deal.submissionTime) {
+            case (?subTime) {
+              // let deadline = subTime + 7 * 86400;
+              let deadline = subTime + 5 * 1000; 
+              if (currentTime >= deadline and deal.status == "Submitted Deliverables") {
+                let _ = await confirmDeal(dealId, deal.to);
+              };
+            };
+            case (null) {};
+          };
+        };
+        case (null) {};
+      };
+    };
+  };
+
   public func mintTokens(principal : Principal, amount : Nat) : async () {
     let defaultAccount = { owner = principal; subaccount = null };
     let balanceOpt = ledger.get(defaultAccount);
@@ -757,4 +799,8 @@ actor {
     return msg.caller;
   };
 
+ system func heartbeat() : async () {
+      await autoConfirmDeals();
+  };
 };
+
