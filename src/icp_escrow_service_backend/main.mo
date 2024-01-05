@@ -13,6 +13,7 @@ import Iter "mo:base/Iter";
 import Blob "mo:base/Blob";
 import Debug "mo:base/Debug";
 import Order "mo:base/Order";
+import Int "mo:base/Int";
 import Account "account";
 import Wallet "wallet";
 import Deal "deal";
@@ -453,8 +454,8 @@ actor {
               case (null) { 0 };
               case (?balance) { balance };
             };
-            let dealFee = lockedAmount * 1 / 100;
-            ledger.put(platformAccount, dealFee);
+            let dealFee = (lockedAmount * 1) / 100;
+            ledger.put(platformAccount,dealFee);
             ledger.put(sellerAccount, sellerBalance + lockedAmount - dealFee);
             let _ = lockedTokens.remove(buyerAccount);
 
@@ -537,7 +538,7 @@ actor {
           dealTimeline = deal.dealTimeline;
           deliverables = updatedDeliverables;
           supportingDocuments = deal.supportingDocuments;
-          submissionTime = deal.submissionTime;
+          submissionTime = ?Time.now();
           buyerCancelRequest = deal.buyerCancelRequest;
           sellerCancelRequest = deal.sellerCancelRequest;
         };
@@ -768,8 +769,9 @@ actor {
         case (?deal) {
           switch (deal.submissionTime) {
             case (?subTime) {
-              // let deadline = subTime + 7 * 86400;
-              let deadline = subTime + 5 * 1000; 
+            // let sevenDays = 7 * 86400 * 1000000000;  
+            let fiveMinutes = 5 * 60 * 1000000000;
+            let deadline = subTime + fiveMinutes;
               if (currentTime >= deadline and deal.status == "Submitted Deliverables") {
                 let _ = await confirmDeal(dealId, deal.to);
               };
