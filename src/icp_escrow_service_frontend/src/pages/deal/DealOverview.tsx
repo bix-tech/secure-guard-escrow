@@ -102,7 +102,7 @@ const DealOverview = () => {
             if ('ok' in result) {
                 console.log('Deal confirmed', result);
             } else {
-                console.error('Deal confirmation failed');
+                console.error('Deal confirmation failed', result);
             }
         } catch (error) {
             console.error('Deal confirmation failed', error);

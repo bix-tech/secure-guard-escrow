@@ -51,9 +51,6 @@ actor {
     dealId : Nat;
     message : Text;
   };
-  public type DealFee = {
-    percent : Float;
-  };
 
   public type BuyerStatus = {
     #Pending;
@@ -347,7 +344,14 @@ actor {
           return #InsufficientBalance;
         } else {
           ledger.put(buyerAccount, balance - amount);
-          lockedTokens.put(buyerAccount, amount);
+          let existingLockedAmountOpt = lockedTokens.get(buyerAccount);
+          let existingLockedAmount = switch (existingLockedAmountOpt){
+            case (null) {0};
+            case (?amount) {amount};
+          };
+
+          let newLockedAmount = existingLockedAmount + amount;
+          lockedTokens.put(buyerAccount, newLockedAmount);
 
           let dealOpt = deals.get(dealId);
           switch (dealOpt) {
@@ -454,10 +458,17 @@ actor {
               case (null) { 0 };
               case (?balance) { balance };
             };
-            let dealFee = (lockedAmount * 1) / 100;
-            ledger.put(platformAccount,dealFee);
-            ledger.put(sellerAccount, sellerBalance + lockedAmount - dealFee);
-            let _ = lockedTokens.remove(buyerAccount);
+          
+            let platformBalanceOpt = ledger.get(platformAccount);
+            let platformBalance = switch(platformBalanceOpt){
+              case (null) {0};
+              case (?balance) {balance};
+            };
+            let dealFee = (deal.amount * 1) / 100;
+            ledger.put(platformAccount,dealFee + platformBalance);
+            ledger.put(sellerAccount, sellerBalance + (deal.amount - dealFee));
+            let newLockedAmount = lockedAmount - deal.amount;
+            lockedTokens.put(buyerAccount, newLockedAmount);
 
             let updatedDeal = {
               status = "Completed";
