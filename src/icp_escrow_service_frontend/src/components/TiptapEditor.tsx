@@ -59,11 +59,11 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({ onContentChange, className 
         }
     }
 
-    const setBlockquote = () => {
-        if (editor) {
-            editor.chain().focus().toggleBlockquote().run();
-        }
-    }
+    // const setBlockquote = () => {
+    //     if (editor) {
+    //         editor.chain().focus().toggleBlockquote().run();
+    //     }
+    // }
 
     const setBulletList = () => {
         if (editor) {
@@ -77,11 +77,11 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({ onContentChange, className 
         }
     }
 
-    const setHorizontalRule = () => {
-        if (editor) {
-            editor.chain().focus().setHorizontalRule().run();
-        }
-    }
+    // const setHorizontalRule = () => {
+    //     if (editor) {
+    //         editor.chain().focus().setHorizontalRule().run();
+    //     }
+    // }
 
     const setLink = () => {
         if (editor) {
@@ -110,40 +110,45 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({ onContentChange, className 
 
     return (
         <>
+            <link
+                rel="stylesheet"
+                href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+            />
+
             {isEditorReady ? (
                 <div className="editor-toolbar">
                     <button type="button" onClick={setBold} className={editor?.isActive('bold') ? 'is-active' : ''}>
-                        Bold
+                        <i className="fas fa-bold"></i>
                     </button>
                     <button type="button" onClick={setItalic} className={editor?.isActive('italic') ? 'is-active' : ''}>
-                        Italic
+                        <i className="fas fa-italic"></i>
                     </button>
                     <button type="button" onClick={setUnderline} className={editor?.isActive('underline') ? 'is-active' : ''}>
-                        Underline
+                        <i className="fas fa-underline"></i>
                     </button>
                     <button type="button" onClick={setStrike} className={editor?.isActive('strike') ? 'is-active' : ''}>
-                        Strike
+                    <i className="fa-solid fa-strikethrough"></i>
                     </button>
                     <button type="button" onClick={setCode} className={editor?.isActive('code') ? 'is-active' : ''}>
-                        Code
+                    <i className="fas fa-code"></i>
                     </button>
-                    <button type="button" onClick={setBlockquote} className={editor?.isActive('blockquote') ? 'is-active' : ''}>
-                        Blockquote
-                    </button>
+                    {/* <button type="button" onClick={setBlockquote} className={editor?.isActive('blockquote') ? 'is-active' : ''}>
+                    <i className="fa-solid fa-block-quote"></i>                   
+                     </button> */}
                     <button type="button" onClick={setBulletList} className={editor?.isActive('bulletList') ? 'is-active' : ''}>
-                        Bullet List
+                    <i className="fa-solid fa-list"></i>
                     </button>
                     <button type="button" onClick={setOrderedList} className={editor?.isActive('orderedList') ? 'is-active' : ''}>
-                        Ordered List
+                    <i className="fas fa-list-ol"></i>
                     </button>
-                    <button type="button" onClick={setHorizontalRule} className={editor?.isActive('horizontalRule') ? 'is-active' : ''}>
-                        Horizontal Rule
-                    </button>
+                    {/* <button type="button" onClick={setHorizontalRule} className={editor?.isActive('horizontalRule') ? 'is-active' : ''}>
+                    <i className="fa-solid fa-horizontal-rule"></i>
+                    </button> */}
                     <button type="button" onClick={setLink} className={editor?.isActive('link') ? 'is-active' : ''}>
-                        Link
+                    <i className="fas fa-link"></i>
                     </button>
                     <button type="button" onClick={setImage} className={editor?.isActive('image') ? 'is-active' : ''}>
-                        Image
+                    <i className="fas fa-image"></i>
                     </button>
 
 

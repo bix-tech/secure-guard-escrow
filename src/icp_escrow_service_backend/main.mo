@@ -32,6 +32,8 @@ actor {
 
   let lockedTokens : TrieMap.TrieMap<Account.Account, Nat> = TrieMap.TrieMap(Account.accountsEqual, Account.accountsHash);
 
+  let platformAcc : Principal = Principal.fromText("msfjg-mdjak-g5m3u-6rel6-bdj6e-2olg2-v2eo2-k6pmq-73oey-m6pq5-qqe");
+
   var nextDealId : Nat = 1;
 
   let deals : TrieMap.TrieMap<Nat, Deal> = TrieMap.TrieMap(Nat.equal, Hash.hash);
@@ -435,6 +437,7 @@ actor {
 
         let sellerAccount = { owner = deal.from; subaccount = null };
         let buyerAccount = { owner = deal.to; subaccount = null };
+        let platformAccount = { owner = platformAcc; subaccount = null };
         let lockedAmountOpt = lockedTokens.get(buyerAccount);
 
         switch (lockedAmountOpt) {
@@ -447,8 +450,9 @@ actor {
               case (null) { 0 };
               case (?balance) { balance };
             };
-
-            ledger.put(sellerAccount, sellerBalance + lockedAmount);
+            let dealFee = lockedAmount * 1/100;
+            ledger.put(platformAccount, dealFee);
+            ledger.put(sellerAccount, sellerBalance + lockedAmount - dealFee);
             let _ = lockedTokens.remove(buyerAccount);
 
             let updatedDeal = {

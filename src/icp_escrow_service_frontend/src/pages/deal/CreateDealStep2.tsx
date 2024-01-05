@@ -9,7 +9,7 @@ import { usePrincipal } from '../../hooks/usePrincipal';
 import { DealFlowContext } from '../../contexts/InitiateDealFlowContext';
 import '../../App.css';
 import { useNavigate } from 'react-router-dom';
-import TiptapEditor from '../../components/TipTapEditor';
+import TiptapEditor from '../../components/TiptapEditor';
 
 type CreateDealProps = {
     onNext: () => void;

@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import InitiatingDealProgressBar from '../../../components/InitiatingDealProgressBar';
 import { backend } from '../../../../../declarations/backend';
 import { useParams, useNavigate } from 'react-router-dom';
-import TiptapEditor from '../../../components/TipTapEditor';
+import TiptapEditor from '../../../components/TiptapEditor';
 
 
 type DocumentFile = {
