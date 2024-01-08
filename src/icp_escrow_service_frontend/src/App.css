@@ -449,4 +449,9 @@ body {
   border-radius: 20px !important;
   padding: 5px 10px;
   font-size: 14px; 
+  height: auto;
+  width: 150px;
+  position: relative;
+  margin-left: auto;
+  margin-top: -25px;
 }
