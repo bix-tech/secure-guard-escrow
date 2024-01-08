@@ -162,10 +162,9 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
             console.log(response);
 
 
-            if (response) {
-                console.log(deal.to);
-                console.log(deal.from);
-                setDealData(deal);
+            if ('ok' in response) {
+                const newDealId = response.ok.CreateDealOk.id;
+                setDealData(prevState => ({ ...prevState, id: newDealId }));
                 if (context) {
                     context.completeStep('step2');
                 }

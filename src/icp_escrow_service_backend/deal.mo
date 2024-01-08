@@ -7,7 +7,9 @@ module {
     public type createDealResult = Result<CreateDealOk, CreateDealErr>;
 
     public type CreateDealOk = {
-        #CreateDealOk;
+        #CreateDealOk : {
+            id : Nat;
+        };
     };
 
     public type CreateDealErr = {

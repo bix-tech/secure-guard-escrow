@@ -265,23 +265,21 @@ actor {
       sellerCancelRequest = false;
     };
 
-      let creatorDescription : Text = if (principal == newDeal.from){
-        "You, as a seller, created a deal named: " # newDeal.name;
-      } else if (principal == newDeal.to) {
-        "You, as a buyer, created a deal named: " # newDeal.name;
-      } else {
-        "Invalid principal";
-      };
+    let creatorDescription : Text = if (principal == newDeal.from) {
+      "You, as a seller, created a deal named: " # newDeal.name;
+    } else if (principal == newDeal.to) {
+      "You, as a buyer, created a deal named: " # newDeal.name;
+    } else {
+      "Invalid principal";
+    };
 
-      let receiverDescription : Text = if (principal == newDeal.from){
-        "You, as a buyer, received a deal named: " # newDeal.name;
-      } else if (principal == newDeal.to) {
-        "You, as a seller, received a deal named: " # newDeal.name;
-      } else {
-        "Invalid principal";
-      };
-
-
+    let receiverDescription : Text = if (principal == newDeal.from) {
+      "You, as a buyer, received a deal named: " # newDeal.name;
+    } else if (principal == newDeal.to) {
+      "You, as a seller, received a deal named: " # newDeal.name;
+    } else {
+      "Invalid principal";
+    };
 
     let creatorLog = {
       dealId = nextDealId;
@@ -315,7 +313,7 @@ actor {
 
     addNotification(newDeal.to, { dealId = nextDealId - 1; message = "You have a new deal named: " # newDeal.name });
 
-    return #ok(#CreateDealOk);
+    return #ok(#CreateDealOk({ id = nextDealId - 1 }));
   };
 
   public shared ({ caller }) func getDeal(dealId : Nat) : async Result<Deal, Text> {
@@ -441,8 +439,8 @@ actor {
 
               let buyerLog = {
                 dealId = dealId;
-                description = "Deal in progress";
-                activityType = "DealIn Progress";
+                description = "Deal in progress, you've locked token for this deal.";
+                activityType = "Deal In Progress";
                 status = "In Progress";
                 amount = deal.amount;
                 activityTime = Time.now();
@@ -452,7 +450,7 @@ actor {
 
               let sellerLog = {
                 dealId = dealId;
-                description = "Deal in progress";
+                description = "Deal in progress, buyer has locked token for this deal.";
                 activityType = "Deal In Progress";
                 status = "In Progress";
                 amount = deal.amount;
@@ -540,7 +538,7 @@ actor {
 
             let sellerLog = {
               dealId = dealId;
-              description = "Deal completed";
+              description = "Deal completed, buyer has confirmed the deal.";
               activityType = "Deal Completed";
               status = "Completed";
               amount = deal.amount;
@@ -551,7 +549,7 @@ actor {
 
             let buyerLog = {
               dealId = dealId;
-              description = "Deal completed";
+              description = "Deal completed, you've confirmed the deal.";
               activityType = "Deal Completed";
               status = "Completed";
               amount = deal.amount;
@@ -607,7 +605,7 @@ actor {
 
         let buyerLog = {
           dealId = dealId;
-          description = "Seller submitted deliverables,";
+          description = "Seller submitted deliverables, please check and confirm the deal if everything is ok.";
           activityType = "Submitted Deliverables";
           status = "Submitted Deliverables";
           amount = deal.amount;
@@ -618,7 +616,7 @@ actor {
 
         let sellerLog = {
           dealId = dealId;
-          description = "You submitted deliverables.";
+          description = "You've submitted deliverables, wait for buyer to confirm deal.";
           activityType = "Submitted Deliverables";
           status = "Submitted Deliverables";
           amount = deal.amount;
@@ -686,6 +684,34 @@ actor {
           };
         };
 
+        if (isBuyer) {
+          let buyerLog = {
+            dealId = dealId;
+            description = "Deal cancelled, please wait for seller to cancel the deal too.";
+            activityType = "Deal Cancelation";
+            status = "Cancelled";
+            amount = deal.amount;
+            activityTime = Time.now();
+            user = deal.to;
+            deal = updatedDeal;
+          };
+
+          await createActivityLog(buyerLog, deal.to);
+        } else if (isSeller) {
+          let sellerLog = {
+            dealId = dealId;
+            description = "Deal cancelled, please wait for buyer to cancel the deal too.";
+            activityType = "Deal Cancelation";
+            status = "Cancelled";
+            amount = deal.amount;
+            activityTime = Time.now();
+            user = deal.from;
+            deal = updatedDeal;
+          };
+
+          await createActivityLog(sellerLog, deal.from);
+        };
+
         if (updatedDeal.buyerCancelRequest and updatedDeal.sellerCancelRequest) {
           let buyerAccount = { owner = deal.to; subaccount = null };
           let lockedAmountOpt = lockedTokens.get(buyerAccount);
@@ -725,6 +751,38 @@ actor {
             buyerCancelRequest = false;
             sellerCancelRequest = false;
           };
+
+          let afterBuyerLog = {
+            dealId = dealId;
+            description = "Deal cancelled, you've cancelled the deal.";
+            activityType = "Deal Cancelation";
+            status = "Cancelled";
+            amount = deal.amount;
+            activityTime = Time.now();
+            user = deal.to;
+            deal = finalDeal;
+          };
+
+          let afterSellerLog = {
+            dealId = dealId;
+            description = "Deal cancelled, you've cancelled the deal.";
+            activityType = "Deal Cancelation";
+            status = "Cancelled";
+            amount = deal.amount;
+            activityTime = Time.now();
+            user = deal.from;
+            deal = finalDeal;
+          };
+
+          await createActivityLog(afterBuyerLog, deal.to);
+          await createActivityLog(afterSellerLog, deal.from);
+
+          if (finalDeal.from == principal) {
+            addNotification(finalDeal.to, { dealId = nextDealId - 1; message = "Seller cancelled the deal." });
+          } else {
+            addNotification(finalDeal.from, { dealId = nextDealId - 1; message = "Buyer cancelled the deal." });
+          };
+
           deals.put(dealId, finalDeal);
           return #ok(finalDeal);
         } else {
