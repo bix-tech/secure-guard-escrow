@@ -5,6 +5,7 @@ import { Principal } from '@dfinity/principal';
 import { Deal } from '../../../../declarations/backend/backend.did';
 import Sidebar from '../../components/Sidebar';
 import { useNavigate } from 'react-router-dom';
+import '../../App.css';
 
 const MyDeal = () => {
     const { principal, isLoading: isPrincipalLoading } = usePrincipal();
@@ -37,9 +38,6 @@ const MyDeal = () => {
         fetchDealData();
     }, [principal, isPrincipalLoading]);
 
-
-
-
     return (
         <div className="container-fluid mt-1">
             <div className="row">
@@ -55,7 +53,7 @@ const MyDeal = () => {
                             deal.map((d, index) => (
                                 <div key={index} className="card p-3 my-2">
                                     <div className="row">
-                                        <div className="col d-flex justify-content-between">
+                                        <div className="col d-flex justify-content-between align-center">
                                             {d.name}
                                             <button className="btn btn-confirm btn-primary" onClick={() => handleViewDealDetails(d.id)}>View Deal Details</button>
                                         </div>

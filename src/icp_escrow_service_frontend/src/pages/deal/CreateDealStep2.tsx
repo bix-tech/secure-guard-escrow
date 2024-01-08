@@ -144,7 +144,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
             console.log(formattedDealEnd);
             console.log(formattedDealStart);
 
-            const response = await backend.createDeal(deal);
+            const response = await backend.createDeal(deal, Principal.fromText(principal || ''));
 
             if (response) {
                 console.log(deal.to);

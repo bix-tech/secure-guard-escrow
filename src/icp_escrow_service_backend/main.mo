@@ -243,7 +243,7 @@ actor {
     return allDocuments;
   };
 
-  public shared ({ caller }) func createDeal(newDeal : Deal) : async Deal.createDealResult {
+  public shared ({ caller }) func createDeal(newDeal : Deal, principal : Principal) : async Deal.createDealResult {
     let dealToCreate = {
       id = nextDealId;
       status = newDeal.status;
@@ -265,9 +265,27 @@ actor {
       sellerCancelRequest = false;
     };
 
-    let buyerLog = {
+      let creatorDescription : Text = if (principal == newDeal.from){
+        "You, as a seller, created a deal named: " # newDeal.name;
+      } else if (principal == newDeal.to) {
+        "You, as a buyer, created a deal named: " # newDeal.name;
+      } else {
+        "Invalid principal";
+      };
+
+      let receiverDescription : Text = if (principal == newDeal.from){
+        "You, as a buyer, received a deal named: " # newDeal.name;
+      } else if (principal == newDeal.to) {
+        "You, as a seller, received a deal named: " # newDeal.name;
+      } else {
+        "Invalid principal";
+      };
+
+
+
+    let creatorLog = {
       dealId = nextDealId;
-      description = "Successfully create a deal";
+      description = creatorDescription;
       activityType = "Deal Created";
       status = newDeal.status;
       amount = newDeal.amount;
@@ -277,10 +295,10 @@ actor {
 
     };
 
-    let sellerLog = {
+    let receiverLog = {
       dealId = nextDealId;
-      description = "Successfully create a deal";
-      activityType = "Deal Created";
+      description = receiverDescription;
+      activityType = "Deal Received";
       status = newDeal.status;
       amount = newDeal.amount;
       activityTime = Time.now();
@@ -288,15 +306,15 @@ actor {
       deal = dealToCreate;
     };
 
-    await createActivityLog(buyerLog, newDeal.to);
-    await createActivityLog(sellerLog, newDeal.from);
+    await createActivityLog(creatorLog, principal);
+    await createActivityLog(receiverLog, if (principal == newDeal.from) newDeal.to else newDeal.from);
 
     deals.put(nextDealId, dealToCreate);
 
     nextDealId += 1;
 
     addNotification(newDeal.to, { dealId = nextDealId - 1; message = "You have a new deal named: " # newDeal.name });
-    
+
     return #ok(#CreateDealOk);
   };
 
@@ -313,7 +331,7 @@ actor {
     };
   };
 
-  public shared ({caller}) func getAllDealsForUser(principal : Principal) : async ResultDeal<[Deal]> {
+  public shared ({ caller }) func getAllDealsForUser(principal : Principal) : async ResultDeal<[Deal]> {
     let allDeals = Iter.toArray(deals.vals());
 
     let userDeals = Array.filter(
