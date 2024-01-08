@@ -27,6 +27,8 @@ const CreateDeal: React.FC<CreateDealProps> = ({ onNext }) => {
     const selectDealType = (dealType: User) => {
         setSelectedDealType(dealType);
         setValue('dealType', dealType);
+
+        console.log(selectedDealType)
     };
 
     const onSubmit = (formData: FormData) => {
@@ -68,8 +70,8 @@ const CreateDeal: React.FC<CreateDealProps> = ({ onNext }) => {
                             <div className="form-group col-md-9 text-start mx-auto">
                                 <label htmlFor="dealType" className="form-label">Are you a buyer or seller in this deal?</label>
                                 <div className="btn-group d-flex">
-                                <input type="hidden" {...register("dealType")} value={selectedDealType} />
-                                <span className={`badge-option ${selectedDealType === User.Buyer ? 'selected' : ''}`} onClick={() => selectDealType(User.Buyer)}>Buyer</span>
+                                    <input type="hidden" {...register("dealType")} value={selectedDealType} />
+                                    <span className={`badge-option ${selectedDealType === User.Buyer ? 'selected' : ''}`} onClick={() => selectDealType(User.Buyer)}>Buyer</span>
                                     <span className={`badge-option ${selectedDealType === User.Seller ? 'selected' : ''}`} onClick={() => selectDealType(User.Seller)}>Seller</span>
                                     {errors.dealType && <p>This field is required</p>}
                                 </div>

@@ -10,6 +10,7 @@ import { DealFlowContext } from '../../contexts/InitiateDealFlowContext';
 import '../../App.css';
 import { useNavigate } from 'react-router-dom';
 import TiptapEditor from '../../components/TiptapEditor';
+import { useForm } from 'react-hook-form';
 
 type CreateDealProps = {
     onNext: () => void;
@@ -33,13 +34,15 @@ type PaymentSchedule = {
 
 type PaymentSchedules = PaymentSchedule[];
 
-
+type FormData = {
+    dealCategory : DealCategory;
+};
 
 
 const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
     const context = useContext(DealFlowContext);
     const navigate = useNavigate();
-    const [selectedCategory, setSelectedCategory] = useState<DealCategory>(DealCategory.NFT);
+    // const [selectedCategory, setSelectedCategory] = useState<DealCategory>(DealCategory.NFT);
     const [recipientPrincipal, setRecipientPrincipal] = useState<string>('');
     const { principal } = usePrincipal();
     const { dealData, setDealData } = useDealData();
@@ -51,18 +54,28 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
     const [uploadedPicture, setUploadedPicture] = useState<UploadedPictureType | null>(null);
     const [editorContent, setEditorContent] = useState('');
     const [uploadedDocuments, setUploadedDocuments] = useState<DocumentFile[]>([]);
-
+    const [selectedDealCategory, setSelectedDealCategory] = useState<DealCategory>(DealCategory.NFT);
+    const { register, setValue} = useForm<FormData>();
 
     useEffect(() => {
         if (!context || !context.stepCompleted.step1) {
             navigate('/createDealStep1');
         }
-    }, [context, navigate]);
+        console.log(selectedDealCategory);
+    }, [context, navigate, selectedDealCategory]);
 
+    register('dealCategory');
 
-    const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedCategory(event.target.value as DealCategory);
+    const selectDealCategory = (dealCategory: DealCategory) => {
+        setSelectedDealCategory(dealCategory);
+        setValue('dealCategory', dealCategory);
+        console.log('deal category clicked');
+        // console.log(dealCategory);
     };
+
+    // const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    //     setSelectedCategory(event.target.value as DealCategory);
+    // };
 
     const [paymentSchedules, setPaymentSchedules] = useState<PaymentSchedules>([
         { packageName: "", packageDescription: "" }
@@ -120,7 +133,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                 dealType: dealData.dealType === "Buyer" ? { "Buyer": null } : { "Seller": null },
                 description: editorContent,
                 status: "Pending",
-                dealCategory: {[selectedCategory] : null},
+                dealCategory: {[selectedDealCategory] : null},
                 dealTimeline: [{
                     dealStart: formattedDealStart,
                     dealEnd: formattedDealEnd
@@ -145,6 +158,9 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
             console.log(formattedDealStart);
 
             const response = await backend.createDeal(deal, Principal.fromText(principal || ''));
+
+            console.log(response);
+
 
             if (response) {
                 console.log(deal.to);
@@ -247,6 +263,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
         setEditorContent(content);
     };
     
+    
 
     const label = dealData.dealType === "Buyer" ? "From" : "To";
 
@@ -280,7 +297,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                     <div className="mb-3">
                         <div className='form-row col-md-9 text-start mx-auto'>
                             <label htmlFor="deal-category" className='form-label text-start'>Deal Category</label>
-                            <select
+                            {/* <select
                                 id="deal-category"
                                 className="form-control"
                                 value={selectedCategory}
@@ -289,7 +306,16 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                                 {Object.values(DealCategory).map((category, index) => (
                                     <option key={index} value={category}>{category}</option>
                                 ))}
-                            </select>
+                            </select> */}
+                            <div className="btn-group d-flex">
+                                <input type="hidden" {...register("dealCategory")} value={selectedDealCategory} />
+                                <span className={`badge-option ${selectedDealCategory === DealCategory.NFT ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.NFT)}>NFT</span>
+                                <span className={`badge-option ${selectedDealCategory === DealCategory.DomainName ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.DomainName)}>Domain Name</span>
+                                <span className={`badge-option ${selectedDealCategory === DealCategory.Services ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.Services)}>Services</span>
+                                <span className={`badge-option ${selectedDealCategory === DealCategory.PhysicalProducts ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.PhysicalProducts)}>Physical Products</span>
+                                <span className={`badge-option ${selectedDealCategory === DealCategory.DigitalProducts ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.DigitalProducts)}>Digital Products</span>
+                                <span className={`badge-option ${selectedDealCategory === DealCategory.Tokens ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.Tokens)}>Tokens</span>
+                            </div>
                         </div>
                     </div>
 
