@@ -173,9 +173,12 @@ const DealOverview = () => {
                         <h4>Deal Overview : {deal.name}</h4>
                         <p>SSM / Company</p>
                         <div className="d-flex flex-row justify-content-end p-5">
-                            <button onClick={handleOpenConfirmModal} className="btn btn-confirm btn-primary" style={{ marginRight: "5px" }}>Confirm Deal</button>
-                            <button onClick={handleOpenCancelModal} className="btn btn-cancel btn-primary">Cancel Deal</button>
-
+                            {deal.status !== 'Confirmed' && deal.status !== 'Cancelled' && (
+                                <button onClick={handleOpenConfirmModal} className="btn btn-confirm btn-primary" style={{ marginRight: "5px" }}>Confirm Deal</button>
+                            )}
+                            {deal.status !== 'Confirmed' && deal.status !== 'Cancelled' && (
+                                <button onClick={handleOpenCancelModal} className="btn btn-cancel btn-primary">Cancel Deal</button>
+                            )}
                             <Modal show={showConfirmModal} onHide={handleCloseConfirmModal}>
                                 <Modal.Header closeButton>
                                     <Modal.Title>Confirm Deal</Modal.Title>
