@@ -57,7 +57,7 @@ const MyDeal = () => {
                                     <div className="row">
                                         <div className="col d-flex justify-content-between">
                                             {d.name}
-                                            <button className="btn btn-create btn-primary" onClick={() => handleViewDealDetails(d.id)}>View Deal Details</button>
+                                            <button className="btn btn-confirm btn-primary" onClick={() => handleViewDealDetails(d.id)}>View Deal Details</button>
                                         </div>
                                     </div>
                                 </div>
