@@ -211,14 +211,12 @@ const DealOverview = () => {
                                             ))}
                                         </div>
                                         <div className="text-start">
-                                            <h4 className="mb-0">Renovation Contract for Condo</h4>
-                                            <small>Apartment Assets</small>
+                                            <h4 className="mb-0">{deal.name}</h4>
+                                            <small>{Object.keys(deal.dealCategory)[0]}</small>
                                         </div>
                                     </div>
 
                                     <hr />
-
-
                                     <div className="contract-info">
                                         <div className="row">
                                             <div className="d-flex align-items-center">

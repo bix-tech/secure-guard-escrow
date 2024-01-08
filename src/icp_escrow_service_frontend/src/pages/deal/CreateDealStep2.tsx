@@ -124,7 +124,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                 dealType: dealData.dealType === "Buyer" ? { "Buyer": null } : { "Seller": null },
                 description: editorContent,
                 status: "Pending",
-                dealCategory: { "NFT": null },
+                dealCategory: {[selectedCategory] : null},
                 dealTimeline: [{
                     dealStart: formattedDealStart,
                     dealEnd: formattedDealEnd
