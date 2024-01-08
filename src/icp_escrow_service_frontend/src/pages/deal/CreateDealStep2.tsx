@@ -3,7 +3,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import CreateDealProgressBar from '../../components/CreateDealProgressBar';
 import { backend } from '../../../../declarations/backend';
-import { DealCategory, DealStatus, useDealData } from '../../contexts/DealContext';
+import { DealCategory, useDealData } from '../../contexts/DealContext';
 import { Principal } from '@dfinity/principal';
 import { usePrincipal } from '../../hooks/usePrincipal';
 import { DealFlowContext } from '../../contexts/InitiateDealFlowContext';
@@ -41,7 +41,6 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
     const navigate = useNavigate();
     const [selectedCategory, setSelectedCategory] = useState<DealCategory>(DealCategory.NFT);
     const [recipientPrincipal, setRecipientPrincipal] = useState<string>('');
-    const [selectedStatus, setSelectedStatus] = useState<DealStatus>(DealStatus.Pending);
     const { principal } = usePrincipal();
     const { dealData, setDealData } = useDealData();
     const [amount, setAmount] = useState<number>(0);
@@ -63,10 +62,6 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
 
     const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedCategory(event.target.value as DealCategory);
-    };
-
-    const handleStatusChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedStatus(event.target.value as DealStatus);
     };
 
     const [paymentSchedules, setPaymentSchedules] = useState<PaymentSchedules>([
@@ -291,22 +286,6 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                             >
                                 {Object.values(DealCategory).map((category, index) => (
                                     <option key={index} value={category}>{category}</option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="mb-3">
-                        <div className='form-row col-md-9 text-start mx-auto'>
-                            <label htmlFor="deal-status" className='form-label text-start'>Deal Status</label>
-                            <select
-                                id="deal-status"
-                                className="form-control"
-                                onChange={handleStatusChange}
-                                value={selectedStatus}
-                            >
-                                {Object.values(DealStatus).map((status, index) => (
-                                    <option key={index} value={status}>{status}</option>
                                 ))}
                             </select>
                         </div>

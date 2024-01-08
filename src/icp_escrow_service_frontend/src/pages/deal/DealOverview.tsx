@@ -212,7 +212,8 @@ const DealOverview = () => {
                                         </div>
                                         <div className="text-start">
                                             <h4 className="mb-0">{deal.name}</h4>
-                                            <small>{Object.keys(deal.dealCategory)[0]}</small>
+                                            <small>{Object.keys(deal.dealCategory)[0]}</small><br />
+                                            <small>{deal.status}</small>
                                         </div>
                                     </div>
 
