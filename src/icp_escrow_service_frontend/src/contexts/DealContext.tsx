@@ -3,6 +3,7 @@ import { DealTimeline, Deliverable, PaymentScheduleInfo } from '../../../declara
 
 
 export type DealData = {
+  id: bigint;
   dealName: string;
   dealType: User;
   dealStatus: DealStatus;
@@ -15,6 +16,7 @@ export type DealData = {
   dealTimeline: DealTimeline[];
   deliverables: Deliverable[];
   supportDocuments: string[];
+  createTime: Date;
   submissionTime: Date;
   buyerCancelRequest: boolean;
   sellerCancelRequest: boolean;
@@ -43,6 +45,7 @@ export enum User {
 }
 
 const initiateDealData: DealData = {
+  id: BigInt(0),
   dealName: '',
   dealType: User.Buyer,
   dealStatus: DealStatus.Pending,
@@ -55,6 +58,7 @@ const initiateDealData: DealData = {
   dealTimeline: [],
   deliverables: [],
   supportDocuments: [],
+  createTime: new Date(),
   submissionTime:  new Date(),
   buyerCancelRequest: false,
   sellerCancelRequest: false,

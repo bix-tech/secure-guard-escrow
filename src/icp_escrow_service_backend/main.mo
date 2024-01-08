@@ -21,6 +21,8 @@ import Deal "deal";
 actor {
   public type Result<A, B> = Result.Result<A, B>;
 
+  public type ResultDeal<T> = { #ok : T; #err : Text };
+
   type Order = { #less; #equal; #greater };
 
   var pictures : HashMap.HashMap<Nat, Blob> = HashMap.HashMap(10, Nat.equal, Hash.hash);
@@ -91,6 +93,7 @@ actor {
   };
 
   public type Deal = {
+    id : Nat;
     status : DealStatus;
     name : Text;
     from : Principal;
@@ -104,6 +107,7 @@ actor {
     paymentScheduleInfo : [PaymentScheduleInfo];
     dealTimeline : [DealTimeline];
     deliverables : [Deliverable];
+    createTime : Time;
     submissionTime : ?Time;
     buyerCancelRequest : Bool;
     sellerCancelRequest : Bool;
@@ -255,6 +259,7 @@ actor {
       dealTimeline = newDeal.dealTimeline;
       deliverables = [];
       supportingDocuments = newDeal.supportingDocuments;
+      createTime = Time.now();
       submissionTime = null;
       buyerCancelRequest = false;
       sellerCancelRequest = false;
@@ -306,6 +311,28 @@ actor {
         return #ok(deal);
       };
     };
+  };
+
+  public shared ({caller}) func getAllDealsForUser(principal : Principal) : async ResultDeal<[Deal]> {
+    let allDeals = Iter.toArray(deals.vals());
+
+    let userDeals = Array.filter(
+      allDeals,
+      func(deal : Deal) : Bool {
+        deal.from == principal or deal.to == principal;
+      },
+    );
+
+    let sortedDeals = Array.sort(
+      userDeals,
+      func(a : Deal, b : Deal) : Order {
+        if (a.createTime > b.createTime) { return #less };
+        if (a.createTime < b.createTime) { return #greater };
+        return #equal;
+      },
+    );
+
+    return #ok(sortedDeals);
   };
 
   public shared ({ caller }) func getDealStatus(dealId : Nat) : async Result<DealStatus, Text> {
@@ -374,6 +401,7 @@ actor {
               };
 
               let updatedDeal = {
+                id = dealId;
                 status = "In Progress";
                 name = deal.name;
                 from = deal.from;
@@ -387,6 +415,7 @@ actor {
                 dealTimeline = deal.dealTimeline;
                 deliverables = deal.deliverables;
                 supportingDocuments = deal.supportingDocuments;
+                createTime = deal.createTime;
                 submissionTime = deal.submissionTime;
                 buyerCancelRequest = deal.buyerCancelRequest;
                 sellerCancelRequest = deal.sellerCancelRequest;
@@ -471,6 +500,7 @@ actor {
             lockedTokens.put(buyerAccount, newLockedAmount);
 
             let updatedDeal = {
+              id = dealId;
               status = "Completed";
               name = deal.name;
               from = deal.from;
@@ -484,6 +514,7 @@ actor {
               paymentScheduleInfo = deal.paymentScheduleInfo;
               dealTimeline = deal.dealTimeline;
               deliverables = deal.deliverables;
+              createTime = deal.createTime;
               submissionTime = deal.submissionTime;
               buyerCancelRequest = false;
               sellerCancelRequest = false;
@@ -536,6 +567,7 @@ actor {
         let updatedDeliverables = Array.append(deal.deliverables, [newDeliverable]);
 
         let updatedDeal = {
+          id = dealId;
           status = "Submitted Deliverables";
           name = deal.name;
           from = deal.from;
@@ -549,6 +581,7 @@ actor {
           dealTimeline = deal.dealTimeline;
           deliverables = updatedDeliverables;
           supportingDocuments = deal.supportingDocuments;
+          createTime = deal.createTime;
           submissionTime = ?Time.now();
           buyerCancelRequest = deal.buyerCancelRequest;
           sellerCancelRequest = deal.sellerCancelRequest;
@@ -611,6 +644,7 @@ actor {
         let isSeller = principal == deal.from;
 
         let updatedDeal = {
+          id = dealId;
           status = deal.status;
           name = deal.name;
           from = deal.from;
@@ -624,6 +658,7 @@ actor {
           supportingDocuments = deal.supportingDocuments;
           dealTimeline = deal.dealTimeline;
           deliverables = deal.deliverables;
+          createTime = deal.createTime;
           submissionTime = deal.submissionTime;
           buyerCancelRequest = if (isBuyer) { true } else {
             deal.buyerCancelRequest;
@@ -653,6 +688,7 @@ actor {
           };
 
           let finalDeal = {
+            id = dealId;
             status = "Cancelled";
             name = deal.name;
             from = deal.from;
@@ -666,6 +702,7 @@ actor {
             dealTimeline = deal.dealTimeline;
             deliverables = deal.deliverables;
             supportingDocuments = deal.supportingDocuments;
+            createTime = deal.createTime;
             submissionTime = deal.submissionTime;
             buyerCancelRequest = false;
             sellerCancelRequest = false;

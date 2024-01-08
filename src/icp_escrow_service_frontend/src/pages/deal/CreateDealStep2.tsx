@@ -114,6 +114,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
 
             const deal = {
                 ...event,
+                id: 0,
                 name: dealData.dealName,
                 label: label,
                 dealType: dealData.dealType === "Buyer" ? { "Buyer": null } : { "Seller": null },
@@ -134,6 +135,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                 })),
                 from: from,
                 amount: amount,
+                createTime: Date.now(),
                 submissionTime: [],
                 sellerCancelRequest: false,
                 buyerCancelRequest: false,
