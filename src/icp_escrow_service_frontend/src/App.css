@@ -331,7 +331,7 @@ body {
   animation: spin 2s linear infinite;
   position: absolute;
   top: 50%;
-  left: 50%;
+  left: 45%;
 }
 
 @keyframes spin {
@@ -441,4 +441,12 @@ body {
   border-radius: 0px !important;
   border: none !important;
   background-color: #f4f4f4 !important;
+}
+
+.btn-create {
+  background-color: #237A88 !important;
+  color: white !important;
+  border-radius: 20px !important;
+  padding: 5px 10px;
+  font-size: 14px; 
 }

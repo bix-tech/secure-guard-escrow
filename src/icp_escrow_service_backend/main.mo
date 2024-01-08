@@ -637,14 +637,12 @@ actor {
           let buyerAccount = { owner = deal.to; subaccount = null };
           let lockedAmountOpt = lockedTokens.get(buyerAccount);
           switch (lockedAmountOpt) {
-            case (null) {
-              return #err("Insufficient Balance");
-            };
+            case (null) {};
             case (?lockedAmount) {
               let balanceOpt = ledger.get(buyerAccount);
               switch (balanceOpt) {
                 case (null) {
-                  return #err("Insufficient Balance");
+                  ledger.put(buyerAccount, lockedAmount);
                 };
                 case (?balance) {
                   ledger.put(buyerAccount, balance + lockedAmount);
@@ -704,7 +702,7 @@ actor {
     return sortedLogs;
   };
 
-  public func getActivityLogsCountForUser(user : Principal) : async Nat {
+  public func getActivityLogsCountForUser(user : Principal, page: Nat, itemsPerPage: Nat) : async [ActivityLog] {
     let allLogs = Array.flatten(Iter.toArray(activityLogs.vals()));
     let userLogs = Array.filter(
       allLogs,
@@ -712,7 +710,13 @@ actor {
         log.user == user;
       },
     );
-    return Array.size(userLogs);
+    let start = page * itemsPerPage;
+    var end = (page + 1) * itemsPerPage;
+    if (end > Array.size(userLogs)){
+      end := Array.size(userLogs);
+    };
+
+    return Iter.toArray(Array.slice(userLogs, start, end));
   };
 
   public func createActivityLog(newLog : ActivityLog, additionalUser : Principal) : async () {

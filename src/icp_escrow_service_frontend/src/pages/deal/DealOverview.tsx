@@ -6,6 +6,9 @@ import '../../App.css';
 import { usePrincipal } from "../../hooks/usePrincipal";
 import Sidebar from '../../components/Sidebar';
 import { Principal } from "@dfinity/principal";
+import { Modal, Button } from 'react-bootstrap';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 // import { Principal } from "@dfinity/principal";
 
 const DealOverview = () => {
@@ -16,7 +19,15 @@ const DealOverview = () => {
     const [pictureUrls, setPictureUrls] = useState<string[]>([]);
     const [deliverableUrls, setDeliverableUrls] = useState<{ [id: string]: string }>({});
     const [isLoading, setIsLoading] = useState(true);
+    const [showConfirmModal, setConfirmModal] = useState(false);
+    const [showCancelModal, setCancelModal] = useState(false);
     const navigate = useNavigate();
+
+    const handleOpenConfirmModal = () => setConfirmModal(true);
+    const handleCloseConfirmModal = () => setConfirmModal(false);
+
+    const handleOpenCancelModal = () => setCancelModal(true);
+    const handleCloseCancelModal = () => setCancelModal(false);
     // const [supportingDocUrls, setSupportingDocUrls] = useState<string[]>([]);
 
 
@@ -101,6 +112,8 @@ const DealOverview = () => {
             const result = await backend.confirmDeal(BigInt(dealId), Principal.fromText(principal || ''));
             if ('ok' in result) {
                 console.log('Deal confirmed', result);
+                toast.success('Deal confirmed successfully');
+                setConfirmModal(false);
             } else {
                 console.error('Deal confirmation failed', result);
             }
@@ -115,6 +128,8 @@ const DealOverview = () => {
 
             if ('ok' in result) {
                 console.log('Deal cancelled', result.ok);
+                toast.success('Deal cancelled successfully');
+                setCancelModal(false);
             } else {
                 console.error('Deal cancellation failed', result.err);
             }
@@ -150,6 +165,7 @@ const DealOverview = () => {
 
     return (
         <div className="container-fluid mt-1">
+            <ToastContainer />
             <div className="row">
                 <Sidebar />
                 <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4">
@@ -157,9 +173,31 @@ const DealOverview = () => {
                         <h4>Deal Overview : {deal.name}</h4>
                         <p>SSM / Company</p>
                         <div className="d-flex flex-row justify-content-end p-5">
-                        <button onClick={() => handleConfirmDeal(Number(dealId))} className="btn btn-confirm btn-primary" style={{marginRight: "5px"}}>Confirm Deal</button>
-                        <button onClick={() => handleCancelDeal(Number(dealId))} className="btn btn-cancel btn-primary">Cancel Deal</button>
-                    </div>
+                            <button onClick={handleOpenConfirmModal} className="btn btn-confirm btn-primary" style={{ marginRight: "5px" }}>Confirm Deal</button>
+                            <button onClick={handleOpenCancelModal} className="btn btn-cancel btn-primary">Cancel Deal</button>
+
+                            <Modal show={showConfirmModal} onHide={handleCloseConfirmModal}>
+                                <Modal.Header closeButton>
+                                    <Modal.Title>Confirm Deal</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body> Are you sure you want to confirm this deal?</Modal.Body>
+                                <Modal.Footer>
+                                    <Button variant="secondary" onClick={handleCloseConfirmModal}>Close</Button>
+                                    <Button variant="primary" onClick={() => { handleConfirmDeal(Number(dealId)) }}>Confirm</Button>
+                                </Modal.Footer>
+                            </Modal>
+
+                            <Modal show={showCancelModal} onHide={handleCloseCancelModal}>
+                                <Modal.Header closeButton>
+                                    <Modal.Title>Cancel Deal</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>Are you sure you want to cancel this deal?</Modal.Body>
+                                <Modal.Footer>
+                                    <Button variant="secondary" onClick={handleCloseCancelModal}>Close</Button>
+                                    <Button variant="primary" onClick={() => { handleCancelDeal(Number(dealId)) }}>Cancel</Button>
+                                </Modal.Footer>
+                            </Modal>
+                        </div>
                     </div>
                     <div className="row mb-3">
                         <div className="col-md-6">

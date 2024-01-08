@@ -4,6 +4,7 @@ import { Principal } from "@dfinity/principal";
 import { usePrincipal } from "../hooks/usePrincipal";
 import Sidebar from '../components/Sidebar';
 import Bottombar from '../components/Bottombar';
+import { useNavigate } from "react-router";
 
 
 interface ActivityLog {
@@ -28,9 +29,14 @@ const Dashboard = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
   const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const navigate = useNavigate();
 
   const handlePageClick = (page: number) => {
     setCurrentPage(page);
+  };
+
+  const handleCreateDeal = () => {
+    navigate('/createDealStep1')
   };
 
 
@@ -50,7 +56,8 @@ const Dashboard = () => {
           status: log.status.toString(),
         }));
         setActivityLogs(mappedLogs);
-        setTotalItems(logs.length);
+        const totalLogs = await backend.getActivityLogsCountForUser(Principal.fromText(principal), BigInt(currentPage), BigInt(itemsPerPage));
+        setTotalItems(totalLogs.length);
         setIsLoading(false);
       } catch (error) {
         console.error("Failed to fetch activity logs:", error);
@@ -69,8 +76,10 @@ const Dashboard = () => {
     <div className="container-fluid mt-1">
       <div className="row">
         <Sidebar />
-
         <div className="col-md-9 ms-sm-auto col-lg-10 px-1" style={{ position: 'relative' }}>
+        <div className="button-container mx-5" style={{float: 'right'}}>
+        <button className="btn btn-create btn-primary" onClick={handleCreateDeal}> Create Deal </button>
+        </div>
           <div className="card p-5 mx-auto my-5" style={{ width: '80%' }}>
             <h2>Activity Logs</h2>
             <table className="table">
@@ -90,6 +99,12 @@ const Dashboard = () => {
                       <div className="spinner-border text-primary" role="status">
                         <span className="visually-hidden">Loading...</span>
                       </div>
+                    </td>
+                  </tr>
+                ) : activityLogs.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} style={{ textAlign: 'center', padding: '20px' }}>
+                      No activity logs found.
                     </td>
                   </tr>
                 ) : (
