@@ -283,12 +283,12 @@ const DealOverview = () => {
                                     {deal.deliverables.map((deliverable, index) => (
                                         <div key={deliverable.id || index} className="deliverable-item justify-content-between">
                                             {deliverable.deliverableDocuments.map((document) => (
-                                                <div className="d-flex align-items-center m-3" style={{ width: "45%" }}>
+                                                <div key={document.id} className="d-flex align-items-center m-3" style={{ width: "45%" }}>
                                                     <div className="avatar me-3" style={{ border: "none" }}>
                                                         <img src="/document-download.png" alt="User Avatar" />
                                                     </div>
                                                     <div className="deliverable-download">
-                                                        <a key={document.id} href={deliverableUrls[document.id.toString()]} download={document.name}>
+                                                        <a href={deliverableUrls[document.id.toString()]} download={document.name}>
                                                             <span>{document.name}</span>
                                                         </a>
                                                     </div>

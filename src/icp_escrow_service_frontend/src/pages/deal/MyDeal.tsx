@@ -7,14 +7,34 @@ import Sidebar from '../../components/Sidebar';
 import { useNavigate } from 'react-router-dom';
 import '../../App.css';
 
+
 const MyDeal = () => {
     const { principal, isLoading: isPrincipalLoading } = usePrincipal();
     const [deal, setDeal] = useState<Deal[] | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
 
-    const handleViewDealDetails = (dealId: bigint) => {
-        navigate(`/deal-overview/${dealId}`);
+    const handleActionDetail = async (dealId: bigint) => {
+        const result = await backend.getDeal(dealId);
+        if ('ok' in result) {
+            if (result.ok.status === 'Pending' && result.ok.to.toString() === principal?.toString()) {
+                navigate(`/deal/buyer/lock-token/${dealId}`);
+            } else if (result.ok.status === 'Pending' && result.ok.from.toString() === principal?.toString()) {
+                navigate(`/deal/seller/waiting-buyer/${dealId}`);
+            } else if (result.ok.status === 'In Progress' && result.ok.to.toString() === principal?.toString()) {
+                navigate(`/deal/buyer/lock-successfully/${dealId}`);
+            } else if (result.ok.status === 'In Progress' && result.ok.from.toString() === principal?.toString()) {
+                navigate(`/deal/seller/submit-deliverables/${dealId}`);
+            } else if (result.ok.status === 'Submitted Deliverables' && result.ok.to.toString() === principal?.toString()) {
+                navigate(`/deal-overview/${dealId}`);
+            } else if (result.ok.status === 'Submitted Deliverables' && result.ok.from.toString() === principal?.toString()) {
+                navigate(`/deal/seller/submit-deliverables-successfully/${dealId}`);
+            } else if (result.ok.status === 'Completed') {
+                navigate(`/deal-overview/${dealId}`);
+            } else if (result.ok.status === 'Cancelled') {
+                navigate(`/deal-overview/${dealId}`);
+            }
+        }
     };
 
     useEffect(() => {
@@ -55,7 +75,47 @@ const MyDeal = () => {
                                     <div className="row">
                                         <div className="col d-flex justify-content-between align-center">
                                             {d.name}
-                                            <button className="btn btn-confirm btn-primary" onClick={() => handleViewDealDetails(d.id)}>View Deal Details</button>
+                                            {d.status === 'Pending' && d.to.toString() === principal?.toString() ? (
+                                                <div>
+                                                    <span className="badge badge-warning">Pending</span>
+                                                    <button className="btn btn-confirm btn-primary" onClick={() => handleActionDetail(d.id)}>Proceed to lock token</button>
+                                                </div>
+                                            ) : d.status === 'Pending' && d.from.toString() === principal?.toString() ? (
+                                                <div>
+                                                    <span className="badge badge-warning">Pending</span>
+                                                    <button className="btn btn-confirm btn-primary" onClick={() => handleActionDetail(d.id)}>Waiting for buyer to lock token</button>
+                                                </div>
+                                            ) : d.status === 'In Progress' && d.to.toString() === principal?.toString() ? (
+                                                <div>
+                                                    <span className="badge badge-primary">In Progress</span>
+                                                    <button className="btn btn-confirm btn-primary" onClick={() => handleActionDetail(d.id)}>Waiting for seller to submit deliverables</button>
+                                                </div>
+                                            ) : d.status === 'In Progress' && d.from.toString() === principal?.toString() ? (
+                                                <div>
+                                                    <span className="badge badge-primary">In Progress</span>
+                                                    <button className="btn btn-confirm btn-primary" onClick={() => handleActionDetail(d.id)}>Proceed to submit deliverables</button>
+                                                </div>
+                                            ) : d.status === 'Submitted Deliverables' && d.to.toString() === principal?.toString() ? (
+                                                <div>
+                                                    <span className="badge badge-success">Submitted Deliverables</span>
+                                                    <button className="btn btn-confirm btn-primary" onClick={() => handleActionDetail(d.id)}>Proceed to confirm deal</button>
+                                                </div>
+                                            ) : d.status === 'Submitted Deliverables' && d.from.toString() === principal?.toString() ? (
+                                                <div>
+                                                    <span className="badge badge-success">Submitted Deliverables</span>
+                                                    <button className="btn btn-confirm btn-primary" onClick={() => handleActionDetail(d.id)}>Waiting for buyer to confirm deal</button>
+                                                </div>
+                                            ) : d.status === 'Completed' ? (
+                                                <div>
+                                                    <span className="badge badge-success">Completed</span>
+                                                    <button className="btn btn-confirm btn-primary" onClick={() => handleActionDetail(d.id)}>View Deal Details</button>
+                                                </div>
+                                            ) : (
+                                                <div>
+                                                    <span className="badge badge-danger">Cancelled</span>
+                                                    <button className="btn btn-confirm btn-primary" onClick={() => handleActionDetail(d.id)}>View Deal Details</button>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
