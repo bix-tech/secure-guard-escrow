@@ -290,8 +290,8 @@ actor {
 
     nextDealId += 1;
 
-    addNotification(newDeal.to, { dealId = nextDealId - 1; message = "You have a new deal" });
-
+    addNotification(newDeal.to, { dealId = nextDealId - 1; message = "You have a new deal named: " # newDeal.name });
+    
     return #ok(#CreateDealOk);
   };
 
@@ -345,9 +345,9 @@ actor {
         } else {
           ledger.put(buyerAccount, balance - amount);
           let existingLockedAmountOpt = lockedTokens.get(buyerAccount);
-          let existingLockedAmount = switch (existingLockedAmountOpt){
-            case (null) {0};
-            case (?amount) {amount};
+          let existingLockedAmount = switch (existingLockedAmountOpt) {
+            case (null) { 0 };
+            case (?amount) { amount };
           };
 
           let newLockedAmount = existingLockedAmount + amount;
@@ -458,14 +458,14 @@ actor {
               case (null) { 0 };
               case (?balance) { balance };
             };
-          
+
             let platformBalanceOpt = ledger.get(platformAccount);
-            let platformBalance = switch(platformBalanceOpt){
-              case (null) {0};
-              case (?balance) {balance};
+            let platformBalance = switch (platformBalanceOpt) {
+              case (null) { 0 };
+              case (?balance) { balance };
             };
             let dealFee = (deal.amount * 1) / 100;
-            ledger.put(platformAccount,dealFee + platformBalance);
+            ledger.put(platformAccount, dealFee + platformBalance);
             ledger.put(sellerAccount, sellerBalance + (deal.amount - dealFee));
             let newLockedAmount = lockedAmount - deal.amount;
             lockedTokens.put(buyerAccount, newLockedAmount);
@@ -702,7 +702,7 @@ actor {
     return sortedLogs;
   };
 
-  public func getActivityLogsCountForUser(user : Principal, page: Nat, itemsPerPage: Nat) : async [ActivityLog] {
+  public func getActivityLogsCountForUser(user : Principal, page : Nat, itemsPerPage : Nat) : async [ActivityLog] {
     let allLogs = Array.flatten(Iter.toArray(activityLogs.vals()));
     let userLogs = Array.filter(
       allLogs,
@@ -712,7 +712,7 @@ actor {
     );
     let start = page * itemsPerPage;
     var end = (page + 1) * itemsPerPage;
-    if (end > Array.size(userLogs)){
+    if (end > Array.size(userLogs)) {
       end := Array.size(userLogs);
     };
 
@@ -784,9 +784,9 @@ actor {
         case (?deal) {
           switch (deal.submissionTime) {
             case (?subTime) {
-            // let sevenDays = 7 * 86400 * 1000000000;  
-            let fiveMinutes = 5 * 60 * 1000000000;
-            let deadline = subTime + fiveMinutes;
+              // let sevenDays = 7 * 86400 * 1000000000;
+              let fiveMinutes = 5 * 60 * 1000000000;
+              let deadline = subTime + fiveMinutes;
               if (currentTime >= deadline and deal.status == "Submitted Deliverables") {
                 let _ = await confirmDeal(dealId, deal.to);
               };
@@ -816,8 +816,7 @@ actor {
     return msg.caller;
   };
 
- system func heartbeat() : async () {
-      await autoConfirmDeals();
+  system func heartbeat() : async () {
+    await autoConfirmDeals();
   };
 };
-

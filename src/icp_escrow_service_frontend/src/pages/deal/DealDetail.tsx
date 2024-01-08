@@ -201,7 +201,7 @@ const DealOverview = () => {
                     </div>
                     <div className="row mb-3">
                         <div className="col-md-6">
-                            <div className="card p-3 my-5" style={{ width: "100%;", height: "100%" }}>
+                            <div className="card p-3 my-5" style={{ width: "100%", height: "100%" }}>
                                 <div className="card-body text-center">
                                     <div className="d-flex align-items-center">
                                         <div className="avatar me-3">
@@ -244,7 +244,7 @@ const DealOverview = () => {
                             </div>
                         </div>
                         <div className="col-md-6">
-                            <div className="card p-3 my-5" style={{ width: "100%;", height: "100%" }}>
+                            <div className="card p-3 my-5" style={{ width: "100%", height: "100%" }}>
                                 <div className="card-body ">
                                     <div className="text-start">
                                         <h4>Deal Description</h4>

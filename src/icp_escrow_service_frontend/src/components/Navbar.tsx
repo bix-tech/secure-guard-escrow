@@ -42,8 +42,7 @@ const Navbar = () => {
 
     const fetchNotifications = async () => {
         if (principal) {
-            const principalObj = Principal.fromText(principal);
-            const fetchedNotifications = await backend.getNotification(principalObj);
+            const fetchedNotifications = await backend.getNotification(Principal.fromText(principal));
             setNotifications(fetchedNotifications);
         }
     }
@@ -69,7 +68,7 @@ const Navbar = () => {
 
 
     const handleNotificationClick = (dealId: bigint) => {
-        navigate(`/initiate-deal-lock-token/${dealId}`);
+        navigate(`/deal-overview/${dealId}`);
     };
 
     const handleHomeClick = () => {
