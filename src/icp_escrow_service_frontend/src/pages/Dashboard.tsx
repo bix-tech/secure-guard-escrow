@@ -78,7 +78,6 @@ const Dashboard = () => {
         <Sidebar />
         <div className="col-md-9 ms-sm-auto col-lg-10 px-1" style={{ position: 'relative' }}>
         <div className="button-container mx-5" style={{float: 'right'}}>
-        <button className="btn btn-create btn-primary" onClick={handleCreateDeal}> Create Deal </button>
         </div>
           <div className="card p-5 mx-auto my-5" style={{ width: '80%' }}>
             <h2>Activity Logs</h2>
@@ -130,6 +129,9 @@ const Dashboard = () => {
               ))}
               <button className="next-page-button" onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages - 1}>Next</button>
             </div>
+
+            <button className="btn btn-create btn-primary" onClick={handleCreateDeal}> Create Deal </button>
+
           </div>
 
           <Bottombar/>
