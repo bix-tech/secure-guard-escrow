@@ -11,6 +11,7 @@ const MyDeal = () => {
     const { principal, isLoading: isPrincipalLoading } = usePrincipal();
     const [deal, setDeal] = useState<Deal[] | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isActive, setIsActive] = useState(false);
     const navigate = useNavigate();
 
     const handleActionDetail = async (dealId: bigint) => {
@@ -53,10 +54,21 @@ const MyDeal = () => {
     }, [principal, isPrincipalLoading]);
 
 
+    const handleHamburgerClick = () => {
+        // 👇️ toggle isActive state on click
+        setIsActive(current => !current);
+
+    };
+
+
     return (
         <div className="container-fluid mt-1">
             <div className="row">
-                <Sidebar />
+                <Sidebar isActive={isActive} />        <div className="btn-group hamburger">
+                    <button className="btn btn-default" type="button" id="menu-toggle" onClick={handleHamburgerClick}>
+                        <img src="hamburger.png" className="menu-icon" alt="" />
+                    </button>
+                </div>
                 <div className="col-9">
                     <h1>MyDeal</h1>
                     {isLoading ? (
