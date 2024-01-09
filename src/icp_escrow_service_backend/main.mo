@@ -31,6 +31,10 @@ actor {
 
   var deliverableDocuments : HashMap.HashMap<Nat, Blob> = HashMap.HashMap(10, Nat.equal, Hash.hash);
 
+  var userProfiles : HashMap.HashMap<Principal, UserProfile> = HashMap.HashMap(10, Principal.equal, Principal.hash);
+
+  var profilePictures : HashMap.HashMap<Nat, Blob> = HashMap.HashMap(10, Nat.equal, Hash.hash);
+
   let ledger : TrieMap.TrieMap<Account.Account, Nat> = TrieMap.TrieMap(Account.accountsEqual, Account.accountsHash);
 
   let lockedTokens : TrieMap.TrieMap<Account.Account, Nat> = TrieMap.TrieMap(Account.accountsEqual, Account.accountsHash);
@@ -49,6 +53,16 @@ actor {
   public type User = {
     #Buyer;
     #Seller;
+  };
+
+  public type UserProfile = {
+    name : Text;
+    email : Text;
+    phone : Text;
+    address : Text;
+    profilePicture : FileReference;
+    age : Nat;
+    dob : Time;
   };
 
   public type Notification = {
@@ -167,6 +181,62 @@ actor {
     );
     notifications.put(user, newNotifications);
     return true;
+  };
+
+  public shared ({ caller }) func getUserProfile(user : Principal) : async Result<UserProfile, Text> {
+    let profileOpt = userProfiles.get(user);
+    switch (profileOpt) {
+      case (null) {
+        return #err("Profile not found");
+      };
+      case (?profile) {
+        return #ok(profile);
+      };
+    };
+  };
+
+  public shared ({ caller }) func updateUserProfile(user : Principal, updatedProfile : UserProfile) : async Result<Text, Text> {
+    let profileOpt = userProfiles.get(user);
+    switch (profileOpt) {
+      case (null) {
+        return #err("No existing profile found for the user.");
+      };
+      case (?profile) {
+        let newProfile = {
+          name = updatedProfile.name;
+          email = updatedProfile.email;
+          phone = updatedProfile.phone;
+          address = updatedProfile.address;
+          profilePicture = updatedProfile.profilePicture;
+          age = updatedProfile.age;
+          dob = updatedProfile.dob;
+        };
+        userProfiles.put(user, newProfile);
+        return #ok("Profile updated");
+      };
+    };
+  };
+
+  public func getProfilePicture(fileRef : FileReference, principal : Principal) : async ?Blob {
+    let profileOpt = userProfiles.get(principal);
+    switch (profileOpt) {
+      case (null) {
+        return null;
+      };
+      case (?profile) {
+        if (profile.profilePicture.id == fileRef.id) {
+          return profilePictures.get(fileRef.id);
+        } else {
+          return null;
+        };
+      };
+    };
+  };
+
+  public func uploadProfilePicture(blob : Blob) : async Nat {
+    let id = profilePictures.size();
+    profilePictures.put(id, blob);
+    return id;
   };
 
   public func uploadPicture(blob : Blob) : async Nat {
@@ -502,7 +572,6 @@ actor {
 
               await createTransactionLog(transactionBuyerLog, deal.to);
               await createTransactionLog(transactionSellerLog, deal.from);
-              
 
               addNotification(updatedDeal.from, { dealId = nextDealId - 1; message = "Buyer locked token, you can submit deliverables now." });
 
@@ -940,7 +1009,6 @@ actor {
       deal = newLog.deal;
     };
 
-
     transactionLogs.put(createLog.dealId, Array.append(existingLogs, [createLog]));
   };
 
@@ -982,7 +1050,6 @@ actor {
 
     return Iter.toArray(Array.slice(userLogs, start, end));
   };
-
 
   public func autoConfirmDeals() : async () {
     let currentTime = Time.now();

@@ -11,6 +11,7 @@ import '../../App.css';
 import { useNavigate } from 'react-router-dom';
 import TiptapEditor from '../../components/TiptapEditor';
 import { useForm } from 'react-hook-form';
+import { FileReference } from '../../../../declarations/backend/backend.did';
 
 type CreateDealProps = {
     onNext: () => void;
@@ -19,6 +20,7 @@ type CreateDealProps = {
 type UploadedPictureType = {
     file: File;
     id: bigint;
+    name: string;
 };
 
 
@@ -52,7 +54,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
     const documentInputRef = useRef<HTMLInputElement>(null);
     const [dealStart, setOpenDate] = useState<Date | null>(null);
     const [dealEnd, setCloseDate] = useState<Date | null>(null);
-    const [uploadedPicture, setUploadedPicture] = useState<UploadedPictureType | null>(null);
+    const [uploadedPicture, setUploadedPicture] = useState<UploadedPictureType>();
     const [editorContent, setEditorContent] = useState('');
     const [uploadedDocuments, setUploadedDocuments] = useState<DocumentFile[]>([]);
     const [selectedDealCategory, setSelectedDealCategory] = useState<DealCategory>(DealCategory.NFT);
@@ -67,11 +69,15 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
 
     register('dealCategory');
 
+    const defaultPicture: UploadedPictureType = {
+        id: BigInt(0),
+        file: new File([], ''),
+        name: 'default',
+    };
+
     const selectDealCategory = (dealCategory: DealCategory) => {
         setSelectedDealCategory(dealCategory);
         setValue('dealCategory', dealCategory);
-        console.log('deal category clicked');
-        // console.log(dealCategory);
     };
 
     // const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -106,10 +112,10 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
             const formattedDealStart = dealStart ? dealStart.getTime() : null;
             const formattedDealEnd = dealEnd ? dealEnd.getTime() : null;
             const supportingDocuments = uploadedDocuments.map((file, index) => ({
-                id: index,
+                id: BigInt(index),
                 name: file.name,
             }));
-            let picture = null;
+            let picture: FileReference | null = null;
             if (uploadedPicture) {
                 picture = {
                     id: uploadedPicture.id,
@@ -127,20 +133,20 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
             }
 
             const deal = {
-                ...event,
-                id: 0,
+                id: BigInt(0),
                 name: dealData.dealName,
                 label: label,
                 dealType: dealData.dealType === "Buyer" ? { "Buyer": null } : { "Seller": null },
                 description: editorContent,
                 status: "Pending",
-                dealCategory: { [selectedDealCategory]: null },
+                dealCategory: getDealCategory(selectedDealCategory),
                 dealTimeline: [{
-                    dealStart: formattedDealStart,
-                    dealEnd: formattedDealEnd
-                }], deliverables: [],
+                    dealStart: dealStart ? BigInt(dealStart.getTime()) : BigInt(0),
+                    dealEnd: dealEnd ? BigInt(dealEnd.getTime()) : BigInt(0)
+                }],
+                deliverables: [],
                 to: to,
-                picture: picture,
+                picture: picture || defaultPicture,
                 supportingDocuments: supportingDocuments,
                 paymentScheduleInfo: paymentSchedules.map(schedule => ({
                     ...schedule,
@@ -148,9 +154,9 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                     description: schedule.packageDescription,
                 })),
                 from: from,
-                amount: amount,
-                createTime: Date.now(),
-                submissionTime: [],
+                amount: BigInt(amount),
+                createTime: BigInt(Date.now()),
+                submissionTime: [BigInt(0)] as [bigint],
                 sellerCancelRequest: false,
                 buyerCancelRequest: false,
             };
@@ -198,7 +204,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
             const binaryData = await file.arrayBuffer();
             const pictureBinary = new Uint8Array(binaryData);
             const pictureId = await uploadPicture(pictureBinary);
-            setUploadedPicture({ file, id: pictureId });
+            setUploadedPicture({ file, id: pictureId, name: file.name });
         }
         displayPictureBadge(file);
     };
@@ -265,6 +271,24 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
         setEditorContent(content);
     };
 
+    const getDealCategory = (dealCategory: DealCategory) => {
+        switch (dealCategory) {
+            case DealCategory.NFT:
+                return { "NFT": null };
+            case DealCategory.DomainName:
+                return { "DomainName": null };
+            case DealCategory.Services:
+                return { "Services": null };
+            case DealCategory.PhysicalProducts:
+                return { "PhysicalProducts": null };
+            case DealCategory.DigitalProducts:
+                return { "DigitalProducts": null };
+            case DealCategory.Tokens:
+                return { "Tokens": null };
+            default:
+                return { "NFT": null };
+        }
+    };
 
 
     const label = dealData.dealType === "Buyer" ? "From" : "To";
@@ -316,17 +340,17 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                                     <option key={index} value={category}>{category}</option>
                                 ))}
                             </select> */}
-                            <div className="btn-group d-flex flex-wrap">
-                                <input type="hidden" {...register("dealCategory")} value={selectedDealCategory} />
-                                <span className={`badge-option ${selectedDealCategory === DealCategory.NFT ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.NFT)}>NFT</span>
-                                <span className={`badge-option ${selectedDealCategory === DealCategory.DomainName ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.DomainName)}>Domain Name</span>
-                                <span className={`badge-option ${selectedDealCategory === DealCategory.Services ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.Services)}>Services</span>
-                                <span className={`badge-option ${selectedDealCategory === DealCategory.PhysicalProducts ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.PhysicalProducts)}>Physical Products</span>
-                                <span className={`badge-option ${selectedDealCategory === DealCategory.DigitalProducts ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.DigitalProducts)}>Digital Products</span>
-                                <span className={`badge-option ${selectedDealCategory === DealCategory.Tokens ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.Tokens)}>Tokens</span>
+                                <div className="btn-group d-flex flex-wrap">
+                                    <input type="hidden" {...register("dealCategory")} value={selectedDealCategory} />
+                                    <span className={`badge-option ${selectedDealCategory === DealCategory.NFT ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.NFT)}>NFT</span>
+                                    <span className={`badge-option ${selectedDealCategory === DealCategory.DomainName ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.DomainName)}>Domain Name</span>
+                                    <span className={`badge-option ${selectedDealCategory === DealCategory.Services ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.Services)}>Services</span>
+                                    <span className={`badge-option ${selectedDealCategory === DealCategory.PhysicalProducts ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.PhysicalProducts)}>Physical Products</span>
+                                    <span className={`badge-option ${selectedDealCategory === DealCategory.DigitalProducts ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.DigitalProducts)}>Digital Products</span>
+                                    <span className={`badge-option ${selectedDealCategory === DealCategory.Tokens ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.Tokens)}>Tokens</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
                         <div className="mb-3">
                             <div className="form-row col-md-9 text-start mx-auto">

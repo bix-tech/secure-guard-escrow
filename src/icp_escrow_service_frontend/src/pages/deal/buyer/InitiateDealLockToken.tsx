@@ -54,14 +54,17 @@ const LockToken = () => {
 
     const handleSubmit = async (event: any) => {
         event.preventDefault();
+        setIsLoading(true);
         const lockTokenResult = await backend.lockToken(Principal.fromText(principal || ''), BigInt(amount), BigInt(dealId || 0));
         console.log("Lock token result:", lockTokenResult);
         console.log("Lock token result:", principal, amount, dealId)
         if ('TokenLocked' in lockTokenResult) {
             navigate(`/deal/buyer/lock-successfully/${dealId}`);
+            setIsLoading(false);
         } else {
             console.error("Failed to lock token:", lockTokenResult);
             setErrorMessage("Failed to lock token: Insufficient Balance");
+            setIsLoading(false);
         }
     };
 

@@ -11,6 +11,9 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 // import { Principal } from "@dfinity/principal";
 
+
+
+
 const DealOverview = () => {
     const [deal, setDeal] = useState<Deal | null>(null);
     const { principal, isLoading: isPrincipalLoading } = usePrincipal();
@@ -22,7 +25,6 @@ const DealOverview = () => {
     const [showConfirmModal, setConfirmModal] = useState(false);
     const [showCancelModal, setCancelModal] = useState(false);
     const [isHamburgerActive, setIsHamburgerActive] = useState(false);
-
 
     const navigate = useNavigate();
 
@@ -60,19 +62,24 @@ const DealOverview = () => {
         };
 
         const fetchPictures = async (deal: Deal) => {
-            const pictureId = deal.picture;
-            const blob = await backend.getPicture(pictureId, BigInt(dealId || 0));
-            if (blob !== null && blob.length > 0) {
-                const array = Array.isArray(blob[0]) ? new Uint8Array(blob[0]) : blob[0];
-                if (array !== undefined) {
-                    const blobObject = new Blob([array]);
-                    const url = URL.createObjectURL(blobObject);
-                    setPictureUrls([url]);
+            const pictureRef = deal.picture;
+            try {
+                const blob = await backend.getPicture(pictureRef, BigInt(dealId || 0));
+                if (blob) {
+                    const array = Array.isArray(blob[0]) ? new Uint8Array(blob[0]) : blob[0];
+                    if (array) {
+                        const blobObject = new Blob([array]);
+                        const url = URL.createObjectURL(blobObject);
+                        setPictureUrls([url]);
+                    }
                 } else {
-                    throw new Error(`No blob returned for picture ${pictureId.id}`);
+                    throw new Error(`No blob returned for picture ${pictureRef.id}`);
                 }
+            } catch (error) {
+                console.error(`Error fetching picture:`);
             }
         };
+
 
         const fetchDeliverables = async (deal: Deal) => {
             const urls: { [id: string]: string } = {};
@@ -175,8 +182,8 @@ const DealOverview = () => {
         <div className="container-fluid mt-1">
             <ToastContainer />
             <div className="row">
-            <Sidebar isHamburgerActive={isHamburgerActive} handleHamburgerClick={handleHamburgerClick}/>
-                <main className={`col-md-9 ms-sm-auto col-lg-10 px-md-4 ${isHamburgerActive ? 'col-lg-12 col-md-12' : ''}`}>
+                <Sidebar isHamburgerActive={isHamburgerActive} handleHamburgerClick={handleHamburgerClick} />
+                <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                     <div className="mt-4">
                         <h4>Deal Overview : {deal.name}</h4>
                         <p>SSM / Company</p>
@@ -187,7 +194,7 @@ const DealOverview = () => {
                             {deal.status !== 'Confirmed' && deal.status !== 'Cancelled' && (
                                 <button onClick={handleOpenConfirmModal} className="btn btn-confirm btn-primary" >Confirm Deal</button>
                             )}
-                            
+
                             <Modal show={showConfirmModal} onHide={handleCloseConfirmModal}>
                                 <Modal.Header closeButton>
                                     <Modal.Title>Confirm Deal</Modal.Title>

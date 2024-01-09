@@ -53,7 +53,7 @@ const initiateDealData: DealData = {
   to: '',
   dealDescription: '',
   dealAmount: 0,
-  paymentSchedule: [],
+  paymentSchedule: [],  
   dealCategory: DealCategory.NFT,
   dealTimeline: [],
   deliverables: [],
