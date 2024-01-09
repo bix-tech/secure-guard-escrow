@@ -21,6 +21,8 @@ const DealOverview = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [showConfirmModal, setConfirmModal] = useState(false);
     const [showCancelModal, setCancelModal] = useState(false);
+    const [isActive, setIsActive] = useState(false);
+
     const navigate = useNavigate();
 
     const handleOpenConfirmModal = () => setConfirmModal(true);
@@ -138,6 +140,12 @@ const DealOverview = () => {
         }
     }
 
+    const handleHamburgerClick = () => {
+        // 👇️ toggle isActive state on click
+        setIsActive(current => !current);
+    
+      };
+
 
     // useEffect(() => {
     //     const fetchSupportingDocuments = async () => {
@@ -167,7 +175,7 @@ const DealOverview = () => {
         <div className="container-fluid mt-1">
             <ToastContainer />
             <div className="row">
-                <Sidebar />
+                <Sidebar isActive={isActive}/>
                 <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                     <div className="mt-4">
                         <h4>Deal Overview : {deal.name}</h4>
