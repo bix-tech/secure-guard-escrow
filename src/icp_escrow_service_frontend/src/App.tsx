@@ -20,6 +20,8 @@ import LockTokenSuccessfully from './pages/deal/buyer/LockTokenSuccessfully';
 import SubmitDeliverablesSuccessfully from './pages/deal/seller/SubmitDeliverablesSuccessfully';
 import { DealFlowProvider } from './contexts/InitiateDealFlowContext';
 import MyDeal from './pages/deal/MyDeal';
+import 'bootstrap/dist/css/bootstrap.css';
+
 
 const NavbarWrapper = () => {
   const location = useLocation();

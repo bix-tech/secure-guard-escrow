@@ -5,7 +5,6 @@ import { Principal } from '@dfinity/principal';
 import { Deal } from '../../../../declarations/backend/backend.did';
 import Sidebar from '../../components/Sidebar';
 import { useNavigate } from 'react-router-dom';
-import '../../App.css';
 
 
 const MyDeal = () => {
@@ -99,7 +98,7 @@ return (
                                     <div className="row">
                                         <div className="col d-flex justify-content-between align-center">
                                             {d.name}
-                                            <span className={`badge badge-${details.badge}`}>{d.status}</span>
+                                            <span className={`badge badge-pill bg-${details.badge}`}>{d.status}</span>
                                             <button className="btn btn-confirm btn-primary" onClick={() => handleActionDetail(d.id)}>{details.text}</button>
                                         </div>
                                     </div>
