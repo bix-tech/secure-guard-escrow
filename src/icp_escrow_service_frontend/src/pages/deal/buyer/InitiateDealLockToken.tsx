@@ -7,7 +7,8 @@ import { usePrincipal } from "../../../hooks/usePrincipal";
 import { useDealData } from "../../../contexts/DealContext";
 
 const LockToken = () => {
-    const { dealData, setDealData} = useDealData();
+    const { dealData, setDealData } = useDealData();
+    const [isLoading, setIsLoading] = useState(true);
     const [amount, setAmount] = useState<bigint>(BigInt(0));
     const { dealId } = useParams();
     const navigate = useNavigate();
@@ -16,6 +17,7 @@ const LockToken = () => {
 
 
     useEffect(() => {
+        setIsLoading(true);
         if (!isPrincipalLoading) {
             const fetchDealDetails = async () => {
                 try {
@@ -31,6 +33,7 @@ const LockToken = () => {
                                 to: result.ok.to.toString(),
                                 from: result.ok.from.toString(),
                             }));
+                            setIsLoading(false);
 
                             if (dealData && dealData.to && Principal.from(dealData.to).toText() !== principal) {
                                 navigate('/dashboard');
@@ -46,7 +49,7 @@ const LockToken = () => {
 
             fetchDealDetails();
         }
-    }, [dealData, principal, navigate, isPrincipalLoading]);
+    }, [principal, navigate, isPrincipalLoading]);
 
 
     const handleSubmit = async (event: any) => {
@@ -63,32 +66,40 @@ const LockToken = () => {
     };
 
     return (
-        <div className="card p-5 mx-auto my-5" style={{ width: '75%' }}>
-            <div className="card-body text-center">
-
-                <InitiatingDealProgressBar currentStep={2} />
-                {errorMessage && <span className="badge bg-danger">{errorMessage}</span>}
-
-                <form className="mt-5" onSubmit={handleSubmit}>
-                    <div className="mb-3">
-                        <div className="form-row col-md-9 text-start mx-auto">
-                            <label htmlFor="tokenAmount" className="form-label text-start">Lock Token</label>
-                            <input
-                                type="number"
-                                className="form-control form-control-lg lock-token-text"
-                                id="tokenAmount"
-                                placeholder="Token Number"
-                                value={amount.toString()}
-                                onChange={(e) => setAmount(BigInt(e.target.value))}
-                            />
-                        </div>
-                    </div>
-
-                    <button type="submit" className="btn mx-auto col-md-9 submit-deal-btn mt-3">Lock Token</button>
-                </form>
-
+        isLoading ? (
+            <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+                <div className="spinner-grow text-success" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </div>
             </div>
-        </div>
+        ) : (
+            <div className="card p-5 mx-auto my-5" style={{ width: '75%' }}>
+                <div className="card-body text-center">
+
+                    <InitiatingDealProgressBar currentStep={2} />
+                    {errorMessage && <span className="badge bg-danger">{errorMessage}</span>}
+
+                    <form className="mt-5" onSubmit={handleSubmit}>
+                        <div className="mb-3">
+                            <div className="form-row col-md-9 text-start mx-auto">
+                                <label htmlFor="tokenAmount" className="form-label text-start">Lock Token</label>
+                                <input
+                                    type="number"
+                                    className="form-control form-control-lg lock-token-text"
+                                    id="tokenAmount"
+                                    placeholder="Token Number"
+                                    value={amount.toString()}
+                                    onChange={(e) => setAmount(BigInt(e.target.value))}
+                                />
+                            </div>
+                        </div>
+
+                        <button type="submit" className="btn mx-auto col-md-9 submit-deal-btn mt-3">Lock Token</button>
+                    </form>
+
+                </div>
+            </div>
+        )
     )
 }
 
