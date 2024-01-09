@@ -578,9 +578,6 @@ actor {
             await createActivityLog(buyerLog, deal.to);
             await createActivityLog(sellerLog, deal.from);
 
-            await createTransactionLog(buyerLog, deal.to);
-            await createTransactionLog(sellerLog, deal.from);
-
             addNotification(updatedDeal.from, { dealId = nextDealId - 1; message = "Buyer confirmed the deal. Please check if you've received the token." });
 
             deals.put(dealId, updatedDeal);
@@ -919,6 +916,45 @@ actor {
 
 
     transactionLogs.put(createLog.dealId, Array.append(existingLogs, [createLog]));
+  };
+
+  public func getTransactionLogsForUser(user : Principal) : async [TransactionLog] {
+    let allLogs = Array.flatten(Iter.toArray(transactionLogs.vals()));
+
+    let userLogs = Array.filter(
+      allLogs,
+      func(log : TransactionLog) : Bool {
+        log.user == user;
+      },
+    );
+
+    let sortedLogs = Array.sort(
+      userLogs,
+      func(a : TransactionLog, b : TransactionLog) : Order {
+        if (a.activityTime > b.activityTime) { return #less };
+        if (a.activityTime < b.activityTime) { return #greater };
+        return #equal;
+      },
+    );
+
+    return sortedLogs;
+  };
+
+  public func getTransactionLogsCountForUser(user : Principal, page : Nat, itemsPerPage : Nat) : async [TransactionLog] {
+    let allLogs = Array.flatten(Iter.toArray(transactionLogs.vals()));
+    let userLogs = Array.filter(
+      allLogs,
+      func(log : TransactionLog) : Bool {
+        log.user == user;
+      },
+    );
+    let start = page * itemsPerPage;
+    var end = (page + 1) * itemsPerPage;
+    if (end > Array.size(userLogs)) {
+      end := Array.size(userLogs);
+    };
+
+    return Iter.toArray(Array.slice(userLogs, start, end));
   };
 
 
