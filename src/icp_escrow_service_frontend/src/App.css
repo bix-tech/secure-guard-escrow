@@ -471,3 +471,35 @@ body {
 .dropstart .dropdown-toggle::before {
   display: none !important;
 }
+
+#sidebar {
+  position: relative;
+  /* left: 0; */
+  display: block;
+  /* transition: 0.5s; */
+}
+
+#sidebar.active{
+  position: relative;
+  /* left: -100%; */
+  /* transition: 0.5s; */
+  display: none !important;
+}
+
+@media only screen and (max-width: 768px) {
+  #sidebar {
+    position: fixed;
+    left: 0;
+    z-index: 999;
+    width: 30%;
+    transition: 0.5s;
+  }
+  
+  #sidebar.active{
+    position: fixed;
+    left: -100%;
+    transition: 0.5s;
+    z-index: 999;
+    /* display: none !important; */
+  }
+}

@@ -94,6 +94,7 @@ const Navbar = () => {
 
 
     return (
+        
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
             <div className="container-fluid">
                 <div className="navbar-brand" onClick={handleHomeClick}>ICP Escrow Service</div>
