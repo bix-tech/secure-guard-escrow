@@ -73,13 +73,16 @@ const Dashboard = () => {
 
 
   return (
-    <div className="container-fluid mt-1">
+    <div className="container-fluid mt-1 d-flex flex-column">
       <div className="row">
+        
         <Sidebar />
-        <div className="col-md-9 ms-sm-auto col-lg-10 px-1" style={{ position: 'relative' }}>
+        
+        <div className="col-md-9 ms-sm-auto col-lg-10 px-1 d-flex flex-column" style={{ position: 'relative' }}>
+        <button className="btn btn-create btn-primary" onClick={handleCreateDeal}> Create Deal </button>
         <div className="button-container mx-5" style={{float: 'right'}}>
         </div>
-          <div className="card p-5 mx-auto my-5" style={{ width: '80%' }}>
+          <div className="card p-5 mx-auto my-5" style={{ width: '80%'}}>
             <h2>Activity Logs</h2>
             <table className="table">
               <thead>
@@ -130,7 +133,6 @@ const Dashboard = () => {
               <button className="next-page-button" onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages - 1}>Next</button>
             </div>
 
-            <button className="btn btn-create btn-primary" onClick={handleCreateDeal}> Create Deal </button>
 
           </div>
 

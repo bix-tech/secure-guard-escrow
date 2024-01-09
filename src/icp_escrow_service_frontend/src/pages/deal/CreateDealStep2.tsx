@@ -316,17 +316,17 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                                     <option key={index} value={category}>{category}</option>
                                 ))}
                             </select> */}
-                                <div className="btn-group d-flex">
-                                    <input type="hidden" {...register("dealCategory")} value={selectedDealCategory} />
-                                    <span className={`badge-option ${selectedDealCategory === DealCategory.NFT ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.NFT)}>NFT</span>
-                                    <span className={`badge-option ${selectedDealCategory === DealCategory.DomainName ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.DomainName)}>Domain Name</span>
-                                    <span className={`badge-option ${selectedDealCategory === DealCategory.Services ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.Services)}>Services</span>
-                                    <span className={`badge-option ${selectedDealCategory === DealCategory.PhysicalProducts ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.PhysicalProducts)}>Physical Products</span>
-                                    <span className={`badge-option ${selectedDealCategory === DealCategory.DigitalProducts ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.DigitalProducts)}>Digital Products</span>
-                                    <span className={`badge-option ${selectedDealCategory === DealCategory.Tokens ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.Tokens)}>Tokens</span>
-                                </div>
+                            <div className="btn-group d-flex flex-wrap">
+                                <input type="hidden" {...register("dealCategory")} value={selectedDealCategory} />
+                                <span className={`badge-option ${selectedDealCategory === DealCategory.NFT ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.NFT)}>NFT</span>
+                                <span className={`badge-option ${selectedDealCategory === DealCategory.DomainName ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.DomainName)}>Domain Name</span>
+                                <span className={`badge-option ${selectedDealCategory === DealCategory.Services ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.Services)}>Services</span>
+                                <span className={`badge-option ${selectedDealCategory === DealCategory.PhysicalProducts ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.PhysicalProducts)}>Physical Products</span>
+                                <span className={`badge-option ${selectedDealCategory === DealCategory.DigitalProducts ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.DigitalProducts)}>Digital Products</span>
+                                <span className={`badge-option ${selectedDealCategory === DealCategory.Tokens ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.Tokens)}>Tokens</span>
                             </div>
                         </div>
+                    </div>
 
                         <div className="mb-3">
                             <div className="form-row col-md-9 text-start mx-auto">

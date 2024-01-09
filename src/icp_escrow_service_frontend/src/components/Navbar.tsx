@@ -100,7 +100,7 @@ const Navbar = () => {
 
                 <div className="ms-auto"></div>
 
-                <Dropdown show={showNotification} onToggle={toggleNotification} ref={notificationRef}>
+                <Dropdown show={showNotification} onToggle={toggleNotification} ref={notificationRef} drop="start">
                     <Dropdown.Toggle as="div" id="dropdown-notification" className="notification-avatar ms-3 d-flex align-items-center justify-content-center">
                         <img src="/notification.png" className="notification-icon" alt="Notification Avatar" />
                     </Dropdown.Toggle>
@@ -114,12 +114,11 @@ const Navbar = () => {
                                     {notification.message}
                                 </Dropdown.Item>
                             ))
-                        )
-                        
-                        }
+                        )}
                         <Dropdown.Item className='clear-notification-btn py-2 rounded-bottom'>Clear Message</Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
+
 
                 <div className="vertical-divider mx-4"></div>
 
@@ -135,7 +134,7 @@ const Navbar = () => {
                         {copied && <span>Copied to clipboard</span>}
                     </div>
                     <Dropdown>
-                        <Dropdown.Toggle variant="default" id="dropdown-basic">
+                        <Dropdown.Toggle variant="default" id="dropdown-basic" >
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>

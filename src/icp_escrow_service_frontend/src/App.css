@@ -376,13 +376,21 @@ body {
   font-size: 14px; 
 }
 
+.btn-confirm:hover {
+  opacity: 0.5;
+}
 
 .btn-cancel {
   background-color: #D6D6D6 !important;
   color: white !important;
   border-radius: 20px !important;
+  border: 1px solid #D6D6D6 !important;
   padding: 5px 10px;
   font-size: 14px; 
+}
+
+.btn-cancel:hover {
+  opacity: 0.5;
 }
 
 .previous-page-button, .next-page-button {
@@ -420,9 +428,10 @@ body {
 
 .bottom-bar {
   background-color: white;
-  position: absolute;
+  position: relative;
   bottom: 0;
   width: 100%;
+  margin-top: auto;
 }
 
 .editor-button {
@@ -447,11 +456,18 @@ body {
   background-color: #237A88 !important;
   color: white !important;
   border-radius: 20px !important;
-  padding: 5px 10px;
-  font-size: 14px; 
-  height: auto;
-  width: 150px;
-  position: relative;
+  padding: 5px 20px !important;
+  font-size: 14px !important; 
   margin-left: auto;
-  margin-top: -25px;
+  margin-top: 20px;
+  position: relative;
+  right: 5%;
+}
+
+.btn-create:hover {
+  opacity: 0.5;
+}
+
+.dropstart .dropdown-toggle::before {
+  display: none !important;
 }
