@@ -30,7 +30,9 @@ const Dashboard = () => {
   const [totalItems, setTotalItems] = useState(0);
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const navigate = useNavigate();
-  const [isActive, setIsActive] = useState(false);
+  // const [isActive, setIsActive] = useState(false);
+  const [isHamburgerActive, setIsHamburgerActive] = useState(false);
+  
 
 
   const handlePageClick = (page: number) => {
@@ -41,6 +43,10 @@ const Dashboard = () => {
     navigate('/createDealStep1')
   };
 
+  const handleHamburgerClick = () => {
+    // Toggle hamburger state
+    setIsHamburgerActive((prev) => !prev);
+  };
 
   const fetchActivityLogs = async () => {
     setIsLoading(true);
@@ -67,11 +73,10 @@ const Dashboard = () => {
     }
   };
   
-  const handleHamburgerClick = () => {
-    // 👇️ toggle isActive state on click
-    setIsActive(current => !current);
+  // const handleHamburgerClick = () => {
+  //   setIsActive(current => !current);
 
-  };
+  // };
 
   useEffect(() => {
     if (principal) {
@@ -84,14 +89,14 @@ const Dashboard = () => {
     <div className="container-fluid mt-1 d-flex flex-column">
       <div className="row">
         
-        <Sidebar isActive={isActive}/>
+        <Sidebar isHamburgerActive={isHamburgerActive} handleHamburgerClick={handleHamburgerClick}/>
         
-        <div className={`col-md-9 ms-sm-auto col-lg-10 px-1 d-flex flex-column ${isActive ? 'col-lg-12 col-md-12' : ''}`} style={{ position: 'relative' }}>
-        <div className="btn-group hamburger">
+        <div className={`col-md-9 ms-sm-auto col-lg-10 px-1 d-flex flex-column ${isHamburgerActive ? 'col-lg-12 col-md-12' : ''}`} style={{ position: 'relative' }}>
+        {/* <div className="btn-group hamburger">
         <button className="btn btn-default" type="button" id="menu-toggle" onClick={handleHamburgerClick}>
           <img src="hamburger.png" className="menu-icon" alt="" />
         </button>
-        </div>
+        </div> */}
         <button className="btn btn-create btn-primary" onClick={handleCreateDeal}> Create Deal </button>
         <div className="button-container mx-5" style={{float: 'right'}}>
         </div>

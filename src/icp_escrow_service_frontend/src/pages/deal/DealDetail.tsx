@@ -21,7 +21,8 @@ const DealOverview = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [showConfirmModal, setConfirmModal] = useState(false);
     const [showCancelModal, setCancelModal] = useState(false);
-    const [isActive, setIsActive] = useState(false);
+    const [isHamburgerActive, setIsHamburgerActive] = useState(false);
+
 
     const navigate = useNavigate();
 
@@ -141,10 +142,9 @@ const DealOverview = () => {
     }
 
     const handleHamburgerClick = () => {
-        // 👇️ toggle isActive state on click
-        setIsActive(current => !current);
-    
-      };
+        // Toggle hamburger state
+        setIsHamburgerActive((prev) => !prev);
+    };
 
 
     // useEffect(() => {
@@ -175,8 +175,8 @@ const DealOverview = () => {
         <div className="container-fluid mt-1">
             <ToastContainer />
             <div className="row">
-                <Sidebar isActive={isActive}/>
-                <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <Sidebar isHamburgerActive={isHamburgerActive} handleHamburgerClick={handleHamburgerClick}/>
+                <main className={`col-md-9 ms-sm-auto col-lg-10 px-md-4 ${isHamburgerActive ? 'col-lg-12 col-md-12' : ''}`}>
                     <div className="mt-4">
                         <h4>Deal Overview : {deal.name}</h4>
                         <p>SSM / Company</p>

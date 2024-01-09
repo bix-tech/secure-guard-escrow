@@ -1,8 +1,14 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from 'react';
 
+interface SidebarProps {
+  isHamburgerActive: boolean;
+  handleHamburgerClick: () => void;
+}
 
-const Sidebar = ({isActive}) => {
+const Sidebar: React.FC<SidebarProps> = ({ isHamburgerActive, handleHamburgerClick }) => {
   const navigate = useNavigate();
+  // const [isHamburgerActive, setIsActive] = useState(false);
 
 
   const handleMyDealClick = () => {
@@ -13,12 +19,21 @@ const Sidebar = ({isActive}) => {
     navigate('/dashboard')
   }
 
+  // const handleHamburgerClick = () => {
+  //   // 👇️ toggle isActive state on click
+  //   setIsActive(current => !current);
 
+  // };
 
 
   return (
-      <nav id="sidebar" className={`pt-3 col-md-3 col-lg-2 d-md-block bg-light sidebar ${isActive ? 'active' : ''}`} style={{ height: 'auto', minHeight: '92vh' }}>
-
+    <div className={`col-md-3 col-lg-2 ps-0 ${isHamburgerActive ? '' : 'bg-white'}`}>
+       <div className="btn-group hamburger">
+          <button className="btn btn-default" type="button" id="menu-toggle" onClick={handleHamburgerClick}>
+            <img src="hamburger.png" className="menu-icon" alt="" />
+          </button>
+        </div>
+      < nav id="sidebar" className={`pt-3 d-md-block sidebar ${isHamburgerActive ? 'active' : ''}`} style={{ height: 'auto', minHeight: '92vh' }}>
         <div className="position-sticky">
           <ul className="nav flex-column">
             <li className="nav-item">
@@ -59,6 +74,8 @@ const Sidebar = ({isActive}) => {
           </ul>
         </div>
       </nav>
+    </div>
+      
   );
 }
 
