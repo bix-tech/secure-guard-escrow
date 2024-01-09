@@ -128,6 +128,7 @@ actor {
 
   public type TransactionLog = {
     dealId : Nat;
+    dealName : Text;
     description : Text;
     activityType : Text;
     amount : Nat;
@@ -472,11 +473,35 @@ actor {
                 deal = updatedDeal;
               };
 
+              let transactionBuyerLog = {
+                dealId = dealId;
+                dealName = deal.name;
+                description = "Locked token for this deal.";
+                activityType = "Locked Token";
+                status = "In Progress";
+                amount = deal.amount;
+                activityTime = Time.now();
+                user = deal.to;
+                deal = updatedDeal;
+              };
+
+              let transactionSellerLog = {
+                dealId = dealId;
+                dealName = deal.name;
+                description = "Buyer locked token for this deal.";
+                activityType = "Locked Token";
+                status = "In Progress";
+                amount = deal.amount;
+                activityTime = Time.now();
+                user = deal.from;
+                deal = updatedDeal;
+              };
+
               await createActivityLog(buyerLog, deal.to);
               await createActivityLog(sellerLog, deal.from);
 
-              await createTransactionLog(buyerLog, deal.to);
-              await createTransactionLog(sellerLog, deal.from);
+              await createTransactionLog(transactionBuyerLog, deal.to);
+              await createTransactionLog(transactionSellerLog, deal.from);
               
 
               addNotification(updatedDeal.from, { dealId = nextDealId - 1; message = "Buyer locked token, you can submit deliverables now." });
@@ -905,6 +930,7 @@ actor {
 
     let createLog : TransactionLog = {
       dealId = newLog.dealId;
+      dealName = newLog.dealName;
       description = newLog.description;
       activityType = newLog.activityType;
       amount = newLog.amount;
