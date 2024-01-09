@@ -43,6 +43,8 @@ actor {
 
   let activityLogs : TrieMap.TrieMap<Nat, [ActivityLog]> = TrieMap.TrieMap(Nat.equal, Hash.hash);
 
+  let transactionLogs : TrieMap.TrieMap<Nat, [TransactionLog]> = TrieMap.TrieMap(Nat.equal, Hash.hash);
+
   let notifications : TrieMap.TrieMap<Principal, [Notification]> = TrieMap.TrieMap(Principal.equal, Principal.hash);
   public type User = {
     #Buyer;
@@ -114,6 +116,17 @@ actor {
   };
 
   public type ActivityLog = {
+    dealId : Nat;
+    description : Text;
+    activityType : Text;
+    amount : Nat;
+    status : DealStatus;
+    activityTime : Time;
+    user : Principal;
+    deal : Deal;
+  };
+
+  public type TransactionLog = {
     dealId : Nat;
     description : Text;
     activityType : Text;
@@ -462,6 +475,10 @@ actor {
               await createActivityLog(buyerLog, deal.to);
               await createActivityLog(sellerLog, deal.from);
 
+              await createTransactionLog(buyerLog, deal.to);
+              await createTransactionLog(sellerLog, deal.from);
+              
+
               addNotification(updatedDeal.from, { dealId = nextDealId - 1; message = "Buyer locked token, you can submit deliverables now." });
 
               deals.put(dealId, updatedDeal);
@@ -560,6 +577,9 @@ actor {
 
             await createActivityLog(buyerLog, deal.to);
             await createActivityLog(sellerLog, deal.from);
+
+            await createTransactionLog(buyerLog, deal.to);
+            await createTransactionLog(sellerLog, deal.from);
 
             addNotification(updatedDeal.from, { dealId = nextDealId - 1; message = "Buyer confirmed the deal. Please check if you've received the token." });
 
@@ -875,6 +895,32 @@ actor {
 
     activityLogs.put(additionalLog.dealId, Array.append(existingAdditionalLogs, [additionalLog]));
   };
+
+  public func createTransactionLog(newLog : TransactionLog, additionalUser : Principal) : async () {
+    let existingLogs = switch (transactionLogs.get(newLog.dealId)) {
+      case (null) {
+        [];
+      };
+      case (?logs) {
+        logs;
+      };
+    };
+
+    let createLog : TransactionLog = {
+      dealId = newLog.dealId;
+      description = newLog.description;
+      activityType = newLog.activityType;
+      amount = newLog.amount;
+      status = newLog.status;
+      activityTime = Time.now();
+      user = newLog.user;
+      deal = newLog.deal;
+    };
+
+
+    transactionLogs.put(createLog.dealId, Array.append(existingLogs, [createLog]));
+  };
+
 
   public func autoConfirmDeals() : async () {
     let currentTime = Time.now();

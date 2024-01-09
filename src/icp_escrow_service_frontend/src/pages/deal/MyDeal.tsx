@@ -60,8 +60,10 @@ const MyDeal = () => {
                 <div className="col-9">
                     <h1>MyDeal</h1>
                     {isLoading ? (
-                        <div className="spinner-border" role="status">
-                            <span className="visually-hidden">Loading...</span>
+                        <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+                            <div className="spinner-grow text-success" role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
                         </div>
                     ) : (
                         deal && deal.length > 0 ? (

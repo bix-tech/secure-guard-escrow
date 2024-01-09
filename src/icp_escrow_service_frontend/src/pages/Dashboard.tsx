@@ -75,14 +75,14 @@ const Dashboard = () => {
   return (
     <div className="container-fluid mt-1 d-flex flex-column">
       <div className="row">
-        
+
         <Sidebar />
-        
+
         <div className="col-md-9 ms-sm-auto col-lg-10 px-1 d-flex flex-column" style={{ position: 'relative' }}>
-        <button className="btn btn-create btn-primary" onClick={handleCreateDeal}> Create Deal </button>
-        <div className="button-container mx-5" style={{float: 'right'}}>
-        </div>
-          <div className="card p-5 mx-auto my-5" style={{ width: '80%'}}>
+          <button className="btn btn-create btn-primary" onClick={handleCreateDeal}> Create Deal </button>
+          <div className="button-container mx-5" style={{ float: 'right' }}>
+          </div>
+          <div className="card p-5 mx-auto my-5" style={{ width: '80%' }}>
             <h2>Activity Logs</h2>
             <table className="table">
               <thead>
@@ -98,8 +98,10 @@ const Dashboard = () => {
                 {isLoading ? (
                   <tr>
                     <td colSpan={5} style={{ textAlign: 'center', padding: '20px' }}>
-                      <div className="spinner-border text-primary" role="status">
-                        <span className="visually-hidden">Loading...</span>
+                      <div className="d-flex justify-content-center align-items-center" style={{ height: '50vh' }}>
+                        <div className="spinner-grow text-success" role="status">
+                          <span className="visually-hidden">Loading...</span>
+                        </div>
                       </div>
                     </td>
                   </tr>
@@ -136,7 +138,7 @@ const Dashboard = () => {
 
           </div>
 
-          <Bottombar/>
+          <Bottombar />
         </div>
 
 
