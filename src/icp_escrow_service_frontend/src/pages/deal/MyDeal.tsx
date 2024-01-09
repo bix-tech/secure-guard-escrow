@@ -63,11 +63,6 @@ const MyDeal = () => {
         <div className="container-fluid mt-1">
             <div className="row">
             <Sidebar isHamburgerActive={isHamburgerActive} handleHamburgerClick={handleHamburgerClick}/>
-                  <div className="btn-group hamburger">
-                    <button className="btn btn-default" type="button" id="menu-toggle" onClick={handleHamburgerClick}>
-                        <img src="hamburger.png" className="menu-icon" alt="" />
-                    </button>
-                </div>
                 <div className="col-9">
                     <h1>MyDeal</h1>
                     {isLoading ? (
