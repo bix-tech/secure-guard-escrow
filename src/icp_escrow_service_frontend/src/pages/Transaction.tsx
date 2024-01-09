@@ -33,32 +33,30 @@ const Transaction = () => {
 
     useEffect(() => {
         const fetchTransactionLogs = async () => {
-            setIsLoading(true);
             if (principal) {
                 try {
-
+                    setIsLoading(true);
                     const logs = await backend.getTransactionLogsForUser(Principal.fromText(principal));
-                    if ('ok' in logs) {
-                        const mappedLogs = logs.map(log => ({
-                            ...log,
-                            dealId: Number(log.dealId),
-                            dealName: log.dealName.toString(),
-                            description: log.description.toString(),
-                            amount: Number(log.amount),
-                            activityTime: Number(log.activityTime),
-                            user: log.user.toString(),
-                            status: log.status.toString(),
-                        }));
+                    const mappedLogs = logs.map(log => ({
+                        ...log,
+                        dealId: Number(log.dealId),
+                        dealName: log.dealName.toString(),
+                        description: log.description.toString(),
+                        amount: Number(log.amount),
+                        activityTime: Number(log.activityTime),
+                        user: log.user.toString(),
+                        status: log.status.toString(),
+                    }));
+                    console.log(logs);
+                    setTransactionLogs(mappedLogs);
+                    console.log(mappedLogs);
+                    const totalLogs = await backend.getTransactionLogsCountForUser(Principal.fromText(principal), BigInt(currentPage), BigInt(itemsPerPage));
+                    setTotalItems(totalLogs.length);
 
-                        setTransactionLogs(mappedLogs);
-
-                        const totalLogs = await backend.getTransactionLogsCountForUser(Principal.fromText(principal), BigInt(currentPage), BigInt(itemsPerPage));
-                        setTotalItems(totalLogs.length);
-                        setIsLoading(false);
-
-                    }
                 } catch (error) {
                     console.error("Error fetching transaction logs:", error);
+                } finally {
+                    setIsLoading(false);
                 }
             }
         }
