@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from 'react';
 
 interface SidebarProps {
   isHamburgerActive: boolean;
@@ -8,31 +7,28 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isHamburgerActive, handleHamburgerClick }) => {
   const navigate = useNavigate();
-  // const [isHamburgerActive, setIsActive] = useState(false);
-
 
   const handleMyDealClick = () => {
     navigate('/myDeal')
   };
 
+  const handleTransactionClick = () => {
+    navigate('/my-transactions')
+  }
+
   const handleHomeClick = () => {
     navigate('/dashboard')
   }
 
-  // const handleHamburgerClick = () => {
-  //   // 👇️ toggle isActive state on click
-  //   setIsActive(current => !current);
-
-  // };
 
 
   return (
     <div className={`col-md-3 col-lg-2 ps-0 ${isHamburgerActive ? '' : 'bg-white'}`}>
-       <div className="btn-group hamburger">
-          <button className="btn btn-default" type="button" id="menu-toggle" onClick={handleHamburgerClick}>
-            <img src="hamburger.png" className="menu-icon" alt="" />
-          </button>
-        </div>
+      <div className="btn-group hamburger">
+        <button className="btn btn-default" type="button" id="menu-toggle" onClick={handleHamburgerClick}>
+          <img src="hamburger.png" className="menu-icon" alt="" />
+        </button>
+      </div>
       < nav id="sidebar" className={`pt-3 d-md-block sidebar ${isHamburgerActive ? 'active' : ''}`} style={{ height: 'auto', minHeight: '92vh' }}>
         <div className="position-sticky">
           <ul className="nav flex-column">
@@ -54,10 +50,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isHamburgerActive, handleHamburgerCli
               </div>
             </li>
             <li className="nav-item">
-              <a className="nav-link mb-3" href="#">
+              <div className="nav-link mb-3" onClick={handleTransactionClick} style={{ cursor: "pointer" }}>
                 <img src="/transaction.png" alt="User Avatar" className="menu-icon me-2" />
                 Transactions
-              </a>
+              </div>
             </li>
             <li className="nav-item">
               <a className="nav-link mb-3" href="#">
@@ -75,7 +71,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isHamburgerActive, handleHamburgerCli
         </div>
       </nav>
     </div>
-      
+
   );
 }
 

@@ -5,6 +5,7 @@ import { Principal } from '@dfinity/principal'
 
 interface TransactionLog {
     dealId: number;
+    dealName: string;
     description: string;
     activityType: string;
     amount: number;
@@ -41,6 +42,7 @@ const Transaction = () => {
                         const mappedLogs = logs.map(log => ({
                             ...log,
                             dealId: Number(log.dealId),
+                            dealName: log.dealName.toString(),
                             description: log.description.toString(),
                             amount: Number(log.amount),
                             activityTime: Number(log.activityTime),
@@ -102,6 +104,7 @@ const Transaction = () => {
                                 transactionLogs.map((log, index) => (
                                     <tr key={index}>
                                         <td>{log.dealId}</td>
+                                        <td>{log.dealName}</td>
                                         <td>{log.description}</td>
                                         <td>{log.activityType}</td>
                                         <td>{log.amount}</td>

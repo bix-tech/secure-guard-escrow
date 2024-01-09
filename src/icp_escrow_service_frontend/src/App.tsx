@@ -21,6 +21,7 @@ import SubmitDeliverablesSuccessfully from './pages/deal/seller/SubmitDeliverabl
 import { DealFlowProvider } from './contexts/InitiateDealFlowContext';
 import MyDeal from './pages/deal/MyDeal';
 import 'bootstrap/dist/css/bootstrap.css';
+import Transaction from './pages/Transaction';
 
 
 const NavbarWrapper = () => {
@@ -93,6 +94,7 @@ function App() {
               <Route path="/" element={<Login />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/myDeal" element={<ProtectedRoute><MyDeal /></ProtectedRoute>} />
+              <Route path="/my-transactions" element={<ProtectedRoute><Transaction /></ProtectedRoute>} />
               <Route path="/deal-overview/:dealId" element={<ProtectedRoute><DealOverview /></ProtectedRoute>} />
               <Route path="/createDealStep1" element={<ProtectedRoute><CreateStep1 onNext='/createDealStep2' onFormSubmit={setDealDetails} /></ProtectedRoute>} />
               <Route path="/createDealStep2" element={<ProtectedRoute><CreateStep2 onNext='/createDealStep3' onFormSubmit={setDealDetails} /></ProtectedRoute>} />
