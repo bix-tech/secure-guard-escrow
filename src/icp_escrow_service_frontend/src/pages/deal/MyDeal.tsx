@@ -17,25 +17,20 @@ const MyDeal = () => {
     const handleActionDetail = async (dealId: bigint) => {
         const result = await backend.getDeal(dealId);
         if ('ok' in result) {
-            if (result.ok.status === 'Pending' && result.ok.to.toString() === principal?.toString()) {
-                navigate(`/deal/buyer/lock-token/${dealId}`);
-            } else if (result.ok.status === 'Pending' && result.ok.from.toString() === principal?.toString()) {
-                navigate(`/deal/seller/waiting-buyer/${dealId}`);
-            } else if (result.ok.status === 'In Progress' && result.ok.to.toString() === principal?.toString()) {
-                navigate(`/deal/buyer/lock-successfully/${dealId}`);
-            } else if (result.ok.status === 'In Progress' && result.ok.from.toString() === principal?.toString()) {
-                navigate(`/deal/seller/submit-deliverables/${dealId}`);
-            } else if (result.ok.status === 'Submitted Deliverables' && result.ok.to.toString() === principal?.toString()) {
-                navigate(`/deal-overview/${dealId}`);
-            } else if (result.ok.status === 'Submitted Deliverables' && result.ok.from.toString() === principal?.toString()) {
-                navigate(`/deal/seller/submit-deliverables-successfully/${dealId}`);
-            } else if (result.ok.status === 'Completed') {
-                navigate(`/deal-overview/${dealId}`);
-            } else if (result.ok.status === 'Cancelled') {
-                navigate(`/deal-overview/${dealId}`);
-            }
+            const { status, to } = result.ok;
+            const isBuyer = to.toString() === principal?.toString();
+
+            const routes: { [key: string]: string } = {
+                'Pending': isBuyer ? `/deal/buyer/lock-token/${dealId}` : `/deal/seller/waiting-buyer/${dealId}`,
+                'In Progress': isBuyer ? `/deal/buyer/lock-successfully/${dealId}` : `/deal/seller/submit-deliverables/${dealId}`,
+                'Submitted Deliverables': isBuyer ? `/deal-overview/${dealId}` : `/deal/seller/submit-deliverables-successfully/${dealId}`,
+                'Completed': `/deal-overview/${dealId}`,
+                'Cancelled': `/deal-overview/${dealId}`
+            };
+            navigate(routes[status]);
         }
     };
+
 
     useEffect(() => {
         const fetchDealData = async () => {
@@ -58,77 +53,68 @@ const MyDeal = () => {
         fetchDealData();
     }, [principal, isPrincipalLoading]);
 
-    return (
-        <div className="container-fluid mt-1">
-            <div className="row">
-                <Sidebar />
-                <div className="col-9">
-                    <h1>MyDeal</h1>
-                    {isLoading ? (
-                        <div className="spinner-border" role="status">
-                            <span className="visually-hidden">Loading...</span>
-                        </div>
-                    ) : (
-                        deal && deal.length > 0 ? (
-                            deal.map((d, index) => (
+
+return (
+    <div className="container-fluid mt-1">
+        <div className="row">
+            <Sidebar />
+            <div className="col-9">
+                <h1>MyDeal</h1>
+                {isLoading ? (
+                    <div className="spinner-border" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
+                ) : (
+                    deal && deal.length > 0 ? (
+                        deal.map((d, index) => {
+                            const isBuyer = d.to.toString() === principal?.toString();
+
+                            const statusDetails: { [key: string]: { badge: string, text: string } } = {
+                                'Pending': {
+                                    badge: 'warning',
+                                    text: isBuyer ? 'Proceed to lock token' : 'Waiting for buyer to lock token'
+                                },
+                                'In Progress': {
+                                    badge: 'primary',
+                                    text: isBuyer ? 'Waiting for seller to submit deliverables' : 'Proceed to submit deliverables'
+                                },
+                                'Submitted Deliverables': {
+                                    badge: 'success',
+                                    text: isBuyer ? 'Proceed to confirm deal' : 'Waiting for buyer to confirm deal'
+                                },
+                                'Completed': {
+                                    badge: 'success',
+                                    text: 'View Deal Details'
+                                },
+                                'Cancelled': {
+                                    badge: 'danger',
+                                    text: 'View Deal Details'
+                                }
+                            };
+
+                            const details = statusDetails[d.status] || { badge: 'danger', text: 'View Deal Details' };
+
+                            return (
                                 <div key={index} className="card p-3 my-2">
                                     <div className="row">
                                         <div className="col d-flex justify-content-between align-center">
                                             {d.name}
-                                            {d.status === 'Pending' && d.to.toString() === principal?.toString() ? (
-                                                <div>
-                                                    <span className="badge badge-warning">Pending</span>
-                                                    <button className="btn btn-confirm btn-primary" onClick={() => handleActionDetail(d.id)}>Proceed to lock token</button>
-                                                </div>
-                                            ) : d.status === 'Pending' && d.from.toString() === principal?.toString() ? (
-                                                <div>
-                                                    <span className="badge badge-warning">Pending</span>
-                                                    <button className="btn btn-confirm btn-primary" onClick={() => handleActionDetail(d.id)}>Waiting for buyer to lock token</button>
-                                                </div>
-                                            ) : d.status === 'In Progress' && d.to.toString() === principal?.toString() ? (
-                                                <div>
-                                                    <span className="badge badge-primary">In Progress</span>
-                                                    <button className="btn btn-confirm btn-primary" onClick={() => handleActionDetail(d.id)}>Waiting for seller to submit deliverables</button>
-                                                </div>
-                                            ) : d.status === 'In Progress' && d.from.toString() === principal?.toString() ? (
-                                                <div>
-                                                    <span className="badge badge-primary">In Progress</span>
-                                                    <button className="btn btn-confirm btn-primary" onClick={() => handleActionDetail(d.id)}>Proceed to submit deliverables</button>
-                                                </div>
-                                            ) : d.status === 'Submitted Deliverables' && d.to.toString() === principal?.toString() ? (
-                                                <div>
-                                                    <span className="badge badge-success">Submitted Deliverables</span>
-                                                    <button className="btn btn-confirm btn-primary" onClick={() => handleActionDetail(d.id)}>Proceed to confirm deal</button>
-                                                </div>
-                                            ) : d.status === 'Submitted Deliverables' && d.from.toString() === principal?.toString() ? (
-                                                <div>
-                                                    <span className="badge badge-success">Submitted Deliverables</span>
-                                                    <button className="btn btn-confirm btn-primary" onClick={() => handleActionDetail(d.id)}>Waiting for buyer to confirm deal</button>
-                                                </div>
-                                            ) : d.status === 'Completed' ? (
-                                                <div>
-                                                    <span className="badge badge-success">Completed</span>
-                                                    <button className="btn btn-confirm btn-primary" onClick={() => handleActionDetail(d.id)}>View Deal Details</button>
-                                                </div>
-                                            ) : (
-                                                <div>
-                                                    <span className="badge badge-danger">Cancelled</span>
-                                                    <button className="btn btn-confirm btn-primary" onClick={() => handleActionDetail(d.id)}>View Deal Details</button>
-                                                </div>
-                                            )}
+                                            <span className={`badge badge-${details.badge}`}>{d.status}</span>
+                                            <button className="btn btn-confirm btn-primary" onClick={() => handleActionDetail(d.id)}>{details.text}</button>
                                         </div>
                                     </div>
                                 </div>
-                            ))
-                        ) : (
-                            <div className="card p-3 my-2">
-                                No Deal Found...
-                            </div>
-                        )
-                    )}
-                </div>
+                            );
+                        })
+                    ) : (
+                        <div className="card p-3 my-2">
+                            No Deal Found...
+                        </div>
+                    )
+                )}
             </div>
         </div>
-    )
+    </div>
+)
 }
 export default MyDeal
