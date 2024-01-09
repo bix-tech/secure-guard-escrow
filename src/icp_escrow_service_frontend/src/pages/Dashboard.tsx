@@ -30,9 +30,8 @@ const Dashboard = () => {
   const [totalItems, setTotalItems] = useState(0);
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const navigate = useNavigate();
-  // const [isActive, setIsActive] = useState(false);
   const [isHamburgerActive, setIsHamburgerActive] = useState(false);
-  
+
 
 
   const handlePageClick = (page: number) => {
@@ -72,11 +71,7 @@ const Dashboard = () => {
       }
     }
   };
-  
-  // const handleHamburgerClick = () => {
-  //   setIsActive(current => !current);
 
-  // };
 
   useEffect(() => {
     if (principal) {
@@ -88,19 +83,14 @@ const Dashboard = () => {
   return (
     <div className="container-fluid mt-1 d-flex flex-column">
       <div className="row">
-        
-        <Sidebar isHamburgerActive={isHamburgerActive} handleHamburgerClick={handleHamburgerClick}/>
-        
+
+        <Sidebar isHamburgerActive={isHamburgerActive} handleHamburgerClick={handleHamburgerClick} />
+
         <div className={`col-md-9 ms-sm-auto col-lg-10 px-1 d-flex flex-column ${isHamburgerActive ? 'col-lg-12 col-md-12' : ''}`} style={{ position: 'relative' }}>
-        {/* <div className="btn-group hamburger">
-        <button className="btn btn-default" type="button" id="menu-toggle" onClick={handleHamburgerClick}>
-          <img src="hamburger.png" className="menu-icon" alt="" />
-        </button>
-        </div> */}
-        <button className="btn btn-create btn-primary" onClick={handleCreateDeal}> Create Deal </button>
-        <div className="button-container mx-5" style={{float: 'right'}}>
-        </div>
-          <div className="card p-5 mx-auto my-5" style={{ width: '80%'}}>
+          <button className="btn btn-create btn-primary" onClick={handleCreateDeal}> Create Deal </button>
+          <div className="button-container mx-5" style={{ float: 'right' }}>
+          </div>
+          <div className="card p-5 mx-auto my-5" style={{ width: '80%' }}>
             <h2>Activity Logs</h2>
             <table className="table">
               <thead>
