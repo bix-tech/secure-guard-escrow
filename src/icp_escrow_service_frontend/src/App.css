@@ -431,7 +431,7 @@ body {
   position: relative;
   bottom: 0;
   width: 100%;
-  margin-top: auto;
+  margin-top: auto !important;
 }
 
 .editor-button {
@@ -624,7 +624,6 @@ body {
     padding: 5px 10px !important;
     font-size: 8px !important; 
     margin-left: auto;
-    margin-top: 0px;
     position: relative;
     right: 5%;
     top: 7%;

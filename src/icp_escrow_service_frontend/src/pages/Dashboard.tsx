@@ -86,11 +86,11 @@ const Dashboard = () => {
 
         <Sidebar isHamburgerActive={isHamburgerActive} handleHamburgerClick={handleHamburgerClick} />
 
-        <div className={`col-md-9 ms-sm-auto col-lg-10 px-1 d-flex flex-column ${isHamburgerActive ? '' : 'col-lg-12 col-md-12'}`} style={{ position: 'relative' }}>
+        <div className={`col-md-9 ms-sm-auto col-lg-10 px-1 d-flex flex-column ${isHamburgerActive ? '' : 'col-lg-12 col-md-12'}`} style={{ position: 'relative', minHeight:'100vh' }}>
           <button className="btn btn-create btn-primary" onClick={handleCreateDeal}> Create Deal </button>
           <div className="button-container mx-5" style={{ float: 'right' }}>
           </div>
-          <div className="card dashboard-card padding-5 mx-auto margin-5 mobile-card" style={{ width: '80%' }}>
+          <div className="card dashboard-card padding-5 mx-auto margin-5 mobile-card" style={{ width: '80%'  }}>
             <h2>Activity Logs</h2>
             <table className="table mobile-font-size-8px">
               <thead>
