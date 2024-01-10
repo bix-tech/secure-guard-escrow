@@ -63,7 +63,7 @@ const MyDeal = () => {
         <div className="container-fluid mt-1">
             <div className="row">
             <Sidebar isHamburgerActive={isHamburgerActive} handleHamburgerClick={handleHamburgerClick}/>
-                <div className="col-9">
+                <div className="col-9 mydeal-card">
                     <h1>MyDeal</h1>
                     {isLoading ? (
                         <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
@@ -102,7 +102,7 @@ const MyDeal = () => {
                                 const details = statusDetails[d.status] || { badge: 'danger', text: 'View Deal Details' };
 
                                 return (
-                                    <div key={index} className="card p-3 my-2">
+                                    <div key={index} className="card p-3 my-2 mobile-font-size-10px">
                                         <div className="row">
                                             <div className="col d-flex justify-content-between align-items-center">
                                                 <div className="d-flex align-items-center">
@@ -116,7 +116,7 @@ const MyDeal = () => {
                                 );
                             })
                         ) : (
-                            <div className="card p-3 my-2">
+                            <div className="card p-3 my-2 mobile-font-size-10px">
                                 No Deal Found...
                             </div>
                         )

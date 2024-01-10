@@ -91,7 +91,7 @@ const Login = () => {
 
     return (
         <div className="d-flex align-items-center justify-content-center" style={{ height: '100vh' }}>
-      <div className="card p-5" style={{ width: '50%' }}>
+      <div className="card login-card p-5" style={{ width: '50%' }}>
         <div className="card-body text-center">
           <div className="avatar mb-5 mx-auto login-avatar">
             {/* <img src={minionLogo} alt="Logo" /> */}

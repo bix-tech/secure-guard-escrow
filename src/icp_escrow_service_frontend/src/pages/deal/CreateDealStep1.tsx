@@ -51,37 +51,39 @@ const CreateDeal: React.FC<CreateDealProps> = ({ onNext }) => {
 
 
     return (
-        <div className="card p-5 mx-auto my-5" style={{ width: '75%' }}>
-            <div className="card-body text-center">
+        <div className="container-fluid mt-1 d-flex flex-column">
+            <div className="card create-deal-step-1-card padding-5 mx-auto margin-y-5 mobile-font-size-8px" style={{ width: '75%' }}>
+                <div className="card-body text-center">
 
-                <CreateDealProgressBar currentStep={1} />
+                    <CreateDealProgressBar currentStep={1} />
 
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="mb-3">
-                        <div className="form-row col-md-9 text-start mx-auto">
-                            <label htmlFor="dealName" className="form-label text-start">Deal Name</label>
-                            <input {...register("dealName", { required: true })} className="form-control" />
-                            {errors.dealName && <p>This field is required</p>}
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                        <div className="mb-3">
+                            <div className="form-row col-md-9 text-start mx-auto">
+                                <label htmlFor="dealName" className="form-label text-start">Deal Name</label>
+                                <input {...register("dealName", { required: true })} className="form-control" />
+                                {errors.dealName && <p>This field is required</p>}
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="mb-3 mt-4">
-                        <div className="form-row">
-                            <div className="form-group col-md-9 text-start mx-auto">
-                                <label htmlFor="dealType" className="form-label">Are you a buyer or seller in this deal?</label>
-                                <div className="btn-group d-flex">
-                                    <input type="hidden" {...register("dealType")} value={selectedDealType} />
-                                    <span className={`badge-option ${selectedDealType === User.Buyer ? 'selected' : ''}`} onClick={() => selectDealType(User.Buyer)}>Buyer</span>
-                                    <span className={`badge-option ${selectedDealType === User.Seller ? 'selected' : ''}`} onClick={() => selectDealType(User.Seller)}>Seller</span>
-                                    {errors.dealType && <p>This field is required</p>}
+                        <div className="mb-3 mt-4">
+                            <div className="form-row">
+                                <div className="form-group col-md-9 text-start mx-auto">
+                                    <label htmlFor="dealType" className="form-label">Are you a buyer or seller in this deal?</label>
+                                    <div className="btn-group d-flex">
+                                        <input type="hidden" {...register("dealType")} value={selectedDealType} />
+                                        <span className={`badge-option ${selectedDealType === User.Buyer ? 'selected' : ''}`} onClick={() => selectDealType(User.Buyer)}>Buyer</span>
+                                        <span className={`badge-option ${selectedDealType === User.Seller ? 'selected' : ''}`} onClick={() => selectDealType(User.Seller)}>Seller</span>
+                                        {errors.dealType && <p>This field is required</p>}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <button type="submit" className="btn mx-auto col-md-9 submit-deal-btn mt-3">Confirm</button>
-                </form>
+                        <button type="submit" className="btn mx-auto col-md-9 submit-deal-btn mt-3 mobile-font-size-8px">Confirm</button>
+                    </form>
 
+                </div>
             </div>
         </div>
     );

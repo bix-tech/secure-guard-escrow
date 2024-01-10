@@ -86,13 +86,13 @@ const Dashboard = () => {
 
         <Sidebar isHamburgerActive={isHamburgerActive} handleHamburgerClick={handleHamburgerClick} />
 
-        <div className={`col-md-9 ms-sm-auto col-lg-10 px-1 d-flex flex-column ${isHamburgerActive ? 'col-lg-12 col-md-12' : ''}`} style={{ position: 'relative' }}>
+        <div className={`col-md-9 ms-sm-auto col-lg-10 px-1 d-flex flex-column ${isHamburgerActive ? '' : 'col-lg-12 col-md-12'}`} style={{ position: 'relative' }}>
           <button className="btn btn-create btn-primary" onClick={handleCreateDeal}> Create Deal </button>
           <div className="button-container mx-5" style={{ float: 'right' }}>
           </div>
-          <div className="card p-5 mx-auto my-5" style={{ width: '80%' }}>
+          <div className="card dashboard-card padding-5 mx-auto margin-5 mobile-card" style={{ width: '80%' }}>
             <h2>Activity Logs</h2>
-            <table className="table">
+            <table className="table mobile-font-size-8px">
               <thead>
                 <tr>
                   <th>ID</th>
@@ -133,7 +133,7 @@ const Dashboard = () => {
               </tbody>
 
             </table>
-            <div className="pagination justify-content-center">
+            <div className="pagination justify-content-center mobile-font-size-8px">
               <button className="previous-page-button" onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 0}>Previous</button>
               {Array.from({ length: totalPages }, (_, i) => (
                 <button key={i} onClick={() => handlePageClick(i)} className={`pages-button ${currentPage === i ? 'active' : ''}`}>

@@ -68,7 +68,7 @@ const Transaction = () => {
     return (
         <div className="container-fluid mt-1 d-flex flex-column">
             <div className="row">
-                <div className="card p-5 mx-auto my-5" style={{ width: '80%' }}>
+                <div className="card transaction-card mx-auto padding-5 margin-y-5 mobile-font-size-8px" style={{ width: '80%' }}>
                     <h2>Activity Logs</h2>
                     <table className="table">
                         <thead>

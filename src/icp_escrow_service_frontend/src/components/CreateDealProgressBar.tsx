@@ -7,7 +7,7 @@ interface CreateDealProgressBarProps {
 
 const CreateDealProgressBar: React.FC<CreateDealProgressBarProps> = ({ currentStep }) => {
     return (
-        <div className="mb-4">
+        <div className="mb-4 mobile-font-size-8px">
             <div className="d-flex justify-content-between align-items-center">
                 <div className={`state-bar d-flex flex-column align-items-center ${currentStep === 1 ? 'active' : ''}`} style={{ width: '20%' }}>
                     <div className="avatar state-avatar">

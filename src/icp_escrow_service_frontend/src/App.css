@@ -144,7 +144,7 @@ body {
 }
 
 .state-avatar {
-  border: none;
+  border: none !important;
 }
 
 .submit-deal-btn {
@@ -475,7 +475,7 @@ body {
 #sidebar {
   position: relative;
   /* left: 0; */
-  display: block;
+  /* display: block; */
   /* transition: 0.5s; */
 }
 
@@ -486,13 +486,72 @@ body {
   display: none !important;
 }
 
-@media only screen and (max-width: 768px) {
+.padding-5 {
+  padding: 3rem !important;
+}
+
+.margin-5 {
+  margin-top: 3rem !important;
+  margin-bottom: 3rem !important;
+}
+
+.margin-y-5{
+  margin-top: 3rem !important;
+  margin-bottom: 3rem !important;
+}
+
+.login-card {
+  width: 50% !important;
+}
+
+/* Mobile View */
+@media only screen and (max-width: 769px) {
+  .mobile-font-size-8px {
+    font-size: 8px !important;
+  }
+
+  .mobile-font-size-10px {
+    font-size: 10px !important;
+  }
+
+  h1 {
+    font-size: 18px !important;
+  }
+
+  h2{
+    font-size: 16px !important;
+  }
+
+  h5 {
+    font-size: 12px !important;
+  }
+
+  h6, .h6 {
+    font-size: 10px !important;
+  }
+
+  .padding-5 {
+    padding: 1rem !important;
+  }
+
+  .margin-5 {
+    margin-top: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .margin-y-5 {
+    margin-top: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+
   #sidebar {
     position: fixed;
     left: 0;
     z-index: 999;
     width: 30%;
     transition: 0.5s;
+    background-color: white;
+    margin-top: 15%;
   }
   
   #sidebar.active{
@@ -501,5 +560,129 @@ body {
     transition: 0.5s;
     z-index: 999;
     /* display: none !important; */
+  }
+
+  .navbar > .container-fluid {
+    flex-wrap: unset !important;
+  }
+
+  .navbar {
+    position: fixed !important;
+    z-index: 1000;
+  }
+
+  .mobile-card {
+    width: 80% !important;
+    /* padding: 1px !important; */
+  }
+
+  .menu-icon {
+    border: none;
+    width: 15px;
+    height: 15px;
+    overflow: hidden;
+    border: none;
+  }
+
+  .hamburger {
+    position: fixed !important;
+    z-index: 1000;
+    margin-top: 500px;
+    margin-top: 13%;
+  }
+
+  /* Login Page */
+  .login-card {
+    width: 80% !important;
+  }
+
+  .login-avatar {
+    width: 75px !important;
+    height: auto !important;
+  }
+  /* End Login Page */
+
+
+  
+  /* Dashboard Page */
+  .dashboard-card {
+    margin-top: 30% !important;
+  }
+
+  .avatar, .notification-avatar {
+    width: 30px;
+    height: 30px;
+    overflow: hidden;
+    border-radius: 50%;
+    border: 1px solid #ccc; 
+  }
+
+  .btn-create {
+    background-color: #237A88 !important;
+    color: white !important;
+    border-radius: 20px !important;
+    padding: 5px 10px !important;
+    font-size: 8px !important; 
+    margin-left: auto;
+    margin-top: 0px;
+    position: relative;
+    right: 5%;
+    top: 7%;
+  }
+  /* End Dashboard Page */
+
+
+  /* My Deal Page */
+  .mydeal-card {
+    margin-top: 25% !important;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  /* End My Deal Page */
+
+  /* Transaction Page */
+  .transaction-card {
+    margin-top: 25% !important;
+  }
+  /* End Transaction Page */
+
+  /* Create Deal Page */
+  .create-deal-step-1-card, .create-deal-step-2-card, .create-deal-step-3-card{
+    margin-top: 25% !important;
+  }
+
+  .view-details-btn {
+    width: 35%;
+    border-radius: 10px;
+    border: 1px solid grey !important;
+    color: black !important;
+  }
+  
+  .view-details-btn:hover {
+    width: 35%;
+    border-radius: 10px;
+    border: 1px solid grey !important;
+    color: black;
+    opacity: 0.3;
+  }
+  
+  .return-dashboard-btn {
+    width: 45%;
+    border-radius: 10px;
+    color: white !important;
+    background-color: #237A88 !important;
+  }
+  
+  .return-dashboard-btn:hover {
+    width: 45%;
+    border-radius: 10px;
+    color: white !important;
+    background-color: #237A88 !important;
+    opacity: 0.5;
+  }
+  /* End Create Deal Page */
+
+  .horizontal-divider {
+    width: 30px !important; 
   }
 }
