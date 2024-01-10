@@ -12,7 +12,7 @@ type DocumentFile = {
 
 
 const CreateDeal = () => {
-
+    const [isLoading, setIsLoading] = useState(true);
     const [editorContent, setEditorContent] = React.useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [uploadedDocuments, setUploadedDocuments] = useState<DocumentFile[]>([]);
@@ -72,8 +72,10 @@ const CreateDeal = () => {
                 })),
                 deliverableDescription: editorContent,
             };
+            setIsLoading(true);
             const response = await backend.addDeliverablesToDeal(BigInt(dealId || 0), newDeliverable);
             if ('ok' in response) {
+                setIsLoading(false);
                 console.log("Deliverables added to deal:", response.ok);
                 navigate(`/deal/seller/submit-deliverables-successfully/${dealId}`);
             }
@@ -82,45 +84,55 @@ const CreateDeal = () => {
         }
     };
 
-        const handleEditorContentChange = (content : string) => {
-            setEditorContent(content);
-        };
+    const handleEditorContentChange = (content: string) => {
+        setEditorContent(content);
+    };
 
 
     return (
-        <div className="card p-5 mx-auto my-5 mb-5" style={{ width: '75%' }}>
-            <div className="card-body text-center">
+        isLoading ? (
+            <div className="container-fluid mt-1 d-flex flex-column">
+                <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+                    <div className="spinner-grow text-success" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        ) : (
+            <div className="card p-5 mx-auto my-5 mb-5" style={{ width: '75%' }}>
+                <div className="card-body text-center">
 
-                <InitiatingDealProgressBar currentStep={3} />
+                    <InitiatingDealProgressBar currentStep={3} />
 
-                <form className="mt-5" onSubmit={onSubmit}>
-                    <div className="mb-3">
-                        <div className="form-row col-md-9 text-start mx-auto">
-                            <label htmlFor="projectName" className="form-label text-start">Upload Pictures</label>
-                            <br />
-                            <label htmlFor="projectName" className="form-label text-start">Recommended size 1500 x 600 (px)</label>
-                            <br />
+                    <form className="mt-5" onSubmit={onSubmit}>
+                        <div className="mb-3">
+                            <div className="form-row col-md-9 text-start mx-auto">
+                                <label htmlFor="projectName" className="form-label text-start">Upload Pictures</label>
+                                <br />
+                                <label htmlFor="projectName" className="form-label text-start">Recommended size 1500 x 600 (px)</label>
+                                <br />
 
-                            <div className="file-drop-area" id="fileDropArea" onClick={triggerFileInput}>
-                                <p>Click here or drag and drop files to upload</p>
-                                <p>Max File Size: 50 MB</p>
-                                <input type="file" id="fileInput" multiple style={{ display: 'none' }} onChange={handleDocumentSelect} ref={fileInputRef} />
+                                <div className="file-drop-area" id="fileDropArea" onClick={triggerFileInput}>
+                                    <p>Click here or drag and drop files to upload</p>
+                                    <p>Max File Size: 50 MB</p>
+                                    <input type="file" id="fileInput" multiple style={{ display: 'none' }} onChange={handleDocumentSelect} ref={fileInputRef} />
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div className="mb-3">
-                        <div className="form-row col-md-9 text-start mx-auto">
-                            <label htmlFor="deal-description" className="form-label text-start">Deal Description</label>
-                            <TiptapEditor onContentChange={handleEditorContentChange} className="form-control"/>
+                        <div className="mb-3">
+                            <div className="form-row col-md-9 text-start mx-auto">
+                                <label htmlFor="deal-description" className="form-label text-start">Deal Description</label>
+                                <TiptapEditor onContentChange={handleEditorContentChange} className="form-control" />
+                            </div>
                         </div>
-                    </div>
 
-                    <button type="submit" className="btn mx-auto col-md-9 submit-deal-btn mt-3">Submit Deliverables</button>
-                </form>
+                        <button type="submit" className="btn mx-auto col-md-9 submit-deal-btn mt-3">Submit Deliverables</button>
+                    </form>
 
+                </div>
             </div>
-        </div>
+        )
     )
 }
 

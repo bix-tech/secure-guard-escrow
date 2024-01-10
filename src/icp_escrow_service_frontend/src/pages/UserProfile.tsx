@@ -13,6 +13,7 @@ type UploadedPictureType = {
 
 const UserProfilePage = () => {
     const { principal } = usePrincipal();
+    const [isLoading, setIsLoading] = useState(true);
     const [pictureUrls, setPictureUrls] = useState<string[]>([]);
     const [uploadedProfilePicture, setUploadedProfilePicture] = useState<UploadedPictureType>();
     const [profile, setProfile] = useState<UserProfile>();
@@ -81,7 +82,7 @@ const UserProfilePage = () => {
                 } catch (error) {
                     console.error("Error fetching user profile:", error);
                 }
-
+                setIsLoading(false);
             }
         }
         fetchUserProfile();
@@ -137,9 +138,11 @@ const UserProfilePage = () => {
                 age: BigInt(age),
                 dob: dob ? BigInt(dob.getTime()) : BigInt(0)
             };
+            setIsLoading(true);
             const result = await backend.updateUserProfile(Principal.fromText(principal || ''), profileData);
             if ('ok' in result) {
                 setProfile(profileData);
+                setIsLoading(false);
             }
         } catch (error) {
             console.error("Error submitting user profile:", error);
@@ -147,84 +150,94 @@ const UserProfilePage = () => {
     };
 
     return (
-        <div className="profile-container card p-5">
-            <form onSubmit={submitUserProfile} className="profile-form d-flex flex-column align-items-center">
-                <div className="form-group">
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handlePictureSelect}
-                        style={{ display: 'none' }}
-                        id="fileInput"
-                    />
-                    {pictureUrls.length > 0 ? (
-                        pictureUrls.map((url) => (
+        isLoading ? (
+            <div className="container-fluid mt-1 d-flex flex-column">
+                <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+                    <div className="spinner-grow text-success" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        ) : (
+            <div className="profile-container card p-5">
+                <form onSubmit={submitUserProfile} className="profile-form d-flex flex-column align-items-center">
+                    <div className="form-group">
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handlePictureSelect}
+                            style={{ display: 'none' }}
+                            id="fileInput"
+                        />
+                        {pictureUrls.length > 0 ? (
+                            pictureUrls.map((url) => (
+                                <img
+                                    key={url}
+                                    src={url}
+                                    alt={`Picture`}
+                                    style={{ width: '100px', height: '100px', borderRadius: '100px' }}
+                                    onClick={() => { triggerProfilePictureInput() }}
+                                />
+                            ))
+                        ) : (
                             <img
-                                key={url}
-                                src={url}
-                                alt={`Picture`}
+                                src="https://www.w3schools.com/howto/img_avatar.png"
+                                alt="Avatar"
+                                className="avatar"
                                 style={{ width: '100px', height: '100px', borderRadius: '100px' }}
                                 onClick={() => { triggerProfilePictureInput() }}
                             />
-                        ))
-                    ) : (
-                        <img
-                            src="https://www.w3schools.com/howto/img_avatar.png"
-                            alt="Avatar"
-                            className="avatar"
-                            style={{ width: '100px', height: '100px', borderRadius: '100px' }}
-                            onClick={() => { triggerProfilePictureInput() }}
-                        />
-                    )}
-                </div>
-                <div className="mb-3">
-                    <div className="form-row col-md-9 text-start mx-auto">
-                        <label>Name</label>
-                        <input type="text" placeholder="Name" value={name} onChange={handleNameChange} className="form-control" />
+                        )}
                     </div>
-                </div>
-                <div className="mb-3">
-                    <div className="form-row col-md-9 text-start mx-auto">
-                        <label>Email:</label>
-                        <input type="email" placeholder="Email" value={email} onChange={handleEmailChange} className="form-control" />
+                    <div className="mb-3">
+                        <div className="form-row col-md-9 text-start mx-auto">
+                            <label>Name</label>
+                            <input type="text" placeholder="Name" value={name} onChange={handleNameChange} className="form-control" />
+                        </div>
                     </div>
-                </div>
-                <div className="mb-3">
-                <div className="form-row col-md-9 text-start mx-auto">
-                    <label>Phone:</label>
-                    <input type="tel" placeholder="Phone" value={phone} onChange={handlePhoneChange} className="form-control" />
-                </div>
-                </div>
-                <div className="mb-3">
-                <div className="form-row col-md-9 text-start mx-auto">
-                    <label>Address:</label>
-                    <input type="text" placeholder="Address" value={address} onChange={handleAddressChange} className="form-control" />
-                </div>
-                </div>
-                <div className="mb-3">
-                <div className="form-row col-md-9 text-start mx-auto">
-                    <label>Age:</label>
-                    <input type="number" placeholder="Age" value={Number(age)} onChange={handleAgeChange} className="form-control" />
-                </div>
-                </div>
-                <div className="mb-3">
-                <div className="form-row col-md-9 text-start mx-auto">
-                    <label htmlFor="open-date" className="form-label text-start">
-                        DOB
-                    </label>
-                    <div className="input-group">
-                        <DatePicker
-                            selected={dob}
-                            onChange={(date: any) => setDob(date)}
-                            dateFormat="MMMM d, yyyy"
-                            className="form-control"
-                        />
+                    <div className="mb-3">
+                        <div className="form-row col-md-9 text-start mx-auto">
+                            <label>Email:</label>
+                            <input type="email" placeholder="Email" value={email} onChange={handleEmailChange} className="form-control" />
+                        </div>
                     </div>
-                </div>
-                </div>
-                <button type="submit" className="btn btn-primary btn-confirm">Submit</button>
-            </form>
-        </div>
+                    <div className="mb-3">
+                        <div className="form-row col-md-9 text-start mx-auto">
+                            <label>Phone:</label>
+                            <input type="tel" placeholder="Phone" value={phone} onChange={handlePhoneChange} className="form-control" />
+                        </div>
+                    </div>
+                    <div className="mb-3">
+                        <div className="form-row col-md-9 text-start mx-auto">
+                            <label>Address:</label>
+                            <input type="text" placeholder="Address" value={address} onChange={handleAddressChange} className="form-control" />
+                        </div>
+                    </div>
+                    <div className="mb-3">
+                        <div className="form-row col-md-9 text-start mx-auto">
+                            <label>Age:</label>
+                            <input type="number" placeholder="Age" value={Number(age)} onChange={handleAgeChange} className="form-control" />
+                        </div>
+                    </div>
+                    <div className="mb-3">
+                        <div className="form-row col-md-9 text-start mx-auto">
+                            <label htmlFor="open-date" className="form-label text-start">
+                                DOB
+                            </label>
+                            <div className="input-group">
+                                <DatePicker
+                                    selected={dob}
+                                    onChange={(date: any) => setDob(date)}
+                                    dateFormat="MMMM d, yyyy"
+                                    className="form-control"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" className="btn btn-primary btn-confirm">Submit</button>
+                </form>
+            </div>
+        )
     );
 }
 export default UserProfilePage
