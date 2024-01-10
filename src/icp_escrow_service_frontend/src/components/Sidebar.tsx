@@ -20,6 +20,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isHamburgerActive, handleHamburgerCli
     navigate('/dashboard')
   }
 
+  const handleProfileClick = () => {
+    navigate('/profile')
+  }
+
 
 
   return (
@@ -56,10 +60,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isHamburgerActive, handleHamburgerCli
               </div>
             </li>
             <li className="nav-item">
-              <a className="nav-link mb-3" href="#">
+              <div className="nav-link mb-3" onClick={handleProfileClick} style={{ cursor: "pointer"}}>
                 <img src="/profile.png" alt="User Avatar" className="menu-icon me-2" />
                 Profile
-              </a>
+              </div>
             </li>
             <li className="nav-item">
               <a className="nav-link mb-3" href="#">
