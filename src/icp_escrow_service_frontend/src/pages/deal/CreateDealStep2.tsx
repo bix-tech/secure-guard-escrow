@@ -205,6 +205,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
             const pictureBinary = new Uint8Array(binaryData);
             const pictureId = await uploadPicture(pictureBinary);
             setUploadedPicture({ file, id: pictureId, name: file.name });
+            setIsLoading(false);
         }
         displayPictureBadge(file);
     };
@@ -226,6 +227,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
 
     const uploadPicture = async (binaryFile: any): Promise<bigint> => {
         try {
+            setIsLoading(true);
             const id = await backend.uploadPicture(binaryFile);
             console.log("Picture uploaded with ID:", id);
             return id;
@@ -238,8 +240,10 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
 
     const uploadSupportingDocument = async (binaryFile: any) => {
         try {
+            setIsLoading(true);
             const response = await backend.uploadSupportingDocument(binaryFile);
             console.log("Document uploaded:", response);
+            setIsLoading(false);
             return response;
         } catch (error) {
             console.error("Failed to upload document:", error);

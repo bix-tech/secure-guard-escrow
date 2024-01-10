@@ -51,7 +51,6 @@ const NavbarWrapper = () => {
 
 function App() {
   const [dealDetails, setDealDetails] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
   const auth = useAuth();
   const isAuthenticated = auth ? auth.isAuthenticated : false;
 
@@ -78,11 +77,6 @@ function App() {
   };
 
   useEffect(() => {
-    const checkAuthentication = async () => {
-      setIsLoading(false);
-    };
-
-    checkAuthentication();
   }, []);
 
 
@@ -91,9 +85,6 @@ function App() {
   }, [isAuthenticated]);
 
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
   return (
     <Router>
       <AuthProvider>
@@ -103,7 +94,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Login />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-              <Route path="/profile" element={<ProtectedRoute><UserProfilePage /></ProtectedRoute>} /> {/* TODO: Change to profile page */}
+              <Route path="/profile" element={<ProtectedRoute><UserProfilePage /></ProtectedRoute>} />
               <Route path="/myDeal" element={<ProtectedRoute><MyDeal /></ProtectedRoute>} />
               <Route path="/my-transactions" element={<ProtectedRoute><Transaction /></ProtectedRoute>} />
               <Route path="/deal-overview/:dealId" element={<ProtectedRoute><DealOverview /></ProtectedRoute>} />

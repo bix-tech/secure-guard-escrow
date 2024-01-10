@@ -4,6 +4,7 @@ import { usePrincipal } from '../hooks/usePrincipal'
 import { Principal } from '@dfinity/principal'
 import DatePicker from 'react-datepicker'
 import { FileReference, UserProfile } from '../../../declarations/backend/backend.did'
+import "react-datepicker/dist/react-datepicker.css";
 
 type UploadedPictureType = {
     file: File;
@@ -21,7 +22,7 @@ const UserProfilePage = () => {
     const [email, setEmail] = useState(profile ? profile.email : '');
     const [phone, setPhone] = useState(profile ? profile.phone : '');
     const [address, setAddress] = useState(profile ? profile.address : '');
-    const [age, setAge] = useState(profile ? profile.age : (0));
+    const [age, setAge] = useState(profile ? profile.age : null);
     const [dob, setDob] = useState(profile ? new Date(Number(profile.dob)) : null);
 
     const defaultPicture: UploadedPictureType = {
@@ -34,8 +35,11 @@ const UserProfilePage = () => {
     const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => setEmail(event.target.value);
     const handlePhoneChange = (event: React.ChangeEvent<HTMLInputElement>) => setPhone(event.target.value);
     const handleAddressChange = (event: React.ChangeEvent<HTMLInputElement>) => setAddress(event.target.value);
-    const handleAgeChange = (event: React.ChangeEvent<HTMLInputElement>) => setAge(parseInt(event.target.value));
 
+    const handleAgeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value;
+        setAge(value ? BigInt(value) : null);
+    };
 
     const fetchPictures = async (deal: UserProfile) => {
         const pictureRef = deal.profilePicture;
@@ -75,7 +79,7 @@ const UserProfilePage = () => {
                         setEmail(profileData.email);
                         setPhone(profileData.phone);
                         setAddress(profileData.address);
-                        setAge(Number(profileData.age));
+                        setAge(BigInt(profileData.age));
                         setDob(new Date(Number(profileData.dob)));
                         await fetchPictures(profileData);
                     }
@@ -139,7 +143,7 @@ const UserProfilePage = () => {
                 phone: phone,
                 address: address,
                 profilePicture: profilePicture || defaultPicture,
-                age: BigInt(age),
+                age: BigInt(age || 0),
                 dob: dob ? BigInt(dob.getTime()) : BigInt(0)
             };
             setIsLoading(true);
@@ -220,7 +224,7 @@ const UserProfilePage = () => {
                     <div className="mb-3">
                         <div className="form-row col-md-9 text-start mx-auto">
                             <label>Age:</label>
-                            <input type="number" placeholder="Age" value={Number(age)} onChange={handleAgeChange} className="form-control" />
+                            <input type="number" placeholder="Age" value={age ? age.toString() : ''} onChange={handleAgeChange} className="form-control" />
                         </div>
                     </div>
                     <div className="mb-3">
@@ -228,13 +232,22 @@ const UserProfilePage = () => {
                             <label htmlFor="open-date" className="form-label text-start">
                                 DOB
                             </label>
-                            <div className="input-group">
+                            <div className="input-group date-picker-group">
                                 <DatePicker
                                     selected={dob}
-                                    onChange={(date: any) => setDob(date)}
+                                    onChange={(date) => setDob(date)}
                                     dateFormat="MMMM d, yyyy"
-                                    className="form-control"
+                                    showYearDropdown
+                                    showMonthDropdown
+                                    dropdownMode="select"
+                                    className="form-control custom-date-picker"
+                                    yearDropdownItemNumber={5}
+                                    placeholderText="Select a date"
+                                    isClearable={true}
                                 />
+                                <span className="input-group-addon">
+                                    <i className="fa fa-calendar" aria-hidden="true"></i>
+                                </span>
                             </div>
                         </div>
                     </div>
