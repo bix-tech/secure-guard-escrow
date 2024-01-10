@@ -11,6 +11,7 @@ import { Principal } from '@dfinity/principal';
 import { backend } from "../../../declarations/backend";
 import { usePrincipal } from '../hooks/usePrincipal';
 import { UserProfile } from '../../../declarations/backend/backend.did';
+import { DropDirection } from 'react-bootstrap/esm/DropdownContext';
 
 type Notification = {
     dealId: bigint;
@@ -27,7 +28,7 @@ const Navbar = () => {
     const [showNotification, setShowNotification] = useState(false);
     const [pictureUrls, setPictureUrls] = useState<string[]>([]);
     const notificationRef = useRef(null);
-    const [dropDirection, setDropDirection] = useState('down');
+    const [dropDirection, setDropDirection] = useState<DropDirection>('down');
 
 
     const formatPrincipal = (principal: string | null) => {
@@ -141,7 +142,7 @@ const Navbar = () => {
 
                 <div className="ms-auto"></div>
 
-                <Dropdown show={showNotification} onToggle={toggleNotification} ref={notificationRef} drop="start">
+                <Dropdown show={showNotification} onToggle={toggleNotification} ref={notificationRef} drop={dropDirection}>
                     <Dropdown.Toggle as="div" id="dropdown-notification" className="notification-avatar ms-3 d-flex align-items-center justify-content-center">
                         <img src="/notification.png" className="notification-icon" alt="Notification Avatar" />
                     </Dropdown.Toggle>
