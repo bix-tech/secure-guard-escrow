@@ -81,7 +81,7 @@ const UserProfilePage = () => {
                 } catch (error) {
                     console.error("Error fetching user profile:", error);
                 }
-            
+
             }
         }
         fetchUserProfile();
@@ -108,6 +108,14 @@ const UserProfilePage = () => {
             throw error;
         }
     };
+
+    const triggerProfilePictureInput = () => {
+        const fileInput = document.getElementById('fileInput');
+        if (fileInput) {
+            fileInput.click();
+            console.log("Clicked file input")
+        }
+    }
 
 
     const submitUserProfile = async (event: any) => {
@@ -139,36 +147,68 @@ const UserProfilePage = () => {
     };
 
     return (
-        <div className="profile-container">
-            <form onSubmit={submitUserProfile} className="profile-form">
+        <div className="profile-container card p-5">
+            <form onSubmit={submitUserProfile} className="profile-form d-flex flex-column align-items-center">
                 <div className="form-group">
-                    <label>Profile Picture:</label>
-                    <input type="file" accept="image/*" onChange={handlePictureSelect} />
-                    {pictureUrls.map((url) => (
-                        <img key={url} src={url} alt={`Picture`} />
-                    ))}
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePictureSelect}
+                        style={{ display: 'none' }}
+                        id="fileInput"
+                    />
+                    {pictureUrls.length > 0 ? (
+                        pictureUrls.map((url) => (
+                            <img
+                                key={url}
+                                src={url}
+                                alt={`Picture`}
+                                style={{ width: '100px', height: '100px', borderRadius: '100px' }}
+                                onClick={() => { triggerProfilePictureInput() }}
+                            />
+                        ))
+                    ) : (
+                        <img
+                            src="https://www.w3schools.com/howto/img_avatar.png"
+                            alt="Avatar"
+                            className="avatar"
+                            style={{ width: '100px', height: '100px', borderRadius: '100px' }}
+                            onClick={() => { triggerProfilePictureInput() }}
+                        />
+                    )}
                 </div>
-                <div className="form-group">
-                    <label>Name:</label>
-                    <input type="text" placeholder="Name" value={name} onChange={handleNameChange} />
+                <div className="mb-3">
+                    <div className="form-row col-md-9 text-start mx-auto">
+                        <label>Name</label>
+                        <input type="text" placeholder="Name" value={name} onChange={handleNameChange} className="form-control" />
+                    </div>
                 </div>
-                <div className="form-group">
-                    <label>Email:</label>
-                    <input type="email" placeholder="Email" value={email} onChange={handleEmailChange} />
+                <div className="mb-3">
+                    <div className="form-row col-md-9 text-start mx-auto">
+                        <label>Email:</label>
+                        <input type="email" placeholder="Email" value={email} onChange={handleEmailChange} className="form-control" />
+                    </div>
                 </div>
-                <div className="form-group">
+                <div className="mb-3">
+                <div className="form-row col-md-9 text-start mx-auto">
                     <label>Phone:</label>
-                    <input type="tel" placeholder="Phone" value={phone} onChange={handlePhoneChange} />
+                    <input type="tel" placeholder="Phone" value={phone} onChange={handlePhoneChange} className="form-control" />
                 </div>
-                <div className="form-group">
+                </div>
+                <div className="mb-3">
+                <div className="form-row col-md-9 text-start mx-auto">
                     <label>Address:</label>
-                    <input type="text" placeholder="Address" value={address} onChange={handleAddressChange} />
+                    <input type="text" placeholder="Address" value={address} onChange={handleAddressChange} className="form-control" />
                 </div>
-                <div className="form-group">
+                </div>
+                <div className="mb-3">
+                <div className="form-row col-md-9 text-start mx-auto">
                     <label>Age:</label>
-                    <input type="number" placeholder="Age" value={Number(age)} onChange={handleAgeChange} />
+                    <input type="number" placeholder="Age" value={Number(age)} onChange={handleAgeChange} className="form-control" />
                 </div>
-                <div className="form-group">
+                </div>
+                <div className="mb-3">
+                <div className="form-row col-md-9 text-start mx-auto">
                     <label htmlFor="open-date" className="form-label text-start">
                         DOB
                     </label>
@@ -181,7 +221,8 @@ const UserProfilePage = () => {
                         />
                     </div>
                 </div>
-                <button type="submit" className="submit-btn">Submit</button>
+                </div>
+                <button type="submit" className="btn btn-primary btn-confirm">Submit</button>
             </form>
         </div>
     );
