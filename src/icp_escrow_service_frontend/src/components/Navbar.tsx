@@ -87,7 +87,7 @@ const Navbar = () => {
             if (principal) {
                 const userProfile = await backend.getUserProfile(Principal.fromText(principal));
                 if ('ok' in userProfile) {
-                    fetchUserProfilePicture(userProfile.ok);
+                   await fetchUserProfilePicture(userProfile.ok);
                 }
             }
         }
@@ -146,7 +146,7 @@ const Navbar = () => {
                         <img src="/notification.png" className="notification-icon" alt="Notification Avatar" />
                     </Dropdown.Toggle>
 
-                    <Dropdown.Menu className="notification-list p-0 mobile-font-size-8px">
+                    <Dropdown.Menu align="end" className="notification-list p-0 mobile-font-size-8px">
                         {notifications.length === 0 ? (
                             <Dropdown.Item>No notifications</Dropdown.Item>
                         ) : (
