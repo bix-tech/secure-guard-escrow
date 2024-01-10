@@ -68,20 +68,14 @@ const Navbar = () => {
     const fetchUserProfilePicture = useCallback(async (user: UserProfile) => {
         try {
             if (principal) {
-                const storedPictureUrl = await localForage.getItem<string>('pictureUrl');
-                if (storedPictureUrl) {
-                    setPictureUrls([storedPictureUrl]);
-                } else {
-                    const pictureRef = user.profilePicture;
-                    const blob = await backend.getProfilePicture(pictureRef, Principal.fromText(principal || ''));
-                    if (blob) {
-                        const array = Array.isArray(blob[0]) ? new Uint8Array(blob[0]) : blob[0];
-                        if (array) {
-                            const blobObject = new Blob([array]);
-                            const url = URL.createObjectURL(blobObject);
-                            await localForage.setItem('pictureUrl', url);
-                            setPictureUrls([url]);
-                        }
+                const pictureRef = user.profilePicture;
+                const blob = await backend.getProfilePicture(pictureRef, Principal.fromText(principal || ''));
+                if (blob) {
+                    const array = Array.isArray(blob[0]) ? new Uint8Array(blob[0]) : blob[0];
+                    if (array) {
+                        const blobObject = new Blob([array]);
+                        const url = URL.createObjectURL(blobObject);
+                        setPictureUrls([url]);
                     }
                 }
             }

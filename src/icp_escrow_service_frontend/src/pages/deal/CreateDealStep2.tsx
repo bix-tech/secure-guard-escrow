@@ -54,7 +54,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
     const documentInputRef = useRef<HTMLInputElement>(null);
     const [dealStart, setOpenDate] = useState<Date | null>(null);
     const [dealEnd, setCloseDate] = useState<Date | null>(null);
-    const [uploadedPicture, setUploadedPicture] = useState<UploadedPictureType>();
+    const [uploadedPicture, setUploadedPicture] = useState<UploadedPictureType | null>(null);
     const [editorContent, setEditorContent] = useState('');
     const [uploadedDocuments, setUploadedDocuments] = useState<DocumentFile[]>([]);
     const [selectedDealCategory, setSelectedDealCategory] = useState<DealCategory>(DealCategory.NFT);
@@ -205,9 +205,12 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
             const pictureBinary = new Uint8Array(binaryData);
             const pictureId = await uploadPicture(pictureBinary);
             setUploadedPicture({ file, id: pictureId, name: file.name });
-            setIsLoading(false);
+            if (pictureInputRef.current){
+            displayPictureBadge(file);
+            } else {
+                console.error("Picture input ref is null");
+            }
         }
-        displayPictureBadge(file);
     };
 
 
@@ -220,14 +223,13 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                 const documentBinary = new Uint8Array(binaryData);
                 await uploadSupportingDocument(documentBinary);
                 setUploadedDocuments([...uploadedDocuments, file]);
+                displayDocumentBadge(files[0]);
             }
         }
-        displayDocumentBadge(files[0]);
     };
 
     const uploadPicture = async (binaryFile: any): Promise<bigint> => {
         try {
-            setIsLoading(true);
             const id = await backend.uploadPicture(binaryFile);
             console.log("Picture uploaded with ID:", id);
             return id;
@@ -240,10 +242,8 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
 
     const uploadSupportingDocument = async (binaryFile: any) => {
         try {
-            setIsLoading(true);
             const response = await backend.uploadSupportingDocument(binaryFile);
             console.log("Document uploaded:", response);
-            setIsLoading(false);
             return response;
         } catch (error) {
             console.error("Failed to upload document:", error);
@@ -254,6 +254,10 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
     const displayPictureBadge = (file: File) => {
         const badgeContainer = document.getElementById('fileDropArea');
         if (badgeContainer) {
+            const oldBadge =badgeContainer.querySelector('.file-badge');
+            if (oldBadge){
+                badgeContainer.removeChild(oldBadge);
+            }
             const badge = document.createElement('span');
             badge.className = 'file-badge';
             badge.textContent = file.name;
@@ -338,16 +342,6 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                             <div className="mb-3">
                                 <div className='form-row col-md-9 text-start mx-auto'>
                                     <label htmlFor="deal-category" className='form-label text-start'>Deal Category</label>
-                                    {/* <select
-                                id="deal-category"
-                                className="form-control"
-                                value={selectedCategory}
-                                onChange={handleCategoryChange}
-                            >
-                                {Object.values(DealCategory).map((category, index) => (
-                                    <option key={index} value={category}>{category}</option>
-                                ))}
-                            </select> */}
                                     <div className="btn-group d-flex flex-wrap">
                                         <input type="hidden" {...register("dealCategory")} value={selectedDealCategory} />
                                         <span className={`badge-option ${selectedDealCategory === DealCategory.NFT ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.NFT)}>NFT</span>

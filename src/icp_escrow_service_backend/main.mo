@@ -251,6 +251,9 @@ actor {
 
   public func uploadPicture(blob : Blob) : async Nat {
     let id = pictures.size();
+    if (id >= 0){
+      let _ = pictures.remove(id);
+    };
     pictures.put(id, blob);
     return id;
   };
