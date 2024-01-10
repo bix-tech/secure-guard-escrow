@@ -25,6 +25,7 @@ const Navbar = () => {
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [showNotification, setShowNotification] = useState(false);
     const notificationRef = useRef(null);
+    const [dropDirection, setDropDirection] = useState('down');
 
 
     const formatPrincipal = (principal: string | null) => {
@@ -64,6 +65,18 @@ const Navbar = () => {
             }
         };
         initAuth();
+
+        // Update drop direction based on screen width
+        const handleResize = () => {
+            setDropDirection(window.innerWidth >= 768 ? 'start' : 'down');
+        };
+    
+        handleResize(); // Initial setup
+        window.addEventListener('resize', handleResize);
+    
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
     }, []);
 
 
@@ -97,7 +110,7 @@ const Navbar = () => {
         
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
             <div className="container-fluid">
-                <div className="navbar-brand" onClick={handleHomeClick}>ICP Escrow Service</div>
+                <div className="navbar-brand mobile-font-size-10px" onClick={handleHomeClick}>ICP Escrow Service</div>
 
                 <div className="ms-auto"></div>
 
@@ -106,7 +119,7 @@ const Navbar = () => {
                         <img src="/notification.png" className="notification-icon" alt="Notification Avatar" />
                     </Dropdown.Toggle>
 
-                    <Dropdown.Menu className="notification-list p-0">
+                    <Dropdown.Menu className="notification-list p-0 mobile-font-size-8px">
                         {notifications.length === 0 ? (
                             <Dropdown.Item>No notifications</Dropdown.Item>
                         ) : (
@@ -128,11 +141,11 @@ const Navbar = () => {
                         <img src="/minion.jpeg" alt="User Avatar" />
                     </div>
                     <div>
-                        <p className="mb-0">
-                            <FaCopy className="copy-icon" onClick={handleCopy} />
+                        <p className="mb-0 mobile-font-size-8px">
+                            <FaCopy className="copy-icon " onClick={handleCopy} />
                             {formatPrincipal(principal)}
                         </p>
-                        {copied && <span>Copied to clipboard</span>}
+                        {copied && <span className='mobile-font-size-8px'>Copied to clipboard</span>}
                     </div>
                     <Dropdown>
                         <Dropdown.Toggle variant="default" id="dropdown-basic" >

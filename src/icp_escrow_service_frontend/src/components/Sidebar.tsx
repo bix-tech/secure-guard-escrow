@@ -23,13 +23,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isHamburgerActive, handleHamburgerCli
 
 
   return (
-    <div className={`col-md-3 col-lg-2 ps-0 ${isHamburgerActive ? '' : 'bg-white'}`}>
-      <div className="btn-group hamburger">
+    <div className={`col-md-3 col-lg-2 ps-0 ${isHamburgerActive ? 'bg-white' : ''}`}>
+      <div className="btn-group hamburger ">
         <button className="btn btn-default" type="button" id="menu-toggle" onClick={handleHamburgerClick}>
           <img src="hamburger.png" className="menu-icon" alt="" />
         </button>
       </div>
-      < nav id="sidebar" className={`pt-3 d-md-block sidebar ${isHamburgerActive ? 'active' : ''}`} style={{ height: 'auto', minHeight: '92vh' }}>
+      <nav id="sidebar" className={`pt-3 d-md-block mobile-font-size-8px sidebar ${isHamburgerActive ? '' : 'active'}`} style={{ height: 'auto', minHeight: '92vh' }}>
         <div className="position-sticky">
           <ul className="nav flex-column">
             <li className="nav-item">

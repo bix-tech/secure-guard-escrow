@@ -294,43 +294,47 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
     const label = dealData.dealType === "Buyer" ? "From" : "To";
 
     return (
+
         isLoading ? (
-            <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
-                <div className="spinner-grow text-success" role="status">
-                    <span className="visually-hidden">Loading...</span>
+            <div className="container-fluid mt-1 d-flex flex-column">
+                <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+                    <div className="spinner-grow text-success" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
                 </div>
             </div>
         ) : (
-            <div className="card p-5 mx-auto my-5 mb-5" style={{ width: '75%' }}>
-                <div className="card-body text-center">
-                    <CreateDealProgressBar currentStep={2} />
-                    <form className="mt-5" onSubmit={onSubmit}>
-                        <div className="mb-3">
-                            <div className="form-row col-md-9 text-start mx-auto">
-                                <label htmlFor="projectName" className="form-label text-start">Upload Pictures</label>
-                                <br />
-                                <label htmlFor="projectName" className="form-label text-start">Recommended size 1500 x 600 (px)</label>
-                                <br />
+            <div className="container-fluid mt-1 d-flex flex-column">
+                <div className="card create-deal-step-2-card padding-5 mx-auto margin-y-5 mb-5 mobile-font-size-8px" style={{ width: '75%' }}>
+                    <div className="card-body text-center">
+                        <CreateDealProgressBar currentStep={2} />
+                        <form className="mt-5" onSubmit={onSubmit}>
+                            <div className="mb-3">
+                                <div className="form-row col-md-9 text-start mx-auto">
+                                    <label htmlFor="projectName" className="form-label text-start">Upload Pictures</label>
+                                    <br />
+                                    <label htmlFor="projectName" className="form-label text-start">Recommended size 1500 x 600 (px)</label>
+                                    <br />
 
-                                <div className="file-drop-area" id="fileDropArea" onClick={triggerPictureInput}>
-                                    <p>Click here or drag and drop files to upload</p>
-                                    <p>Max File Size: 50 MB</p>
-                                    <input type="file" id="pictureInput" style={{ display: 'none' }} onChange={handlePictureSelect} ref={pictureInputRef} />
+                                    <div className="file-drop-area" id="fileDropArea" onClick={triggerPictureInput}>
+                                        <p>Click here or drag and drop files to upload</p>
+                                        <p>Max File Size: 50 MB</p>
+                                        <input type="file" id="pictureInput" style={{ display: 'none' }} onChange={handlePictureSelect} ref={pictureInputRef} />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="mb-3">
-                            <div className="form-row col-md-9 text-start mx-auto">
-                                <label htmlFor="deal-description" className="form-label text-start">Deal Description</label>
-                                <TiptapEditor onContentChange={handleEditorContentChange} className="form-control rich-editor" />
+                            <div className="mb-3">
+                                <div className="form-row col-md-9 text-start mx-auto">
+                                    <label htmlFor="deal-description" className="form-label text-start">Deal Description</label>
+                                    <TiptapEditor onContentChange={handleEditorContentChange} className="form-control rich-editor" />
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="mb-3">
-                            <div className='form-row col-md-9 text-start mx-auto'>
-                                <label htmlFor="deal-category" className='form-label text-start'>Deal Category</label>
-                                {/* <select
+                            <div className="mb-3">
+                                <div className='form-row col-md-9 text-start mx-auto'>
+                                    <label htmlFor="deal-category" className='form-label text-start'>Deal Category</label>
+                                    {/* <select
                                 id="deal-category"
                                 className="form-control"
                                 value={selectedCategory}
@@ -340,135 +344,136 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                                     <option key={index} value={category}>{category}</option>
                                 ))}
                             </select> */}
-                                <div className="btn-group d-flex flex-wrap">
-                                    <input type="hidden" {...register("dealCategory")} value={selectedDealCategory} />
-                                    <span className={`badge-option ${selectedDealCategory === DealCategory.NFT ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.NFT)}>NFT</span>
-                                    <span className={`badge-option ${selectedDealCategory === DealCategory.DomainName ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.DomainName)}>Domain Name</span>
-                                    <span className={`badge-option ${selectedDealCategory === DealCategory.Services ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.Services)}>Services</span>
-                                    <span className={`badge-option ${selectedDealCategory === DealCategory.PhysicalProducts ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.PhysicalProducts)}>Physical Products</span>
-                                    <span className={`badge-option ${selectedDealCategory === DealCategory.DigitalProducts ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.DigitalProducts)}>Digital Products</span>
-                                    <span className={`badge-option ${selectedDealCategory === DealCategory.Tokens ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.Tokens)}>Tokens</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="mb-3">
-                            <div className="form-row col-md-9 text-start mx-auto">
-                                <label htmlFor="deal-timeline" className="form-label text-start">
-                                    Deal Timeline
-                                </label>
-                                <div className="row">
-                                    <div className="col-md-6">
-                                        <label htmlFor="open-date" className="form-label text-start">
-                                            Set Live Date
-                                        </label>
-                                        <div className="input-group">
-                                            <DatePicker
-                                                selected={dealStart}
-                                                onChange={(date: any) => setOpenDate(date)}
-                                                dateFormat="MMMM d, yyyy"
-                                                className="form-control"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-6">
-                                        <label htmlFor="close-date" className="form-label text-start">
-                                            Close Date
-                                        </label>
-                                        <div className="input-group">
-                                            <DatePicker
-                                                selected={dealEnd}
-                                                onChange={(date: any) => setCloseDate(date)}
-                                                dateFormat="MMMM d, yyyy h:mm aa"
-                                                className="form-control"
-                                            />
-                                        </div>
+                                    <div className="btn-group d-flex flex-wrap">
+                                        <input type="hidden" {...register("dealCategory")} value={selectedDealCategory} />
+                                        <span className={`badge-option ${selectedDealCategory === DealCategory.NFT ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.NFT)}>NFT</span>
+                                        <span className={`badge-option ${selectedDealCategory === DealCategory.DomainName ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.DomainName)}>Domain Name</span>
+                                        <span className={`badge-option ${selectedDealCategory === DealCategory.Services ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.Services)}>Services</span>
+                                        <span className={`badge-option ${selectedDealCategory === DealCategory.PhysicalProducts ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.PhysicalProducts)}>Physical Products</span>
+                                        <span className={`badge-option ${selectedDealCategory === DealCategory.DigitalProducts ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.DigitalProducts)}>Digital Products</span>
+                                        <span className={`badge-option ${selectedDealCategory === DealCategory.Tokens ? 'selected' : ''}`} onClick={() => selectDealCategory(DealCategory.Tokens)}>Tokens</span>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="mb-3">
-                            <div className="form-row col-md-9 text-start mx-auto">
-                                <label htmlFor="projectName" className="form-label text-start">Supporting Documents</label>
-                                <br />
-
-                                <div className="file-drop-area-2" id="fileDropArea2" onClick={triggerDocumentInput}>
-                                    <p>Click here or drag and drop files to upload</p>
-                                    <input type="file" id="documentInput" multiple style={{ display: 'none' }} onChange={handleDocumentSelect} ref={documentInputRef} />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="mb-3">
-                            <div className="form-row col-md-9 text-start mx-auto">
-                                <label htmlFor="projectName" className="form-label text-start">Payment Schedule Information</label>
-                                <br />
-                                <div className="border rounded py-3 px-3">
-                                    <label htmlFor="projectName" className="h6 form-label text-start">Payment Schedule 1</label>
-                                    <br />
-                                    {paymentSchedules.map((schedule, index) => (
-                                        <div key={index} className="border rounded py-3 px-3 mb-3">
-                                            <div className="form-group">
-                                                {/* Package Name */}
-                                                <label htmlFor={`packageName-${index}`} className="form-label text-start mt-3">Package Name</label>
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    id="packageName"
-                                                    placeholder="Package Name"
-                                                    value={schedule.packageName}
-                                                    onChange={e => handleScheduleChange(e, index, 'packageName')}
+                            <div className="mb-3">
+                                <div className="form-row col-md-9 text-start mx-auto">
+                                    <label htmlFor="deal-timeline" className="form-label text-start">
+                                        Deal Timeline
+                                    </label>
+                                    <div className="row">
+                                        <div className="col-md-6">
+                                            <label htmlFor="open-date" className="form-label text-start">
+                                                Set Live Date
+                                            </label>
+                                            <div className="input-group">
+                                                <DatePicker
+                                                    selected={dealStart}
+                                                    onChange={(date: any) => setOpenDate(date)}
+                                                    dateFormat="MMMM d, yyyy"
+                                                    className="form-control mobile-font-size-8px"
                                                 />
-
-                                                {/* Description */}
-                                                <label htmlFor={`description-${index}`} className="form-label text-start mt-3">Description</label>
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    id="description"
-                                                    placeholder="Description"
-                                                    value={schedule.packageDescription}
-                                                    onChange={e => handleScheduleChange(e, index, 'packageDescription')}
-                                                />
-
-                                                {/* To */}
-                                                <label htmlFor="recipientPrincipal">{label}</label>
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    id="recipientPrincipal"
-                                                    placeholder={`Enter recipient Principal ID`}
-                                                    value={recipientPrincipal}
-                                                    onChange={(e) => setRecipientPrincipal(e.target.value)}
-                                                />
-
-                                                {/* Total Token */}
-                                                <label htmlFor={`amount-${index}`} className="form-label text-start mt-3">Total Token</label>
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    id="amount"
-                                                    placeholder="Total Token"
-                                                    value={amount}
-                                                    onChange={e => setAmount(parseInt(e.target.value))}
-                                                />
-
-                                                {/* Remove Button */}
-                                                <button type="button" className="btn remove-payment-btn mt-4" onClick={() => removeSchedule(index)}>Remove Payment Schedule</button>
                                             </div>
                                         </div>
-                                    ))}
-                                    {/* Button to add more schedules */}
-                                    <button type="button" className="btn add-payment-btn mt-4" onClick={addSchedule}>Add More Schedules</button>
+                                        <div className="col-md-6">
+                                            <label htmlFor="close-date" className="form-label text-start">
+                                                Close Date
+                                            </label>
+                                            <div className="input-group ">
+                                                <DatePicker
+                                                    selected={dealEnd}
+                                                    onChange={(date: any) => setCloseDate(date)}
+                                                    dateFormat="MMMM d, yyyy h:mm aa"
+                                                    className="form-control mobile-font-size-8px"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+
+                            <div className="mb-3">
+                                <div className="form-row col-md-9 text-start mx-auto">
+                                    <label htmlFor="projectName" className="form-label text-start">Supporting Documents</label>
+                                    <br />
+
+                                    <div className="file-drop-area-2" id="fileDropArea2" onClick={triggerDocumentInput}>
+                                        <p>Click here or drag and drop files to upload</p>
+                                        <input type="file" id="documentInput" multiple style={{ display: 'none' }} onChange={handleDocumentSelect} ref={documentInputRef} />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mb-3">
+                                <div className="form-row col-md-9 text-start mx-auto">
+                                    <label htmlFor="projectName" className="form-label text-start">Payment Schedule Information</label>
+                                    <br />
+                                    <div className="border rounded py-3 px-3">
+                                        <label htmlFor="projectName" className="h6 form-label text-start">Payment Schedule 1</label>
+                                        <br />
+                                        {paymentSchedules.map((schedule, index) => (
+                                            <div key={index} className="border rounded py-3 px-3 mb-3">
+                                                <div className="form-group">
+                                                    {/* Package Name */}
+                                                    <label htmlFor={`packageName-${index}`} className="form-label text-start mt-3">Package Name</label>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control mobile-font-size-8px"
+                                                        id="packageName"
+                                                        placeholder="Package Name"
+                                                        value={schedule.packageName}
+                                                        onChange={e => handleScheduleChange(e, index, 'packageName')}
+                                                    />
+
+                                                    {/* Description */}
+                                                    <label htmlFor={`description-${index}`} className="form-label text-start mt-3">Description</label>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control mobile-font-size-8px"
+                                                        id="description"
+                                                        placeholder="Description"
+                                                        value={schedule.packageDescription}
+                                                        onChange={e => handleScheduleChange(e, index, 'packageDescription')}
+                                                    />
+
+                                                    {/* To */}
+                                                    <label htmlFor="recipientPrincipal" className="form-label text-start mt-3">{label}</label>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control mobile-font-size-8px"
+                                                        id="recipientPrincipal"
+                                                        placeholder={`Enter recipient Principal ID`}
+                                                        value={recipientPrincipal}
+                                                        onChange={(e) => setRecipientPrincipal(e.target.value)}
+                                                    />
+
+                                                    {/* Total Token */}
+                                                    <label htmlFor={`amount-${index}`} className="form-label text-start mt-3">Total Token</label>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control mobile-font-size-8px"
+                                                        id="amount"
+                                                        placeholder="Total Token"
+                                                        value={amount}
+                                                        onChange={e => setAmount(parseInt(e.target.value))}
+                                                    />
+
+                                                    {/* Remove Button */}
+                                                    <button type="button" className="btn col-md-12 remove-payment-btn mt-4 mobile-font-size-8px" onClick={() => removeSchedule(index)}>Remove Payment Schedule</button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                        {/* Button to add more schedules */}
+                                        <button type="button" className="btn add-payment-btn mt-4 mobile-font-size-8px" onClick={addSchedule}>Add More Schedules</button>
+                                    </div>
+                                </div>
+                            </div>
 
 
-                        <button type="submit" className="btn mx-auto col-md-9 submit-deal-btn mt-3">Create Deal</button>
-                    </form>
+                            <button type="submit" className="btn mx-auto col-md-9 submit-deal-btn mt-3">Create Deal</button>
+                        </form>
 
+                    </div>
                 </div>
             </div>
         )
