@@ -199,7 +199,17 @@ actor {
     let profileOpt = userProfiles.get(user);
     switch (profileOpt) {
       case (null) {
-        return #err("No existing profile found for the user.");
+        let newProfile = {
+          name = updatedProfile.name;
+          email = updatedProfile.email;
+          phone = updatedProfile.phone;
+          address = updatedProfile.address;
+          profilePicture = updatedProfile.profilePicture;
+          age = updatedProfile.age;
+          dob = updatedProfile.dob;
+        };
+        userProfiles.put(user, newProfile);
+        return #ok("Profile created");
       };
       case (?profile) {
         let newProfile = {

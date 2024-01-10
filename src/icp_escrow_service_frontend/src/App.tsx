@@ -22,6 +22,7 @@ import { DealFlowProvider } from './contexts/InitiateDealFlowContext';
 import MyDeal from './pages/deal/MyDeal';
 import 'bootstrap/dist/css/bootstrap.css';
 import Transaction from './pages/Transaction';
+import UserProfilePage from './pages/UserProfile';
 
 
 const NavbarWrapper = () => {
@@ -93,6 +94,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Login />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><UserProfilePage /></ProtectedRoute>} /> {/* TODO: Change to profile page */}
               <Route path="/myDeal" element={<ProtectedRoute><MyDeal /></ProtectedRoute>} />
               <Route path="/my-transactions" element={<ProtectedRoute><Transaction /></ProtectedRoute>} />
               <Route path="/deal-overview/:dealId" element={<ProtectedRoute><DealOverview /></ProtectedRoute>} />
