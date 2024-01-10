@@ -31,6 +31,10 @@ const Navbar = () => {
     const notificationRef = useRef(null);
     const [dropDirection, setDropDirection] = useState<DropDirection>('down');
 
+    const handleProfileClick = () => {
+        navigate('/profile');
+    };
+
 
     const formatPrincipal = (principal: string | null) => {
         if (!principal) return null;
@@ -201,9 +205,8 @@ const Navbar = () => {
                         <Dropdown>
                             <Dropdown.Toggle variant="default" id="dropdown-basic" >
                             </Dropdown.Toggle>
-
                             <Dropdown.Menu>
-                                <Dropdown.Item href="#">Profile</Dropdown.Item>
+                                <Dropdown.Item onClick={handleProfileClick}>Profile</Dropdown.Item>
                                 <Dropdown.Item href="#">Settings</Dropdown.Item>
                                 <Dropdown.Divider />
                                 <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
