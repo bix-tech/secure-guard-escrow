@@ -10,6 +10,7 @@ import { FaCopy } from 'react-icons/fa';
 import { Principal } from '@dfinity/principal';
 import { backend } from "../../../declarations/backend";
 import { usePrincipal } from '../hooks/usePrincipal';
+import { UserProfile } from '../../../declarations/backend/backend.did';
 
 type Notification = {
     dealId: bigint;
@@ -24,6 +25,7 @@ const Navbar = () => {
     const [copied, setCopied] = useState(false);
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [showNotification, setShowNotification] = useState(false);
+    const [pictureUrls, setPictureUrls] = useState<string[]>([]);
     const notificationRef = useRef(null);
     const [dropDirection, setDropDirection] = useState('down');
 
@@ -55,6 +57,20 @@ const Navbar = () => {
         }
     };
 
+    const fetchUserProfilePicture = async (user: UserProfile) => {
+        const pictureRef = user.profilePicture;
+        const blob = await backend.getProfilePicture(pictureRef, Principal.fromText(principal || ''));
+        if (blob) {
+            const array = Array.isArray(blob[0]) ? new Uint8Array(blob[0]) : blob[0];
+            if (array) {
+                const blobObject = new Blob([array]);
+                const url = URL.createObjectURL(blobObject);
+                setPictureUrls([url]);
+            }
+        }
+
+    }
+
     useEffect(() => {
         const initAuth = async () => {
             try {
@@ -66,18 +82,29 @@ const Navbar = () => {
         };
         initAuth();
 
+        const fetchUserProfile = async () => {
+            if (principal) {
+                const userProfile = await backend.getUserProfile(Principal.fromText(principal));
+                if ('ok' in userProfile) {
+                    fetchUserProfilePicture(userProfile.ok);
+                }
+            }
+        }
+
         // Update drop direction based on screen width
         const handleResize = () => {
             setDropDirection(window.innerWidth >= 768 ? 'start' : 'down');
         };
-    
+
         handleResize(); // Initial setup
+        fetchUserProfile();
         window.addEventListener('resize', handleResize);
-    
+
         return () => {
             window.removeEventListener('resize', handleResize);
         };
-    }, []);
+    }, [fetchUserProfilePicture]);
+
 
 
     const handleNotificationClick = (dealId: bigint) => {
@@ -107,7 +134,7 @@ const Navbar = () => {
 
 
     return (
-        
+
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
             <div className="container-fluid">
                 <div className="navbar-brand mobile-font-size-10px" onClick={handleHomeClick}>ICP Escrow Service</div>
@@ -138,7 +165,13 @@ const Navbar = () => {
 
                 <div className="d-flex align-items-center">
                     <div className="avatar me-3">
-                        <img src="/minion.jpeg" alt="User Avatar" />
+                        {pictureUrls.length > 0 ? (
+                            pictureUrls.map(url => (
+                                <img src={url} key={url} alt="User Avatar" />
+                            ))
+                        ) : (
+                            <img src="/minion.jpeg" alt="User Avatar" />
+                        )}
                     </div>
                     <div>
                         <p className="mb-0 mobile-font-size-8px">
