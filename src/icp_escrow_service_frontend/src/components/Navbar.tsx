@@ -92,12 +92,11 @@ const Navbar = () => {
             }
         }
 
-        // Update drop direction based on screen width
         const handleResize = () => {
-            setDropDirection(window.innerWidth >= 768 ? 'start' : 'down');
+            setDropDirection(window.innerWidth >= 768 ? 'down' : 'down');
         };
 
-        handleResize(); // Initial setup
+        handleResize(); 
         fetchUserProfile();
         window.addEventListener('resize', handleResize);
 
