@@ -27,10 +27,19 @@ import UserProfilePage from './pages/UserProfile';
 
 const NavbarWrapper = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     localforage.setItem('lastVisitedRoute', location.pathname);
-  }, [location]);
+    const getLastVisitedRoute = async () => {
+      const lastVisitedRoute = await localforage.getItem<string>('lastVisitedRoute');
+      if (lastVisitedRoute) {
+        navigate(lastVisitedRoute);
+      }
+    };
+
+    getLastVisitedRoute();
+  }, []);
 
   if (location.pathname === "/") {
     return null;

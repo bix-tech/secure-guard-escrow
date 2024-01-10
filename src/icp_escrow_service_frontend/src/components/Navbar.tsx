@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { AuthClient } from "@dfinity/auth-client";
-import { useNavigate } from 'react-router';
+import { useNavigate, useLocation } from 'react-router';
 import { useAuth } from '../contexts/AuthContext';
 import { Dropdown } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -21,6 +21,7 @@ type Notification = {
 const Navbar = () => {
     const { logout } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
     const { principal } = usePrincipal();
     const [isLoading, setIsLoading] = useState(true);
     const [authClient, setAuthClient] = useState<AuthClient | null>(null);
@@ -97,21 +98,36 @@ const Navbar = () => {
         initAuth();
 
         const fetchUserProfile = async () => {
-            if (principal) {
-                const userProfile = await backend.getUserProfile(Principal.fromText(principal));
-                if ('ok' in userProfile) {
-                    fetchUserProfilePicture(userProfile.ok);
-                } else {
-                    setIsLoading(false);
-                    console.log("User profile not found");
+            try {
+                if (principal) {
+                    const userProfile = await backend.getUserProfile(Principal.fromText(principal));
+                    if ('ok' in userProfile) {
+                        fetchUserProfilePicture(userProfile.ok);
+                    } else {
+                        setIsLoading(false);
+                        navigate('/profile');
+                    }
                 }
+            } catch (error) {
+                console.error("Error in fetchUserProfile:", error);
+                setIsLoading(false);
             }
-        }
+        };
 
         const handleResize = () => {
             setDropDirection(window.innerWidth >= 768 ? 'down' : 'down');
         };
 
+        const checkUserProfile = async () => {
+            if (principal) {
+                const userProfile = await backend.getUserProfile(Principal.fromText(principal));
+                if ('err' in userProfile){
+                    navigate('profile');
+                }
+            }
+        };
+        
+        checkUserProfile(); 
         fetchUserProfile();
         handleResize();
         window.addEventListener('resize', handleResize);
@@ -119,7 +135,7 @@ const Navbar = () => {
         return () => {
             window.removeEventListener('resize', handleResize);
         };
-    }, [fetchUserProfilePicture]);
+    }, [fetchUserProfilePicture, principal, location]);
 
 
 

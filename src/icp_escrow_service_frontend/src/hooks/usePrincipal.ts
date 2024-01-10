@@ -7,7 +7,7 @@ export const usePrincipal = () => {
 
 
     const fetchPrincipal = useCallback(async () => {
-        const isAuthenticated = await localForage.getItem<string>('isAuthenticated');
+        const isAuthenticated = await localForage.getItem<boolean>('isAuthenticated');
         if (isAuthenticated) {
             const storedPrincipal = await localForage.getItem<string | null>('principal');
             console.log("Fetched Principal: ", storedPrincipal);

@@ -9,7 +9,7 @@ import { usePrincipal } from '../hooks/usePrincipal';
 
 
 const Login = () => {
-  const { principal } = usePrincipal(); 
+  const { principal } = usePrincipal();
   const { login, setIsAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [authClient, setAuthClient] = useState<AuthClient | null>(null);
@@ -20,36 +20,29 @@ const Login = () => {
       try {
         const authClient = await AuthClient.create({
           idleOptions: {
-            idleTimeout: 1000 * 60 * 30,
+            idleTimeout: 1000 * 60 * 30, // 30 minutes
             disableDefaultIdleCallback: true
           }
         });
         setAuthClient(authClient);
-        if (principal) {
-          setIsAuthenticated(true);
-          login();
-          const lastVisitedRoute = await localForage.getItem<string>('lastVisitedRoute');
-          navigate(lastVisitedRoute || '/deal/DealInformation');
-        } else if (await authClient.isAuthenticated()) {
-          reinitializeSession(authClient);
+  
+        if (window.location.pathname === '/') {
+          if (await authClient.isAuthenticated() || principal) {
+            setIsAuthenticated(true);
+            login();
+  
+            const lastVisitedRoute = await localForage.getItem<string>('lastVisitedRoute');
+            navigate(lastVisitedRoute && lastVisitedRoute !== '/' ? lastVisitedRoute : '/dashboard');
+          }
         }
       } catch (error) {
         console.error("Failed to initialize authentication:", error);
       }
-    };
-
-    const reinitializeSession = async (authClient: AuthClient) => {
-      const identity = authClient.getIdentity();
-      const newPrincipal = identity.getPrincipal().toString();
-
-      await localForage.setItem('principal', newPrincipal);
-
-      login();
-      navigate('/dashboard');
-    }
+    };  
 
     initAuth();
-  }, []);
+  }, [principal, login, setIsAuthenticated, navigate]);
+
 
 
 
