@@ -12,6 +12,7 @@ import { backend } from "../../../declarations/backend";
 import { usePrincipal } from '../hooks/usePrincipal';
 import { UserProfile } from '../../../declarations/backend/backend.did';
 import { DropDirection } from 'react-bootstrap/esm/DropdownContext';
+import Cookies from 'js-cookie';
 
 type Notification = {
     dealId: bigint;
@@ -67,14 +68,20 @@ const Navbar = () => {
     const fetchUserProfilePicture = useCallback(async (user: UserProfile) => {
         try {
             if (principal) {
-                const pictureRef = user.profilePicture;
-                const blob = await backend.getProfilePicture(pictureRef, Principal.fromText(principal || ''));
-                if (blob) {
-                    const array = Array.isArray(blob[0]) ? new Uint8Array(blob[0]) : blob[0];
-                    if (array) {
-                        const blobObject = new Blob([array]);
-                        const url = URL.createObjectURL(blobObject);
-                        setPictureUrls([url]);
+                const storedPictureUrl = await localForage.getItem<string>('pictureUrl');
+                if (storedPictureUrl) {
+                    setPictureUrls([storedPictureUrl]);
+                } else {
+                    const pictureRef = user.profilePicture;
+                    const blob = await backend.getProfilePicture(pictureRef, Principal.fromText(principal || ''));
+                    if (blob) {
+                        const array = Array.isArray(blob[0]) ? new Uint8Array(blob[0]) : blob[0];
+                        if (array) {
+                            const blobObject = new Blob([array]);
+                            const url = URL.createObjectURL(blobObject);
+                            await localForage.setItem('pictureUrl', url);
+                            setPictureUrls([url]);
+                        }
                     }
                 }
             }
@@ -152,8 +159,8 @@ const Navbar = () => {
                 await authClient.logout();
             }
             logout();
-
-            await localForage.removeItem('principal');
+            Cookies.remove('principal');
+            await localForage.removeItem('pictureUrl');
 
             navigate('/');
 

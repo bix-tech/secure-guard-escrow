@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import localForage from "localforage";
 import { usePrincipal } from '../hooks/usePrincipal';
+import Cookies from 'js-cookie';
 
 
 const Login = () => {
@@ -63,8 +64,8 @@ const Login = () => {
           const identity = authClient.getIdentity();
           const newPrincipal = identity.getPrincipal().toString();
           const agent = new HttpAgent({ identity });
-          const actor = createBackendActor(process.env.BACKEND_CANISTER_ID!, { agent });
-          await localForage.setItem('principal', newPrincipal);
+          const actor = createBackendActor(process.env.BACKEND_CANISTER_ID!, { agent });   
+          Cookies.set('principal', newPrincipal);       
           setDaoActor(actor);
           console.log(principal);
           console.log(daoActor);

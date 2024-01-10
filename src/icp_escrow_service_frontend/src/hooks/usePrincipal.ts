@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import localForage from 'localforage';
+import Cookies from 'js-cookie';
 
 export const usePrincipal = () => {
     const [principal, setPrincipal] = useState<string | null>(null);
@@ -9,9 +10,8 @@ export const usePrincipal = () => {
     const fetchPrincipal = useCallback(async () => {
         const isAuthenticated = await localForage.getItem<boolean>('isAuthenticated');
         if (isAuthenticated) {
-            const storedPrincipal = await localForage.getItem<string | null>('principal');
-            console.log("Fetched Principal: ", storedPrincipal);
-            setPrincipal(storedPrincipal);
+            const storedPrincipal = Cookies.get('principal');
+            setPrincipal(storedPrincipal || null);
         } else {
             setPrincipal(null);
         }

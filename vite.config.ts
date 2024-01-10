@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import basicSsl from '@vitejs/plugin-basic-ssl';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -25,7 +26,11 @@ export default defineConfig({
       },
     },
   },
-  plugins: [react()],
+  plugins: [
+    react(),
+    basicSsl(),
+  ], 
+
 
   define: {
     'process.env': process.env
