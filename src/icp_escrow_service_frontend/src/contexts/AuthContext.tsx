@@ -15,14 +15,20 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-    const login = () => setIsAuthenticated(true);
-    const logout = () => setIsAuthenticated(false);
+    const login = async () => {
+        await localforage.setItem('isAuthenticated', true);
+        setIsAuthenticated(true);
+    };
+
+    const logout = async () => {
+        await localforage.setItem('isAuthenticated', false);
+        setIsAuthenticated(false);
+    };
 
     useEffect(() => {
         const checkAuthentication = async () => {
-            const storedPrincipal = await localforage.getItem<string | null>('principal');
-            const isUserAuthenticated = !!storedPrincipal;
-            setIsAuthenticated(isUserAuthenticated);
+            const storedAuthState = await localforage.getItem<boolean>('isAuthenticated');
+            setIsAuthenticated(storedAuthState === true);
         };
 
         checkAuthentication();

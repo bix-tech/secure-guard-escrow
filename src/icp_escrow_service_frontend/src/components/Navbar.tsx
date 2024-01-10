@@ -65,6 +65,7 @@ const Navbar = () => {
 
     const fetchUserProfilePicture = useCallback(async (user: UserProfile) => {
         try {
+            console.log(principal);
             if (principal) {
                 const pictureRef = user.profilePicture;
                 const blob = await backend.getProfilePicture(pictureRef, Principal.fromText(principal || ''));
@@ -102,7 +103,7 @@ const Navbar = () => {
                     fetchUserProfilePicture(userProfile.ok);
                 } else {
                     setIsLoading(false);
-                    navigate('/profile');
+                    console.log("User profile not found");
                 }
             }
         }

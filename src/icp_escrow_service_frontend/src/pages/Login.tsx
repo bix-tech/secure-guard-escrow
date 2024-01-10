@@ -9,88 +9,87 @@ import { usePrincipal } from '../hooks/usePrincipal';
 
 
 const Login = () => {
-    const  principal  = usePrincipal(); // Use the updated usePrincipal hook
-    const { login, setIsAuthenticated } = useAuth();
-    const navigate = useNavigate();
-    const [authClient, setAuthClient] = useState<AuthClient | null>(null);
-    const [daoActor, setDaoActor] = useState<ReturnType<typeof createBackendActor> | null>(null);
+  const { principal } = usePrincipal(); 
+  const { login, setIsAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const [authClient, setAuthClient] = useState<AuthClient | null>(null);
+  const [daoActor, setDaoActor] = useState<ReturnType<typeof createBackendActor> | null>(null);
 
-    useEffect(() => {
-      const initAuth = async () => {
-        try {
-          const authClient = await AuthClient.create({
-            idleOptions: {
-              idleTimeout: 1000 * 60 * 30, 
-              disableDefaultIdleCallback: true 
-            }
-          });
-          setAuthClient(authClient);
-            if (principal) {
-            login();
-            console.log("Stored principal:", principal);
-            setIsAuthenticated(true);
-            const lastVisitedRoute = await localForage.getItem<string>('lastVisitedRoute');
-            navigate(lastVisitedRoute || '/deal/DealInformation');
-          } else if (await authClient.isAuthenticated()) {
-            reinitializeSession(authClient);
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        const authClient = await AuthClient.create({
+          idleOptions: {
+            idleTimeout: 1000 * 60 * 30,
+            disableDefaultIdleCallback: true
           }
-        } catch (error) {
-          console.error("Failed to initialize authentication:", error);
+        });
+        setAuthClient(authClient);
+        if (principal) {
+          setIsAuthenticated(true);
+          login();
+          const lastVisitedRoute = await localForage.getItem<string>('lastVisitedRoute');
+          navigate(lastVisitedRoute || '/deal/DealInformation');
+        } else if (await authClient.isAuthenticated()) {
+          reinitializeSession(authClient);
         }
-      };
-
-      const reinitializeSession = async (authClient: AuthClient) => {
-        const identity = authClient.getIdentity();
-        const newPrincipal = identity.getPrincipal().toString();
-
-        await localForage.setItem('principal', newPrincipal);
-        
-        login();
-        navigate('/dashboard');
+      } catch (error) {
+        console.error("Failed to initialize authentication:", error);
       }
-      
-      initAuth();
-    }, []);
-
-    
-
-    const handleLogin = async () => {
-        try {
-          // console.log("DFX_NETWORK:", process.env.DFX_NETWORK);
-          // console.log("INTERNET_IDENTITY_CANISTER_ID:", process.env.INTERNET_IDENTITY_CANISTER_ID);
-          // console.log("BACKEND_CANISTER_ID:", process.env.BACKEND_CANISTER_ID);
-            const identityProvider = process.env.DFX_NETWORK === 'ic'
-                ? 'https://identity.ic0.app'
-                : `http://127.0.0.1:4943/?canisterId=${process.env.INTERNET_IDENTITY_CANISTER_ID}`;
-                console.log(identityProvider);
-
-            await authClient?.login({
-                identityProvider,
-                onSuccess: async () => {
-                    console.log("Login successful");
-                    const identity = authClient.getIdentity();
-                    const newPrincipal = identity.getPrincipal().toString();
-                    const agent = new HttpAgent({ identity });
-                    const actor = createBackendActor(process.env.BACKEND_CANISTER_ID!, { agent });
-                    await localForage.setItem('principal', newPrincipal);
-                    setDaoActor(actor);
-                    console.log(principal);
-                    console.log(daoActor);
-                    login();
-                    navigate('/dashboard');
-                },
-                onError: (error?: string | undefined) => {
-                    console.error("Login error:", error);
-                }
-            });
-        } catch (error) {
-            console.error("Error in handleLogin:", error);
-        }
     };
 
+    const reinitializeSession = async (authClient: AuthClient) => {
+      const identity = authClient.getIdentity();
+      const newPrincipal = identity.getPrincipal().toString();
 
-    return (
-        <div className="d-flex align-items-center justify-content-center" style={{ height: '100vh' }}>
+      await localForage.setItem('principal', newPrincipal);
+
+      login();
+      navigate('/dashboard');
+    }
+
+    initAuth();
+  }, []);
+
+
+
+  const handleLogin = async () => {
+    try {
+      // console.log("DFX_NETWORK:", process.env.DFX_NETWORK);
+      // console.log("INTERNET_IDENTITY_CANISTER_ID:", process.env.INTERNET_IDENTITY_CANISTER_ID);
+      // console.log("BACKEND_CANISTER_ID:", process.env.BACKEND_CANISTER_ID);
+      const identityProvider = process.env.DFX_NETWORK === 'ic'
+        ? 'https://identity.ic0.app'
+        : `http://127.0.0.1:4943/?canisterId=${process.env.INTERNET_IDENTITY_CANISTER_ID}`;
+      console.log(identityProvider);
+
+      await authClient?.login({
+        identityProvider,
+        onSuccess: async () => {
+          console.log("Login successful");
+          const identity = authClient.getIdentity();
+          const newPrincipal = identity.getPrincipal().toString();
+          const agent = new HttpAgent({ identity });
+          const actor = createBackendActor(process.env.BACKEND_CANISTER_ID!, { agent });
+          await localForage.setItem('principal', newPrincipal);
+          setDaoActor(actor);
+          console.log(principal);
+          console.log(daoActor);
+          login();
+          navigate('/dashboard');
+        },
+        onError: (error?: string | undefined) => {
+          console.error("Login error:", error);
+        }
+      });
+    } catch (error) {
+      console.error("Error in handleLogin:", error);
+    }
+  };
+
+
+  return (
+    <div className="d-flex align-items-center justify-content-center" style={{ height: '100vh' }}>
       <div className="card login-card p-5" style={{ width: '50%' }}>
         <div className="card-body text-center">
           <div className="avatar mb-5 mx-auto login-avatar">
@@ -105,7 +104,7 @@ const Login = () => {
         </div>
       </div>
     </div>
-    );
+  );
 };
 
 export default Login;

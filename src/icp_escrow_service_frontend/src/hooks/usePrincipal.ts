@@ -7,9 +7,14 @@ export const usePrincipal = () => {
 
 
     const fetchPrincipal = useCallback(async () => {
-        const storedPrincipal = await localForage.getItem<string | null>('principal');
-        console.log("Fetched Principal: ", storedPrincipal);
-        setPrincipal(storedPrincipal);
+        const isAuthenticated = await localForage.getItem<string>('isAuthenticated');
+        if (isAuthenticated) {
+            const storedPrincipal = await localForage.getItem<string | null>('principal');
+            console.log("Fetched Principal: ", storedPrincipal);
+            setPrincipal(storedPrincipal);
+        } else {
+            setPrincipal(null);
+        }
         setIsLoading(false);
     }, []);
 
@@ -17,5 +22,5 @@ export const usePrincipal = () => {
         fetchPrincipal();
     }, [fetchPrincipal]);
 
-    return { principal, isLoading};
+    return { principal, isLoading };
 };

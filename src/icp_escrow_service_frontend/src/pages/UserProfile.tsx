@@ -94,6 +94,8 @@ const UserProfilePage = () => {
             const binaryData = await file.arrayBuffer();
             const pictureBinary = new Uint8Array(binaryData);
             const pictureId = await uploadProfilePicture(pictureBinary);
+            const urls = URL.createObjectURL(file);
+            setPictureUrls([urls]);
             setUploadedProfilePicture({ file, id: pictureId, name: file.name });
         }
     };
@@ -101,8 +103,10 @@ const UserProfilePage = () => {
 
     const uploadProfilePicture = async (binaryFile: any): Promise<bigint> => {
         try {
+            setIsLoading(true);
             const id = await backend.uploadProfilePicture(binaryFile);
             console.log("Picture uploaded with ID:", id);
+            setIsLoading(false);
             return id;
         } catch (error) {
             console.error("Failed to upload picture:", error);
