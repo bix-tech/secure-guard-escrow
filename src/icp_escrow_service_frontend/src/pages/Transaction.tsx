@@ -25,7 +25,7 @@ const Transaction = () => {
     const [transactionLogs, setTransactionLogs] = useState<TransactionLog[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalItems, setTotalItems] = useState(0);
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const [totalPages, setTotalPages] = useState(0);
 
     const handlePageClick = (page: number) => {
         setCurrentPage(page);
@@ -36,7 +36,7 @@ const Transaction = () => {
             if (principal) {
                 try {
                     setIsLoading(true);
-                    const logs = await backend.getTransactionLogsForUser(Principal.fromText(principal));
+                    const logs = await backend.getTransactionLogsForUser(Principal.fromText(principal), BigInt(currentPage), BigInt(itemsPerPage));
                     const mappedLogs = logs.map(log => ({
                         ...log,
                         dealId: Number(log.dealId),
@@ -50,8 +50,10 @@ const Transaction = () => {
                     console.log(logs);
                     setTransactionLogs(mappedLogs);
                     console.log(mappedLogs);
-                    const totalLogs = await backend.getTransactionLogsCountForUser(Principal.fromText(principal), BigInt(currentPage), BigInt(itemsPerPage));
-                    setTotalItems(totalLogs.length);
+                    const totalLogsCount = Number(await backend.getTransactionLogsCountForUser(Principal.fromText(principal)));
+                    setTotalItems(totalLogsCount);
+                    const totalPages = Math.ceil(totalLogsCount / itemsPerPage);
+                    setTotalPages(totalPages);
 
                 } catch (error) {
                     console.error("Error fetching transaction logs:", error);
@@ -70,6 +72,7 @@ const Transaction = () => {
             <div className="row">
                 <div className="card transaction-card mx-auto padding-5 margin-y-5 mobile-font-size-8px" style={{ width: '80%' }}>
                     <h2>Activity Logs</h2>
+                    <div>Total logs: {totalItems}</div>
                     <table className="table">
                         <thead>
                             <tr>

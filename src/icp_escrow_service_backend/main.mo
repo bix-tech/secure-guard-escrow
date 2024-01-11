@@ -251,7 +251,7 @@ actor {
 
   public func uploadPicture(blob : Blob) : async Nat {
     let id = pictures.size();
-    if (id >= 0){
+    if (id >= 0) {
       let _ = pictures.remove(id);
     };
     pictures.put(id, blob);
@@ -917,7 +917,7 @@ actor {
     };
   };
 
-  public func getActivityLogsForUser(user : Principal) : async [ActivityLog] {
+  public func getActivityLogsForUser(user : Principal, page : Nat, itemsPerPage : Nat) : async [ActivityLog] {
     let allLogs = Array.flatten(Iter.toArray(activityLogs.vals()));
 
     let userLogs = Array.filter(
@@ -936,10 +936,16 @@ actor {
       },
     );
 
-    return sortedLogs;
+    let start = page * itemsPerPage;
+    var end = (page + 1) * itemsPerPage;
+    if (end > Array.size(userLogs)) {
+      end := Array.size(userLogs);
+    };
+
+    return Iter.toArray(Array.slice(sortedLogs, start, end));
   };
 
-  public func getActivityLogsCountForUser(user : Principal, page : Nat, itemsPerPage : Nat) : async [ActivityLog] {
+  public func getActivityLogsCountForUser(user : Principal) : async Nat {
     let allLogs = Array.flatten(Iter.toArray(activityLogs.vals()));
     let userLogs = Array.filter(
       allLogs,
@@ -947,13 +953,7 @@ actor {
         log.user == user;
       },
     );
-    let start = page * itemsPerPage;
-    var end = (page + 1) * itemsPerPage;
-    if (end > Array.size(userLogs)) {
-      end := Array.size(userLogs);
-    };
-
-    return Iter.toArray(Array.slice(userLogs, start, end));
+    return Array.size(userLogs);
   };
 
   public func createActivityLog(newLog : ActivityLog, additionalUser : Principal) : async () {
@@ -1025,7 +1025,7 @@ actor {
     transactionLogs.put(createLog.dealId, Array.append(existingLogs, [createLog]));
   };
 
-  public func getTransactionLogsForUser(user : Principal) : async [TransactionLog] {
+  public func getTransactionLogsForUser(user : Principal, page : Nat, itemsPerPage : Nat) : async [TransactionLog] {
     let allLogs = Array.flatten(Iter.toArray(transactionLogs.vals()));
 
     let userLogs = Array.filter(
@@ -1044,10 +1044,16 @@ actor {
       },
     );
 
-    return sortedLogs;
+    let start = page * itemsPerPage;
+    var end = (page + 1) * itemsPerPage;
+    if (end > Array.size(userLogs)) {
+      end := Array.size(userLogs);
+    };
+
+    return Iter.toArray(Array.slice(sortedLogs, start, end));
   };
 
-  public func getTransactionLogsCountForUser(user : Principal, page : Nat, itemsPerPage : Nat) : async [TransactionLog] {
+  public func getTransactionLogsCountForUser(user : Principal) : async Nat {
     let allLogs = Array.flatten(Iter.toArray(transactionLogs.vals()));
     let userLogs = Array.filter(
       allLogs,
@@ -1055,13 +1061,8 @@ actor {
         log.user == user;
       },
     );
-    let start = page * itemsPerPage;
-    var end = (page + 1) * itemsPerPage;
-    if (end > Array.size(userLogs)) {
-      end := Array.size(userLogs);
-    };
 
-    return Iter.toArray(Array.slice(userLogs, start, end));
+    return Array.size(userLogs);
   };
 
   public func autoConfirmDeals() : async () {

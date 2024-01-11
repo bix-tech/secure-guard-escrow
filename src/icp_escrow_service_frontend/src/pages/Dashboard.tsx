@@ -28,7 +28,7 @@ const Dashboard = () => {
   const { principal } = usePrincipal();
   const [currentPage, setCurrentPage] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const [totalPages, setTotalPages] = useState(0);
   const navigate = useNavigate();
   const [isHamburgerActive, setIsHamburgerActive] = useState(true);
 
@@ -50,7 +50,7 @@ const Dashboard = () => {
     setIsLoading(true);
     if (principal) {
       try {
-        const logs = await backend.getActivityLogsForUser(Principal.fromText(principal));
+        const logs = await backend.getActivityLogsForUser(Principal.fromText(principal), BigInt(currentPage), BigInt(itemsPerPage));
         console.log("Activity logs:", logs);
         const mappedLogs = logs.map(log => ({
           ...log,
@@ -62,8 +62,10 @@ const Dashboard = () => {
           status: log.status.toString(),
         }));
         setActivityLogs(mappedLogs);
-        const totalLogs = await backend.getActivityLogsCountForUser(Principal.fromText(principal), BigInt(currentPage), BigInt(itemsPerPage));
-        setTotalItems(totalLogs.length);
+        const totalLogsCount = Number(await backend.getActivityLogsCountForUser(Principal.fromText(principal)));
+        setTotalItems(totalLogsCount);
+        const totalPages = Math.ceil(totalLogsCount / itemsPerPage);
+        setTotalPages(totalPages);
         setIsLoading(false);
       } catch (error) {
         console.error("Failed to fetch activity logs:", error);
@@ -80,15 +82,16 @@ const Dashboard = () => {
 
 
   return (
-    <div className="container-fluid mt-1 d-flex flex-column">
+    <div className="container-fluid d-flex flex-column">
     <div className="row d-flex">
         <Sidebar isHamburgerActive={isHamburgerActive} handleHamburgerClick={handleHamburgerClick} />
-        <div className={`col-md-9 ms-sm-auto col-lg-10 px-1 d-flex flex-column`} style={{ position: 'relative', minHeight:'100vh' }}>
+        <div className={`col-md-9 ms-sm-auto col-lg-10 px-0 d-flex flex-column`} style={{ position: 'relative', minHeight:'100vh' }}>
           <button className="btn btn-create btn-primary" onClick={handleCreateDeal}> Create Deal </button>
           <div className="button-container mx-5" style={{ float: 'right' }}>
           </div>
           <div className="card dashboard-card padding-5 mx-auto margin-5 mobile-card" style={{ width: '80%'  }}>
             <h2>Activity Logs</h2>
+            <div>Total logs: {totalItems}</div>
             <table className="table mobile-font-size-8px">
               <thead>
                 <tr>
