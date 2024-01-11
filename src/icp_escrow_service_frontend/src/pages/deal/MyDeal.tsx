@@ -12,7 +12,7 @@ const MyDeal = () => {
     const [deal, setDeal] = useState<Deal[] | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
-    const [isHamburgerActive, setIsHamburgerActive] = useState(false);
+    const [isHamburgerActive, setIsHamburgerActive] = useState(true);
 
     const handleHamburgerClick = () => {
         setIsHamburgerActive((prev) => !prev);
@@ -60,11 +60,10 @@ const MyDeal = () => {
     }, [principal, isPrincipalLoading]);
 
     return (
-        <div className="container-fluid mt-1">
-            <div className="row">
+        <div className="container-fluid">
+            <div className="row d-flex">
             <Sidebar isHamburgerActive={isHamburgerActive} handleHamburgerClick={handleHamburgerClick}/>
                 <div className="col-9 mydeal-card">
-                    <h1>MyDeal</h1>
                     {isLoading ? (
                         <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
                             <div className="spinner-grow text-success" role="status">

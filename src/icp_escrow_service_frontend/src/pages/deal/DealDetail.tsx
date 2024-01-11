@@ -24,7 +24,7 @@ const DealOverview = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [showConfirmModal, setConfirmModal] = useState(false);
     const [showCancelModal, setCancelModal] = useState(false);
-    const [isHamburgerActive, setIsHamburgerActive] = useState(false);
+    const [isHamburgerActive, setIsHamburgerActive] = useState(true);
 
     const navigate = useNavigate();
 

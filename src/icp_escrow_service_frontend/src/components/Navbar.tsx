@@ -166,7 +166,7 @@ const Navbar = () => {
 
     return (
         isLoading ? (
-            <nav className="navbar navbar-expand-lg navbar-light bg-light">
+            <nav className="navbar navbar-expand-lg navbar-white bg-white">
                 <div className="container-fluid">
                     <div className="navbar-brand mobile-font-size-10px" onClick={handleHomeClick}>ICP Escrow Service</div>
 
@@ -225,7 +225,7 @@ const Navbar = () => {
                 </div>
             </nav>
         ) : (
-            <nav className="navbar navbar-expand-lg navbar-light bg-light">
+            <nav className="navbar navbar-expand-lg navbar-white bg-white">
                 <div className="container-fluid">
                     <div className="navbar-brand mobile-font-size-10px" onClick={handleHomeClick}>ICP Escrow Service</div>
 

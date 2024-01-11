@@ -368,10 +368,16 @@ body {
   color: white;
 }
 
+@media (max-width: 768px) {
+  .btn-confirm {
+    font-size: 8px !important; 
+  }
+}
+
 .btn-confirm {
   background-color: #237A88 !important;
   color: white !important;
-  border-radius: 20px !important;
+  border-radius: 10px !important;
   padding: 5px 10px;
   font-size: 14px; 
 }
@@ -474,17 +480,15 @@ body {
 
 #sidebar {
   position: relative;
-  /* left: 0; */
-  /* display: block; */
-  /* transition: 0.5s; */
+  transition: transform 0.5s ease, background-color 0.5s ease;
+  background-color: white;
 }
 
 #sidebar.active{
   position: relative;
-  /* left: -100%; */
-  /* transition: 0.5s; */
-  display: none !important;
+  transform: translateX(-100%);  
 }
+
 
 .padding-5 {
   padding: 3rem !important;
@@ -503,6 +507,14 @@ body {
 .login-card {
   width: 50% !important;
 }
+
+.hamburger {
+  position: absolute !important;
+  z-index: 1000;
+  top: 7%;
+  
+}
+
 
 /* Mobile View */
 @media only screen and (max-width: 769px) {
@@ -549,7 +561,7 @@ body {
     left: 0;
     z-index: 999;
     width: 30%;
-    transition: 0.5s;
+    transition: transform 0.5s ease;
     background-color: white;
     margin-top: 15%;
   }
@@ -559,7 +571,6 @@ body {
     left: -100%;
     transition: 0.5s;
     z-index: 999;
-    /* display: none !important; */
   }
 
   .navbar > .container-fluid {
@@ -587,8 +598,7 @@ body {
   .hamburger {
     position: fixed !important;
     z-index: 1000;
-    margin-top: 500px;
-    margin-top: 13%;
+    top: 7%
   }
 
   /* Login Page */

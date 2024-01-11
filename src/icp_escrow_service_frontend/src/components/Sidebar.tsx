@@ -37,7 +37,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isHamburgerActive, handleHamburgerCli
         <div className="position-sticky">
           <ul className="nav flex-column">
             <li className="nav-item">
-              <h5 className="nav active px-3 py-2">
+              <h5 className="nav active px-3 py-3 mt-2">
                 MENU
               </h5>
             </li>

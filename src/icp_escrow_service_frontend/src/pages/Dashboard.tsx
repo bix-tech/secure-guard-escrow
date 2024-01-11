@@ -30,7 +30,7 @@ const Dashboard = () => {
   const [totalItems, setTotalItems] = useState(0);
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const navigate = useNavigate();
-  const [isHamburgerActive, setIsHamburgerActive] = useState(false);
+  const [isHamburgerActive, setIsHamburgerActive] = useState(true);
 
 
 
@@ -42,8 +42,7 @@ const Dashboard = () => {
     navigate('/createDealStep1')
   };
 
-  const handleHamburgerClick = () => {
-    // Toggle hamburger state
+  const handleHamburgerClick = () => {    
     setIsHamburgerActive((prev) => !prev);
   };
 
@@ -82,11 +81,9 @@ const Dashboard = () => {
 
   return (
     <div className="container-fluid mt-1 d-flex flex-column">
-      <div className="row">
-
+    <div className="row d-flex">
         <Sidebar isHamburgerActive={isHamburgerActive} handleHamburgerClick={handleHamburgerClick} />
-
-        <div className={`col-md-9 ms-sm-auto col-lg-10 px-1 d-flex flex-column ${isHamburgerActive ? '' : 'col-lg-12 col-md-12'}`} style={{ position: 'relative', minHeight:'100vh' }}>
+        <div className={`col-md-9 ms-sm-auto col-lg-10 px-1 d-flex flex-column`} style={{ position: 'relative', minHeight:'100vh' }}>
           <button className="btn btn-create btn-primary" onClick={handleCreateDeal}> Create Deal </button>
           <div className="button-container mx-5" style={{ float: 'right' }}>
           </div>

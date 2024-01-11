@@ -205,8 +205,8 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
             const pictureBinary = new Uint8Array(binaryData);
             const pictureId = await uploadPicture(pictureBinary);
             setUploadedPicture({ file, id: pictureId, name: file.name });
-            if (pictureInputRef.current){
-            displayPictureBadge(file);
+            if (pictureInputRef.current) {
+                displayPictureBadge(file);
             } else {
                 console.error("Picture input ref is null");
             }
@@ -254,8 +254,8 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
     const displayPictureBadge = (file: File) => {
         const badgeContainer = document.getElementById('fileDropArea');
         if (badgeContainer) {
-            const oldBadge =badgeContainer.querySelector('.file-badge');
-            if (oldBadge){
+            const oldBadge = badgeContainer.querySelector('.file-badge');
+            if (oldBadge) {
                 badgeContainer.removeChild(oldBadge);
             }
             const badge = document.createElement('span');
@@ -404,6 +404,13 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
 
                             <div className="mb-3">
                                 <div className="form-row col-md-9 text-start mx-auto">
+                                <label htmlFor="recipientPrincipal" className="form-label text-start mt-3">{label}</label>
+                                    <input type="text" placeholder="Enter recipient Principal ID" value={recipientPrincipal} onChange={(e) => setRecipientPrincipal(e.target.value)} className="form-control" id="recipientPrincipal" />
+                                </div>
+                            </div>
+
+                            <div className="mb-3">
+                                <div className="form-row col-md-9 text-start mx-auto">
                                     <label htmlFor="projectName" className="form-label text-start">Payment Schedule Information</label>
                                     <br />
                                     <div className="border rounded py-3 px-3">
@@ -432,18 +439,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                                                         placeholder="Description"
                                                         value={schedule.packageDescription}
                                                         onChange={e => handleScheduleChange(e, index, 'packageDescription')}
-                                                    />
-
-                                                    {/* To */}
-                                                    <label htmlFor="recipientPrincipal" className="form-label text-start mt-3">{label}</label>
-                                                    <input
-                                                        type="text"
-                                                        className="form-control mobile-font-size-8px"
-                                                        id="recipientPrincipal"
-                                                        placeholder={`Enter recipient Principal ID`}
-                                                        value={recipientPrincipal}
-                                                        onChange={(e) => setRecipientPrincipal(e.target.value)}
-                                                    />
+                                                    />                                                
 
                                                     {/* Total Token */}
                                                     <label htmlFor={`amount-${index}`} className="form-label text-start mt-3">Total Token</label>
