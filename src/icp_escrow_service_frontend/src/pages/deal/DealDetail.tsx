@@ -268,29 +268,13 @@ const DealOverview = () => {
                                     <div className="text-start">
                                         <h4>Deal Description</h4>
                                         <p>
-                                            {deal.description}
-                                            {/* Lorem ipsum dolor sit amet consectetur adipisicing elit. Et fugiat autem voluptatibus voluptas perferendis dicta dolore? Maiores dolorum, iusto veniam id porro quis optio animi totam, similique cumque voluptatem? Eligendi? */}
+                                        <div dangerouslySetInnerHTML={{ __html: deal.description }} />
                                         </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    {/* <div className="d-flex flex-row justify-content-between p-5">
-                        <div className="card p-5 mx-auto my-5" style={{ width: '45%' }}>
-                            Buyer {deal.to.toString()}
-                            Seller {deal.from.toString()}
-                            {pictureUrls.map((url) => (
-                                <img key={url} src={url} alt={`Picture`} />
-                            ))}
-                        </div>
-                        <div className="card p-5 mx-auto my-5" style={{ width: '45%' }}>
-                            Deal Description<br />
-                            {deal.description && extractText(deal.description)}
-                        </div>
-                    </div> */}
-
                     <div className="row mb-3">
                         <div className="col-md-12">
                             <div className="card p-5 mx-auto my-5">

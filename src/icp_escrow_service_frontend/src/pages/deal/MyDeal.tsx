@@ -37,6 +37,16 @@ const MyDeal = () => {
         }
     };
 
+    const handleDealClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        const dealId = BigInt((event.target as HTMLDivElement).dataset.id!);
+        setIsLoading(true);
+        const result = await backend.getDeal(dealId);
+        if ('ok' in result) {
+            navigate(`/deal-overview/${dealId}`)
+            setIsLoading(false);
+        }
+    }
+
 
     useEffect(() => {
         const fetchDealData = async () => {
@@ -105,7 +115,7 @@ const MyDeal = () => {
                                         <div className="row">
                                             <div className="col d-flex justify-content-between align-items-center">
                                                 <div className="d-flex align-items-center">
-                                                    {d.name}
+                                                    <div className="cursor-pointer" data-id={d.id} onClick={handleDealClick}>{d.name}</div>
                                                     <span className={`badge badge-pill bg-${details.badge} ml-2 mx-2`}>{d.status}</span>
                                                 </div>
                                                 <button className="btn btn-confirm btn-primary" onClick={() => handleActionDetail(d.id)}>{details.text}</button>

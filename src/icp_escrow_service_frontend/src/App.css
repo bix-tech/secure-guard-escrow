@@ -344,7 +344,6 @@ body {
 }
 
 .menu-icon {
-  border: none;
   width: 25px;
   height: 25px;
   overflow: hidden;
@@ -713,4 +712,8 @@ body {
   100% {
       transform: rotate(360deg);
   }
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }
