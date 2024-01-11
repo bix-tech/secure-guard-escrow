@@ -1,5 +1,6 @@
 import localforage from 'localforage';
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import Cookies from 'js-cookie';
 
 interface AuthContextType {
     isAuthenticated: boolean;
@@ -28,7 +29,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         const checkAuthentication = async () => {
             const storedAuthState = await localforage.getItem<boolean>('isAuthenticated');
-            setIsAuthenticated(storedAuthState === true);
+            const cookie = Cookies.get('principal');
+            if (storedAuthState === true && cookie) {
+                setIsAuthenticated(true);
+            } else {
+                setIsAuthenticated(false);
+            }
         };
 
         checkAuthentication();

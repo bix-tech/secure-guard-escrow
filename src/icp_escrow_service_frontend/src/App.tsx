@@ -77,11 +77,6 @@ function App() {
   };
 
   useEffect(() => {
-  }, []);
-
-
-  useEffect(() => {
-    console.log(isAuthenticated);
   }, [isAuthenticated]);
 
 

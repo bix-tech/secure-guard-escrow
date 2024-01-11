@@ -65,7 +65,7 @@ const Login = () => {
           const newPrincipal = identity.getPrincipal().toString();
           const agent = new HttpAgent({ identity });
           const actor = createBackendActor(process.env.BACKEND_CANISTER_ID!, { agent });   
-          Cookies.set('principal', newPrincipal);       
+          Cookies.set('principal', newPrincipal, { expires: 7, secure: true, sameSite: 'Strict' });
           setDaoActor(actor);
           console.log(principal);
           console.log(daoActor);
