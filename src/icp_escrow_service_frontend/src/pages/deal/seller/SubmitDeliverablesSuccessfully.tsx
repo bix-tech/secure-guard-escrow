@@ -1,7 +1,11 @@
 import { useNavigate } from 'react-router-dom'
 import { useParams } from "react-router-dom";
 
-const CreateDealSuccessful = () => {
+interface SidebarProps {
+    isSidebarActive: boolean;
+};
+
+const CreateDealSuccessful : React.FC<SidebarProps> = ( {isSidebarActive} ) => {
     const { dealId } = useParams(); 
     const navigate = useNavigate();
 
@@ -13,7 +17,8 @@ const CreateDealSuccessful = () => {
         navigate(`/deal-overview/${dealId}`);
     }
     return (
-        <div className="card p-5 mx-auto my-5" style={{width: '75%'}}>
+        <div className="container-fluid mt-1 d-flex flex-column p-3">
+        <div className={`card p-5 mx-auto my-5 ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
         <div className="card-body text-center">
             
             <div className="mb-4">
@@ -27,6 +32,7 @@ const CreateDealSuccessful = () => {
             </div>
 
         </div>
+    </div>
     </div>
     )
 }

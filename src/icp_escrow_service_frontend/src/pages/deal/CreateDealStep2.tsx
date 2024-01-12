@@ -15,6 +15,7 @@ import { FileReference } from '../../../../declarations/backend/backend.did';
 
 type CreateDealProps = {
     onNext: () => void;
+    isSidebarActive: boolean;
 };
 
 type UploadedPictureType = {
@@ -41,7 +42,7 @@ type FormData = {
 };
 
 
-const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
+const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext, isSidebarActive }) => {
     const context = useContext(DealFlowContext);
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
@@ -312,8 +313,8 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext }) => {
                 </div>
             </div>
         ) : (
-            <div className="container-fluid mt-1 d-flex flex-column">
-                <div className="card create-deal-step-2-card padding-5 mx-auto margin-y-5 mb-5 mobile-font-size-8px" style={{ width: '75%' }}>
+            <div className="container-fluid d-flex flex-column justify-content-center align-items-center p-3">
+                <div className={`card create-deal-step-2-card p-5 margin-y-5 mobile-font-size-8px ${isSidebarActive ? 'not-full-width' : 'full-width'}`} >
                     <div className="card-body text-center">
                         <CreateDealProgressBar currentStep={2} />
                         <form className="mt-5" onSubmit={onSubmit}>

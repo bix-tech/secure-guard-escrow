@@ -5,8 +5,11 @@ import { Principal } from '@dfinity/principal';
 import { Deal } from '../../../../declarations/backend/backend.did';
 import { useNavigate } from 'react-router-dom';
 
+interface SidebarProps {
+    isSidebarActive: boolean;
+};
 
-const MyDeal = () => {
+const MyDeal : React.FC<SidebarProps> = ( { isSidebarActive }) => {
     const { principal, isLoading: isPrincipalLoading } = usePrincipal();
     const [deal, setDeal] = useState<Deal[] | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -62,9 +65,9 @@ const MyDeal = () => {
     }, [principal, isPrincipalLoading]);
 
     return (
-        <div className="container-fluid">
+        <div className="container-fluid p-5">
             <div className="row d-flex">
-                <div className="col-9 mydeal-card">
+                <div className={`col-9 mydeal-card ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
                     {isLoading ? (
                         <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
                             <div className="spinner-grow text-success" role="status">

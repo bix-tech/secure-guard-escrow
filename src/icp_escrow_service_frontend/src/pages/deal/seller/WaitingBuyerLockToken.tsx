@@ -6,7 +6,11 @@ import { usePrincipal } from "../../../hooks/usePrincipal";
 import { useDealData } from "../../../contexts/DealContext";
 import { Principal } from "@dfinity/principal"
 
-const WaitingBuyerLockToken = () => {
+interface SidebarProps {
+    isSidebarActive: boolean;
+};
+
+const WaitingBuyerLockToken : React.FC<SidebarProps> = ({isSidebarActive}) => {
     const { dealId } = useParams();
     const navigate = useNavigate();
     const { dealData, setDealData } = useDealData();
@@ -60,7 +64,8 @@ const WaitingBuyerLockToken = () => {
 
 
     return (
-        <div className="card p-5 mx-auto my-5" style={{ width: '75%' }}>
+        <div className="container-fluid d-flex flex-column p-3">
+        <div className={`card waiting-buyer-card p-5 my-5 ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
             <div className="card-body text-center">
 
                 <InitiatingDealProgressBar currentStep={2} />
@@ -75,6 +80,7 @@ const WaitingBuyerLockToken = () => {
                 </div>
 
             </div>
+        </div>
         </div>
     )
 }

@@ -6,6 +6,7 @@ import { DealFlowContext } from '../../contexts/InitiateDealFlowContext';
 
 type CreateDealProps = {
     onNext: () => void;
+    isSidebarActive: boolean;
 };
 
 
@@ -15,7 +16,7 @@ type FormData = {
 };
 
 
-const CreateDeal: React.FC<CreateDealProps> = ({ onNext }) => {
+const CreateDeal: React.FC<CreateDealProps> = ({ onNext, isSidebarActive }) => {
     const context = useContext(DealFlowContext);
     const { dealData, setDealData } = useDealData();
     const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormData>();
@@ -49,10 +50,9 @@ const CreateDeal: React.FC<CreateDealProps> = ({ onNext }) => {
         onNext();
     };
 
-
     return (
-        <div className="container-fluid mt-1 d-flex flex-column">
-            <div className="card create-deal-step-1-card padding-5 mx-auto margin-y-5 mobile-font-size-8px" style={{ width: '75%' }}>
+        <div className="container-fluid p-3 d-flex flex-column">
+            <div className={`card create-deal-step-1-card p-5 my-5 mobile-font-size-8px ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
                 <div className="card-body text-center">
                     <CreateDealProgressBar currentStep={1} />
                     <form onSubmit={handleSubmit(onSubmit)}>

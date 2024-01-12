@@ -7,7 +7,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { useNavigate } from 'react-router-dom';
 import './App.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Dispatch, SetStateAction } from 'react';
 import DealOverview from './pages/deal/DealDetail';
 import localforage from 'localforage';
 import CreateDealStep1 from './pages/deal/CreateDealStep1';
@@ -23,13 +23,12 @@ import MyDeal from './pages/deal/MyDeal';
 import 'bootstrap/dist/css/bootstrap.css';
 import Transaction from './pages/Transaction';
 import UserProfilePage from './pages/UserProfile';
+import Footer from './components/Footer';
 
 
-const NavbarWrapper = () => {
+const NavbarWrapper = ({ isSidebarActive, setIsSidebarActive }: { isSidebarActive: boolean, setIsSidebarActive: Dispatch<SetStateAction<boolean>> }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [isSidebarActive, setIsSidebarActive] = useState(window.innerWidth > 768);
-
 
   useEffect(() => {
     localforage.setItem('lastVisitedRoute', location.pathname);
@@ -62,9 +61,10 @@ function App() {
   const [dealDetails, setDealDetails] = useState({});
   const auth = useAuth();
   const isAuthenticated = auth ? auth.isAuthenticated : false;
+  const [isSidebarActive, setIsSidebarActive] = useState(window.innerWidth > 768);
 
 
-  const CreateStep1 = ({ onNext, onFormSubmit }: { onNext: string, onFormSubmit: (data: any) => void }) => {
+  const CreateStep1 = ({ onNext, onFormSubmit, isSidebarActive }: { onNext: string, onFormSubmit: (data: any) => void , isSidebarActive: boolean}) => {
     const navigate = useNavigate();
 
     const handleNext = () => {
@@ -72,10 +72,10 @@ function App() {
       navigate(onNext);
     };
 
-    return <CreateDealStep1 onNext={handleNext} />;
+    return <CreateDealStep1 onNext={handleNext} isSidebarActive={isSidebarActive} />;
   };
 
-  const CreateStep2 = ({ onNext, onFormSubmit }: { onNext: string, onFormSubmit: (data: any) => void }) => {
+  const CreateStep2 = ({ onNext, onFormSubmit, isSidebarActive }: { onNext: string, onFormSubmit: (data: any) => void , isSidebarActive: boolean}) => {
     const navigate = useNavigate();
 
     const handleNext = () => {
@@ -83,7 +83,7 @@ function App() {
       navigate(onNext);
     };
 
-    return <CreateDealStep2 onNext={handleNext} />;
+    return <CreateDealStep2 onNext={handleNext} isSidebarActive={isSidebarActive} />;
   };
 
   useEffect(() => {
@@ -95,23 +95,24 @@ function App() {
       <AuthProvider>
         <DealDataProvider>
           <DealFlowProvider>
-            <NavbarWrapper />
+          <NavbarWrapper isSidebarActive={isSidebarActive} setIsSidebarActive={setIsSidebarActive} />
             <Routes>
               <Route path="/" element={<Login />} />
-              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-              <Route path="/profile" element={<ProtectedRoute><UserProfilePage /></ProtectedRoute>} />
-              <Route path="/myDeal" element={<ProtectedRoute><MyDeal /></ProtectedRoute>} />
-              <Route path="/my-transactions" element={<ProtectedRoute><Transaction /></ProtectedRoute>} />
-              <Route path="/deal-overview/:dealId" element={<ProtectedRoute><DealOverview /></ProtectedRoute>} />
-              <Route path="/createDealStep1" element={<ProtectedRoute><CreateStep1 onNext='/createDealStep2' onFormSubmit={setDealDetails} /></ProtectedRoute>} />
-              <Route path="/createDealStep2" element={<ProtectedRoute><CreateStep2 onNext='/createDealStep3' onFormSubmit={setDealDetails} /></ProtectedRoute>} />
-              <Route path="/createDealStep3" element={<ProtectedRoute><CreateDealStep3 /></ProtectedRoute>} />
-              <Route path="/deal/seller/waiting-buyer/:dealId" element={<ProtectedRoute><WaitingBuyerLockToken /></ProtectedRoute>} />
-              <Route path="/deal/buyer/lock-token/:dealId" element={<ProtectedRoute><InitiateDealLockToken /></ProtectedRoute>} />
-              <Route path="/deal/buyer/lock-successfully/:dealId" element={<ProtectedRoute><LockTokenSuccessfully /></ProtectedRoute>} />
-              <Route path="/deal/seller/submit-deliverables/:dealId" element={<ProtectedRoute><SubmitDeliverables /></ProtectedRoute>} />
-              <Route path="/deal/seller/submit-deliverables-successfully/:dealId" element={<ProtectedRoute><SubmitDeliverablesSuccessfully /></ProtectedRoute>} />
+              <Route path="/dashboard" element={<ProtectedRoute><Dashboard isSidebarActive={isSidebarActive}/></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><UserProfilePage isSidebarActive={isSidebarActive} /></ProtectedRoute>} />
+              <Route path="/myDeal" element={<ProtectedRoute><MyDeal isSidebarActive={isSidebarActive} /></ProtectedRoute>} />
+              <Route path="/my-transactions" element={<ProtectedRoute><Transaction isSidebarActive={isSidebarActive} /></ProtectedRoute>} />
+              <Route path="/deal-overview/:dealId" element={<ProtectedRoute><DealOverview isSidebarActive={isSidebarActive} /></ProtectedRoute>} />
+              <Route path="/createDealStep1" element={<ProtectedRoute><CreateStep1 isSidebarActive={isSidebarActive} onNext='/createDealStep2' onFormSubmit={setDealDetails} /></ProtectedRoute>} />
+              <Route path="/createDealStep2" element={<ProtectedRoute><CreateStep2 isSidebarActive={isSidebarActive} onNext='/createDealStep3' onFormSubmit={setDealDetails} /></ProtectedRoute>} />
+              <Route path="/createDealStep3" element={<ProtectedRoute><CreateDealStep3 isSidebarActive={isSidebarActive}/></ProtectedRoute>} />
+              <Route path="/deal/seller/waiting-buyer/:dealId" element={<ProtectedRoute><WaitingBuyerLockToken isSidebarActive={isSidebarActive}/></ProtectedRoute>} />
+              <Route path="/deal/buyer/lock-token/:dealId" element={<ProtectedRoute><InitiateDealLockToken isSidebarActive={isSidebarActive} /></ProtectedRoute>} />
+              <Route path="/deal/buyer/lock-successfully/:dealId" element={<ProtectedRoute><LockTokenSuccessfully isSidebarActive={isSidebarActive} /></ProtectedRoute>} />
+              <Route path="/deal/seller/submit-deliverables/:dealId" element={<ProtectedRoute><SubmitDeliverables isSidebarActive={isSidebarActive}/></ProtectedRoute>} />
+              <Route path="/deal/seller/submit-deliverables-successfully/:dealId" element={<ProtectedRoute><SubmitDeliverablesSuccessfully isSidebarActive={isSidebarActive} /></ProtectedRoute>} />
             </Routes>
+            <Footer isSidebarActive={isSidebarActive} />
           </DealFlowProvider>
         </DealDataProvider>
       </AuthProvider>

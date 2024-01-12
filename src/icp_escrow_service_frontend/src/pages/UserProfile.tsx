@@ -12,7 +12,11 @@ type UploadedPictureType = {
     name: string;
 };
 
-const UserProfilePage = () => {
+interface SidebarProps {
+    isSidebarActive: boolean;
+};
+
+const UserProfilePage : React.FC<SidebarProps> = ( {isSidebarActive} ) => {
     const { principal } = usePrincipal();
     const [isLoading, setIsLoading] = useState(true);
     const [pictureUrls, setPictureUrls] = useState<string[]>([]);
@@ -167,92 +171,94 @@ const UserProfilePage = () => {
                 </div>
             </div>
         ) : (
-            <div className="profile-container card p-5">
-                <form onSubmit={submitUserProfile} className="profile-form d-flex flex-column align-items-center mt-5">
-                    <div className="form-group">
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handlePictureSelect}
-                            style={{ display: 'none' }}
-                            id="fileInput"
-                        />
-                        {pictureUrls.length > 0 ? (
-                            pictureUrls.map((url) => (
+            <div className="container-fluid d-flex flex-column p-5">
+                <div className={`profile-container card p-5 ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
+                    <form onSubmit={submitUserProfile} className="profile-form d-flex flex-column align-items-center mt-5">
+                        <div className="form-group">
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handlePictureSelect}
+                                style={{ display: 'none' }}
+                                id="fileInput"
+                            />
+                            {pictureUrls.length > 0 ? (
+                                pictureUrls.map((url) => (
+                                    <img
+                                        key={url}
+                                        src={url}
+                                        alt={`Picture`}
+                                        style={{ width: '100px', height: '100px', borderRadius: '100px' }}
+                                        onClick={() => { triggerProfilePictureInput() }}
+                                    />
+                                ))
+                            ) : (
                                 <img
-                                    key={url}
-                                    src={url}
-                                    alt={`Picture`}
+                                    src="https://www.w3schools.com/howto/img_avatar.png"
+                                    alt="Avatar"
+                                    className="avatar"
                                     style={{ width: '100px', height: '100px', borderRadius: '100px' }}
                                     onClick={() => { triggerProfilePictureInput() }}
                                 />
-                            ))
-                        ) : (
-                            <img
-                                src="https://www.w3schools.com/howto/img_avatar.png"
-                                alt="Avatar"
-                                className="avatar"
-                                style={{ width: '100px', height: '100px', borderRadius: '100px' }}
-                                onClick={() => { triggerProfilePictureInput() }}
-                            />
-                        )}
-                    </div>
-                    <div className="mb-3">
-                        <div className="form-row col-md-9 text-start mx-auto">
-                            <label>Name</label>
-                            <input type="text" placeholder="Name" value={name} onChange={handleNameChange} className="form-control" />
+                            )}
                         </div>
-                    </div>
-                    <div className="mb-3">
-                        <div className="form-row col-md-9 text-start mx-auto">
-                            <label>Email:</label>
-                            <input type="email" placeholder="Email" value={email} onChange={handleEmailChange} className="form-control" />
-                        </div>
-                    </div>
-                    <div className="mb-3">
-                        <div className="form-row col-md-9 text-start mx-auto">
-                            <label>Phone:</label>
-                            <input type="tel" placeholder="Phone" value={phone} onChange={handlePhoneChange} className="form-control" />
-                        </div>
-                    </div>
-                    <div className="mb-3">
-                        <div className="form-row col-md-9 text-start mx-auto">
-                            <label>Address:</label>
-                            <input type="text" placeholder="Address" value={address} onChange={handleAddressChange} className="form-control" />
-                        </div>
-                    </div>
-                    <div className="mb-3">
-                        <div className="form-row col-md-9 text-start mx-auto">
-                            <label>Age:</label>
-                            <input type="number" placeholder="Age" value={age ? age.toString() : ''} onChange={handleAgeChange} className="form-control" />
-                        </div>
-                    </div>
-                    <div className="mb-3">
-                        <div className="form-row col-md-9 text-start mx-auto">
-                            <label htmlFor="open-date" className="form-label text-start">
-                                DOB
-                            </label>
-                            <div className="input-group date-picker-group">
-                                <DatePicker
-                                    selected={dob}
-                                    onChange={(date) => setDob(date)}
-                                    dateFormat="MMMM d, yyyy"
-                                    showYearDropdown
-                                    showMonthDropdown
-                                    dropdownMode="select"
-                                    className="form-control custom-date-picker"
-                                    yearDropdownItemNumber={5}
-                                    placeholderText="Select a date"
-                                    isClearable={true}
-                                />
-                                <span className="input-group-addon">
-                                    <i className="fa fa-calendar" aria-hidden="true"></i>
-                                </span>
+                        <div className="mb-3">
+                            <div className="form-row col-md-9 text-start mx-auto">
+                                <label>Name</label>
+                                <input type="text" placeholder="Name" value={name} onChange={handleNameChange} className="form-control" />
                             </div>
                         </div>
-                    </div>
-                    <button type="submit" className="btn btn-primary btn-confirm">Submit</button>
-                </form>
+                        <div className="mb-3">
+                            <div className="form-row col-md-9 text-start mx-auto">
+                                <label>Email:</label>
+                                <input type="email" placeholder="Email" value={email} onChange={handleEmailChange} className="form-control" />
+                            </div>
+                        </div>
+                        <div className="mb-3">
+                            <div className="form-row col-md-9 text-start mx-auto">
+                                <label>Phone:</label>
+                                <input type="tel" placeholder="Phone" value={phone} onChange={handlePhoneChange} className="form-control" />
+                            </div>
+                        </div>
+                        <div className="mb-3">
+                            <div className="form-row col-md-9 text-start mx-auto">
+                                <label>Address:</label>
+                                <input type="text" placeholder="Address" value={address} onChange={handleAddressChange} className="form-control" />
+                            </div>
+                        </div>
+                        <div className="mb-3">
+                            <div className="form-row col-md-9 text-start mx-auto">
+                                <label>Age:</label>
+                                <input type="number" placeholder="Age" value={age ? age.toString() : ''} onChange={handleAgeChange} className="form-control" />
+                            </div>
+                        </div>
+                        <div className="mb-3">
+                            <div className="form-row col-md-9 text-start mx-auto">
+                                <label htmlFor="open-date" className="form-label text-start">
+                                    DOB
+                                </label>
+                                <div className="input-group date-picker-group">
+                                    <DatePicker
+                                        selected={dob}
+                                        onChange={(date) => setDob(date)}
+                                        dateFormat="MMMM d, yyyy"
+                                        showYearDropdown
+                                        showMonthDropdown
+                                        dropdownMode="select"
+                                        className="form-control custom-date-picker"
+                                        yearDropdownItemNumber={5}
+                                        placeholderText="Select a date"
+                                        isClearable={true}
+                                    />
+                                    <span className="input-group-addon">
+                                        <i className="fa fa-calendar" aria-hidden="true"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" className="btn btn-primary btn-confirm">Submit</button>
+                    </form>
+                </div>
             </div>
         )
     );

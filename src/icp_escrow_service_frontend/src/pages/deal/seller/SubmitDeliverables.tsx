@@ -10,8 +10,12 @@ type DocumentFile = {
     name: string;
 };
 
+interface SidebarProps {
+    isSidebarActive: boolean;
+};
 
-const CreateDeal = () => {
+
+const CreateDeal : React.FC<SidebarProps> = ( {isSidebarActive} ) => {
     const [isLoading, setIsLoading] = useState(true);
     const [editorContent, setEditorContent] = React.useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -99,7 +103,8 @@ const CreateDeal = () => {
                 </div>
             </div>
         ) : (
-            <div className="card p-5 mx-auto my-5 mb-5" style={{ width: '75%' }}>
+            <div className="container-fluid mt-1 d-flex flex-column">
+            <div className={`card p-5 my-5 mb-5 ${isSidebarActive ? 'not-full-width' : 'full-width' }`}>
                 <div className="card-body text-center">
 
                     <InitiatingDealProgressBar currentStep={3} />
@@ -131,6 +136,7 @@ const CreateDeal = () => {
                     </form>
 
                 </div>
+            </div>
             </div>
         )
     )

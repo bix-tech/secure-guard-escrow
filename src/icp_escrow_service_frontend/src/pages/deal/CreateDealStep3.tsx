@@ -4,7 +4,11 @@ import { useContext, useEffect } from "react";
 import { DealFlowContext } from "../../contexts/InitiateDealFlowContext";
 import { useDealData } from "../../contexts/DealContext";
 
-const CreateDealSuccessful = () => {
+interface SidebarProps {
+    isSidebarActive: boolean;
+};
+
+const CreateDealSuccessful : React.FC<SidebarProps> = ({ isSidebarActive }) => {
     const context = useContext(DealFlowContext);
     const { dealData } = useDealData();
     const navigate = useNavigate();
@@ -26,7 +30,7 @@ const CreateDealSuccessful = () => {
 
     return (
         <div className="container-fluid mt-1 d-flex flex-column">
-            <div className="card create-deal-step-3-card padding-5 mx-auto margin-y-5 mobile-font-size-8px" style={{ width: '75%' }}>
+            <div className={`card create-deal-step-3-card p-5 margin-y-5 mobile-font-size-8px ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
                 <div className="card-body text-center">
 
                     <CreateDealProgressBar currentStep={3} />

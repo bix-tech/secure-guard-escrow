@@ -16,10 +16,15 @@ interface TransactionLog {
         to: Principal;
         from: Principal;
     }
-}
+};
+
+interface SidebarProps {
+    isSidebarActive: boolean;
+};
+
 const itemsPerPage = 10;
 
-const Transaction = () => {
+const Transaction : React.FC<SidebarProps> = ({ isSidebarActive }) => {
     const [isLoading, setIsLoading] = useState(true);
     const { principal } = usePrincipal();
     const [transactionLogs, setTransactionLogs] = useState<TransactionLog[]>([]);
@@ -68,10 +73,10 @@ const Transaction = () => {
 
 
     return (
-        <div className="container-fluid mt-1 d-flex flex-column">
+        <div className="container-fluid d-flex flex-column p-5">
             <div className="row">
-                <div className="card transaction-card mx-auto padding-5 margin-y-5 mobile-font-size-8px" style={{ width: '80%' }}>
-                    <h2>Activity Logs</h2>
+                <div className={`card transaction-card margin-5 p-5 mobile-font-size-8px ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
+                    <h2>Transaction Logs</h2>
                     <div>Total logs: {totalItems}</div>
                     <table className="table">
                         <thead>

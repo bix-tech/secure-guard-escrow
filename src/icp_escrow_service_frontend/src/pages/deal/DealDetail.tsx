@@ -9,10 +9,13 @@ import { Modal, Button } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+interface SidebarProps {
+    isSidebarActive: boolean;
+}
 
 
 
-const DealOverview = () => {
+const DealOverview : React.FC<SidebarProps> = ( {isSidebarActive}) => {
     const [deal, setDeal] = useState<Deal | null>(null);
     const { principal, isLoading: isPrincipalLoading } = usePrincipal();
     const [error, setError] = useState('');
@@ -174,7 +177,7 @@ const DealOverview = () => {
         <div className="container-fluid mt-1">
             <ToastContainer />
             <div className="row">
-                <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <main className={`col-md-9 ms-sm-auto col-lg-10 px-md-4 ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
                     <div className="mt-4">
                         <h4>Deal Overview : {deal.name}</h4>
                         <p>SSM / Company</p>

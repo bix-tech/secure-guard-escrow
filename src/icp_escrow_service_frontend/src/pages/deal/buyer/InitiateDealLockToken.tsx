@@ -6,7 +6,11 @@ import { Principal } from "@dfinity/principal";
 import { usePrincipal } from "../../../hooks/usePrincipal";
 import { useDealData } from "../../../contexts/DealContext";
 
-const LockToken = () => {
+interface SidebarProps {
+    isSidebarActive: boolean;
+};
+
+const LockToken : React.FC<SidebarProps> = ( {isSidebarActive} ) => {
     const { dealData, setDealData } = useDealData();
     const [isLoading, setIsLoading] = useState(true);
     const [amount, setAmount] = useState<bigint>(BigInt(0));
@@ -76,7 +80,8 @@ const LockToken = () => {
                 </div>
             </div>
         ) : (
-            <div className="card p-5 mx-auto my-5" style={{ width: '75%' }}>
+            <div className="container-fluid d-flex flex-column p-5">
+            <div className={`card p-5 my-5 ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
                 <div className="card-body text-center">
 
                     <InitiatingDealProgressBar currentStep={2} />
@@ -102,6 +107,7 @@ const LockToken = () => {
 
                 </div>
             </div>
+        </div>
         )
     )
 }

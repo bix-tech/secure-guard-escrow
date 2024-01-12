@@ -433,7 +433,7 @@ body {
 
 .bottom-bar {
   background-color: white;
-  position: relative;
+  position: fixed;
   bottom: 0;
   width: 100%;
   margin-top: auto !important;
@@ -497,17 +497,22 @@ body {
 }
 
 .hamburger {
-  position: absolute !important;
-  z-index: 1000;
+  position: fixed !important;
+  z-index: 1001;
   top: 0; 
 }
+
+.hamburger:hover {
+  opacity: 0.5;
+}
+
 .sidebar {
   position: fixed;
   top: 0;
   left: 0;
   bottom: 0;
   transform: translateX(-100%);
-  width: 20%;
+  width: 15%;
   background-color: transparent;
   transition: transform 0.5s ease-in-out, background-color 0.5s ease-in-out;
 }
@@ -517,10 +522,41 @@ body {
   background-color: white;
   z-index: 1000;
 }
+@keyframes full-width {
+  0% { width: calc(100% - 15%); margin-left: 15%; }
+  100% { width: 100%; margin-left: 0; }
+}
 
+@keyframes not-full-width {
+  0% { width: 100%; margin-left: 0; }
+  100% { width: calc(100% - 15%); margin-left: 15%; }
+}
+
+.full-width {
+  animation: full-width 0.5s forwards;
+}
+
+.not-full-width {
+  animation: not-full-width 0.5s forwards;
+}
+
+.col-md-9 {
+  width: 100%;
+}
 
 /* Mobile View */
 @media only screen and (max-width: 769px) {
+  @keyframes full-width {
+    0% { }
+    100% {  }
+  }
+  
+  @keyframes not-full-width {
+    0% { }
+    100% {  }
+  }
+  
+
   .mobile-font-size-8px {
     font-size: 8px !important;
   }
