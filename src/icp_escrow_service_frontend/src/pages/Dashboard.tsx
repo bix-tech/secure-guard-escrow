@@ -2,7 +2,7 @@ import { backend } from "../../../declarations/backend";
 import { useState, useEffect } from 'react';
 import { Principal } from "@dfinity/principal";
 import { usePrincipal } from "../hooks/usePrincipal";
-import Bottombar from '../components/Bottombar';
+import Bottombar from '../components/Footer';
 import { useNavigate } from "react-router";
 
 
