@@ -15,7 +15,7 @@ interface SidebarProps {
 
 
 
-const DealOverview : React.FC<SidebarProps> = ( {isSidebarActive}) => {
+const DealOverview: React.FC<SidebarProps> = ({ isSidebarActive }) => {
     const [deal, setDeal] = useState<Deal | null>(null);
     const { principal, isLoading: isPrincipalLoading } = usePrincipal();
     const [error, setError] = useState('');
@@ -110,11 +110,13 @@ const DealOverview : React.FC<SidebarProps> = ( {isSidebarActive}) => {
     }
 
     if (!deal) {
-        return <div className="loader"></div>;
-    }
-
-    if (isLoading) {
-        return <div className="loader"></div>;
+        return <div className="container-fluid mt-1 d-flex flex-column">
+            <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+                <div className="spinner-grow text-success" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
     }
 
     const handleConfirmDeal = async (dealId: number) => {
@@ -174,130 +176,137 @@ const DealOverview : React.FC<SidebarProps> = ( {isSidebarActive}) => {
     // }, [deal]);
 
     return (
-        <div className="container-fluid mt-1">
-            <ToastContainer />
-            <div className="row">
-                <main className={`col-md-9 ms-sm-auto col-lg-10 px-md-4 ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
-                    <div className="mt-4">
-                        <h4>Deal Overview : {deal.name}</h4>
-                        <p>SSM / Company</p>
-                        <div className="d-flex flex-row justify-content-end">
-                            {deal.status !== 'Confirmed' && deal.status !== 'Cancelled' && (
-                                <button onClick={handleOpenCancelModal} className="btn btn-cancel btn-primary" style={{ marginRight: "5px" }}>Cancel Deal</button>
-                            )}
-                            {deal.status !== 'Confirmed' && deal.status !== 'Cancelled' && (
-                                <button onClick={handleOpenConfirmModal} className="btn btn-confirm btn-primary" >Confirm Deal</button>
-                            )}
-
-                            <Modal show={showConfirmModal} onHide={handleCloseConfirmModal}>
-                                <Modal.Header closeButton>
-                                    <Modal.Title>Confirm Deal</Modal.Title>
-                                </Modal.Header>
-                                <Modal.Body> Are you sure you want to confirm this deal?</Modal.Body>
-                                <Modal.Footer>
-                                    <Button variant="secondary" onClick={handleCloseConfirmModal}>Close</Button>
-                                    <Button variant="primary" onClick={() => { handleConfirmDeal(Number(dealId)) }}>Confirm</Button>
-                                </Modal.Footer>
-                            </Modal>
-
-                            <Modal show={showCancelModal} onHide={handleCloseCancelModal}>
-                                <Modal.Header closeButton>
-                                    <Modal.Title>Cancel Deal</Modal.Title>
-                                </Modal.Header>
-                                <Modal.Body>Are you sure you want to cancel this deal?</Modal.Body>
-                                <Modal.Footer>
-                                    <Button variant="secondary" onClick={handleCloseCancelModal}>Close</Button>
-                                    <Button variant="primary" onClick={() => { handleCancelDeal(Number(dealId)) }}>Cancel</Button>
-                                </Modal.Footer>
-                            </Modal>
-                        </div>
+        isLoading ? (
+            <div className="container-fluid mt-1 d-flex flex-column">
+                <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+                    <div className="spinner-grow text-success" role="status">
+                        <span className="visually-hidden">Loading...</span>
                     </div>
-                    <div className="row mb-3">
-                        <div className="col-md-6">
-                            <div className="card p-3 my-5" style={{ width: "100%", height: "100%" }}>
-                                <div className="card-body text-center">
-                                    <div className="d-flex align-items-center">
-                                        <div className="avatar me-3">
-                                            {/* <img src="/minion.jpeg" alt="User Avatar" /> */}
-                                            {pictureUrls.map((url) => (
-                                                <img key={url} src={url} alt={`Picture`} />
-                                            ))}
+                </div>
+            </div>
+        ) : (
+            <div className="container-fluid mt-1">
+                <ToastContainer />
+                <div className="row">
+                    <main className={`col-md-9 ms-sm-auto col-lg-10 px-md-4 ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
+                        <div className="mt-4">
+                            <h4>Deal Overview : {deal.name}</h4>
+                            <p>SSM / Company</p>
+                            <div className="d-flex flex-row justify-content-end">
+                                {deal.status !== 'Confirmed' && deal.status !== 'Cancelled' && (
+                                    <button onClick={handleOpenCancelModal} className="btn btn-cancel btn-primary" style={{ marginRight: "5px" }}>Cancel Deal</button>
+                                )}
+                                {deal.status !== 'Confirmed' && deal.status !== 'Cancelled' && (
+                                    <button onClick={handleOpenConfirmModal} className="btn btn-confirm btn-primary" >Confirm Deal</button>
+                                )}
+
+                                <Modal show={showConfirmModal} onHide={handleCloseConfirmModal}>
+                                    <Modal.Header closeButton>
+                                        <Modal.Title>Confirm Deal</Modal.Title>
+                                    </Modal.Header>
+                                    <Modal.Body> Are you sure you want to confirm this deal?</Modal.Body>
+                                    <Modal.Footer>
+                                        <Button variant="secondary" onClick={handleCloseConfirmModal}>Close</Button>
+                                        <Button variant="primary" onClick={() => { handleConfirmDeal(Number(dealId)) }}>Confirm</Button>
+                                    </Modal.Footer>
+                                </Modal>
+
+                                <Modal show={showCancelModal} onHide={handleCloseCancelModal}>
+                                    <Modal.Header closeButton>
+                                        <Modal.Title>Cancel Deal</Modal.Title>
+                                    </Modal.Header>
+                                    <Modal.Body>Are you sure you want to cancel this deal?</Modal.Body>
+                                    <Modal.Footer>
+                                        <Button variant="secondary" onClick={handleCloseCancelModal}>Close</Button>
+                                        <Button variant="primary" onClick={() => { handleCancelDeal(Number(dealId)) }}>Cancel</Button>
+                                    </Modal.Footer>
+                                </Modal>
+                            </div>
+                        </div>
+                        <div className="row mb-3">
+                            <div className="col-md-6">
+                                <div className="card p-3 my-5" style={{ width: "100%", height: "100%" }}>
+                                    <div className="card-body text-center">
+                                        <div className="d-flex align-items-center">
+                                            <div className="avatar me-3">
+                                                {pictureUrls.map((url) => (
+                                                    <img key={url} src={url} alt={`Picture`} />
+                                                ))}
+                                            </div>
+                                            <div className="text-start">
+                                                <h4 className="mb-0">{deal.name}</h4>
+                                                <small>{Object.keys(deal.dealCategory)[0]}</small><br />
+                                                <small>{deal.status}</small>
+                                            </div>
                                         </div>
+
+                                        <hr />
+                                        <div className="contract-info">
+                                            <div className="row">
+                                                <div className="d-flex align-items-center">
+                                                    <div className="avatar me-3">
+                                                        <img src="/minion.jpeg" alt="User Avatar" />
+                                                    </div>
+                                                    <div className="text-start">
+                                                        <h6 className="mb-0">Buyer</h6>
+                                                        <small>{deal.to.toString()}</small>
+                                                    </div>
+                                                </div>
+                                                <div className="d-flex align-items-center mt-3">
+                                                    <div className="avatar me-3">
+                                                        <img src="/minion.jpeg" alt="User Avatar" />
+                                                    </div>
+                                                    <div className="text-start">
+                                                        <h6 className="mb-0">Seller</h6>
+                                                        <small>{deal.from.toString()}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-md-6">
+                                <div className="card p-3 my-5" style={{ width: "100%", height: "100%" }}>
+                                    <div className="card-body ">
                                         <div className="text-start">
-                                            <h4 className="mb-0">{deal.name}</h4>
-                                            <small>{Object.keys(deal.dealCategory)[0]}</small><br />
-                                            <small>{deal.status}</small>
-                                        </div>
-                                    </div>
-
-                                    <hr />
-                                    <div className="contract-info">
-                                        <div className="row">
-                                            <div className="d-flex align-items-center">
-                                                <div className="avatar me-3">
-                                                    <img src="/minion.jpeg" alt="User Avatar" />
-                                                </div>
-                                                <div className="text-start">
-                                                    <h6 className="mb-0">Buyer</h6>
-                                                    <small>{deal.to.toString()}</small>
-                                                </div>
-                                            </div>
-                                            <div className="d-flex align-items-center mt-3">
-                                                <div className="avatar me-3">
-                                                    <img src="/minion.jpeg" alt="User Avatar" />
-                                                </div>
-                                                <div className="text-start">
-                                                    <h6 className="mb-0">Seller</h6>
-                                                    <small>{deal.from.toString()}</small>
-                                                </div>
-                                            </div>
+                                            <h4>Deal Description</h4>
+                                            <div dangerouslySetInnerHTML={{ __html: deal.description }} />
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div className="col-md-6">
-                            <div className="card p-3 my-5" style={{ width: "100%", height: "100%" }}>
-                                <div className="card-body ">
-                                    <div className="text-start">
-                                        <h4>Deal Description</h4>
-                                        <p>
-                                        <div dangerouslySetInnerHTML={{ __html: deal.description }} />
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="row mb-3">
-                        <div className="col-md-12">
-                            <div className="card p-5 mx-auto my-5">
-                                <h4>Deliverables</h4>
-                                <div className="deliverables-grid">
-                                    {deal.deliverables.map((deliverable, index) => (
-                                        <div key={deliverable.id || index} className="deliverable-item justify-content-between">
-                                            {deliverable.deliverableDocuments.map((document) => (
-                                                <div key={document.id} className="d-flex align-items-center m-3" style={{ width: "45%" }}>
-                                                    <div className="avatar me-3" style={{ border: "none" }}>
-                                                        <img src="/document-download.png" alt="User Avatar" />
+                        <div className="row mb-3">
+                            <div className="col-md-12">
+                                <div className="card p-5 mx-auto my-5">
+                                    <h4>Deliverables</h4>
+                                    <div className="deliverables-grid">
+                                        {deal.deliverables.map((deliverable, index) => (
+                                            <div key={deliverable.id || index} className="deliverable-item justify-content-between">
+                                                {deliverable.deliverableDocuments.map((document) => (
+                                                    <div key={document.id} className="d-flex align-items-center m-3" style={{ width: "45%" }}>
+                                                        <div className="avatar me-3" style={{ border: "none" }}>
+                                                            <img src="/document-download.png" alt="User Avatar" />
+                                                        </div>
+                                                        <div className="deliverable-download">
+                                                            <a href={deliverableUrls[document.id.toString()]} download={document.name}>
+                                                                <span>{document.name}</span>
+                                                            </a>
+                                                        </div>
                                                     </div>
-                                                    <div className="deliverable-download">
-                                                        <a href={deliverableUrls[document.id.toString()]} download={document.name}>
-                                                            <span>{document.name}</span>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ))}
+                                                ))}
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </main>
+                    </main>
+                </div >
             </div >
-        </div >
-    )
+        )
+    );
 }
 
 export default DealOverview

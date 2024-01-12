@@ -512,7 +512,7 @@ body {
   left: 0;
   bottom: 0;
   transform: translateX(-100%);
-  width: 15%;
+  width: 16%;
   background-color: transparent;
   transition: transform 0.5s ease-in-out, background-color 0.5s ease-in-out;
 }
@@ -523,13 +523,13 @@ body {
   z-index: 1000;
 }
 @keyframes full-width {
-  0% { width: calc(100% - 15%); margin-left: 15%; }
+  0% { width: calc(100% - 16%); margin-left: 16%; }
   100% { width: 100%; margin-left: 0; }
 }
 
 @keyframes not-full-width {
   0% { width: 100%; margin-left: 0; }
-  100% { width: calc(100% - 15%); margin-left: 15%; }
+  100% { width: calc(100% - 16%); margin-left: 16%; }
 }
 
 .full-width {
@@ -747,4 +747,9 @@ body {
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+.spinner-grow {
+  margin-top: 40vh;
+  margin-left: 15%;
 }
