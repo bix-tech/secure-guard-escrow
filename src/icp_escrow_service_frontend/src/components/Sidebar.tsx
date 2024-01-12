@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
 
-interface SidebarProps {
-  isHamburgerActive: boolean;
-  handleHamburgerClick: () => void;
-}
+type SidebarProps = {
+  isSidebarActive: boolean;
+};
 
-const Sidebar: React.FC<SidebarProps> = ({ isHamburgerActive, handleHamburgerClick }) => {
+
+const Sidebar: React.FC<SidebarProps> = ({ isSidebarActive }) => {
   const navigate = useNavigate();
 
   const handleMyDealClick = () => {
@@ -24,16 +24,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isHamburgerActive, handleHamburgerCli
     navigate('/profile')
   }
 
-
-
   return (
-    <div className={`col-md-3 col-lg-2 ps-0 ${isHamburgerActive ? 'bg-white' : ''}`}>
-      <div className="btn-group hamburger ">
-        <button className="btn btn-default" type="button" id="menu-toggle" onClick={handleHamburgerClick}>
-          <img src="hamburger.png" className="menu-icon" alt="" />
-        </button>
-      </div>
-      <nav id="sidebar" className={`pt-3 d-md-block mobile-font-size-8px sidebar ${isHamburgerActive ? '' : 'active'}`} style={{ height: 'auto', minHeight: '92vh' }}>
+    <div className={`col-md-3 col-lg-2 ps-0 ${isSidebarActive ? 'bg-white' : ''}`}>
+      <nav id="sidebar" className={`pt-3 d-md-block sidebar ${isSidebarActive ? 'active' : ''}`} style={{ height: 'auto', minHeight: '80vh' }}>
         <div className="position-sticky">
           <ul className="nav flex-column">
             <li className="nav-item">

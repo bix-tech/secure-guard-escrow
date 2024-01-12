@@ -2,7 +2,6 @@ import { backend } from "../../../declarations/backend";
 import { useState, useEffect } from 'react';
 import { Principal } from "@dfinity/principal";
 import { usePrincipal } from "../hooks/usePrincipal";
-import Sidebar from '../components/Sidebar';
 import Bottombar from '../components/Bottombar';
 import { useNavigate } from "react-router";
 
@@ -30,7 +29,6 @@ const Dashboard = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const navigate = useNavigate();
-  const [isHamburgerActive, setIsHamburgerActive] = useState(true);
 
 
 
@@ -40,10 +38,6 @@ const Dashboard = () => {
 
   const handleCreateDeal = () => {
     navigate('/createDealStep1')
-  };
-
-  const handleHamburgerClick = () => {    
-    setIsHamburgerActive((prev) => !prev);
   };
 
   const fetchActivityLogs = async () => {
@@ -84,7 +78,6 @@ const Dashboard = () => {
   return (
     <div className="container-fluid d-flex flex-column">
     <div className="row d-flex">
-        <Sidebar isHamburgerActive={isHamburgerActive} handleHamburgerClick={handleHamburgerClick} />
         <div className={`col-md-9 ms-sm-auto col-lg-10 px-0 d-flex flex-column`} style={{ position: 'relative', minHeight:'100vh' }}>
           <button className="btn btn-create btn-primary" onClick={handleCreateDeal}> Create Deal </button>
           <div className="button-container mx-5" style={{ float: 'right' }}>

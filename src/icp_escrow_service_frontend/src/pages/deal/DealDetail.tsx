@@ -4,12 +4,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Deal } from "../../../../declarations/backend/backend.did";
 import '../../App.css';
 import { usePrincipal } from "../../hooks/usePrincipal";
-import Sidebar from '../../components/Sidebar';
 import { Principal } from "@dfinity/principal";
 import { Modal, Button } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-// import { Principal } from "@dfinity/principal";
 
 
 
@@ -24,7 +22,6 @@ const DealOverview = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [showConfirmModal, setConfirmModal] = useState(false);
     const [showCancelModal, setCancelModal] = useState(false);
-    const [isHamburgerActive, setIsHamburgerActive] = useState(true);
 
     const navigate = useNavigate();
 
@@ -148,11 +145,6 @@ const DealOverview = () => {
         }
     }
 
-    const handleHamburgerClick = () => {
-        // Toggle hamburger state
-        setIsHamburgerActive((prev) => !prev);
-    };
-
 
     // useEffect(() => {
     //     const fetchSupportingDocuments = async () => {
@@ -182,7 +174,6 @@ const DealOverview = () => {
         <div className="container-fluid mt-1">
             <ToastContainer />
             <div className="row">
-                <Sidebar isHamburgerActive={isHamburgerActive} handleHamburgerClick={handleHamburgerClick} />
                 <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                     <div className="mt-4">
                         <h4>Deal Overview : {deal.name}</h4>

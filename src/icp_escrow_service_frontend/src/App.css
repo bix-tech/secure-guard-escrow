@@ -477,17 +477,6 @@ body {
   display: none !important;
 }
 
-#sidebar {
-  position: relative;
-  transition: transform 0.5s ease, background-color 0.5s ease;
-  background-color: white;
-}
-
-#sidebar.active{
-  position: relative;
-  transform: translateX(-100%);  
-}
-
 
 .padding-5 {
   padding: 3rem !important;
@@ -510,8 +499,23 @@ body {
 .hamburger {
   position: absolute !important;
   z-index: 1000;
-  top: 7%;
-  
+  top: 0; 
+}
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  transform: translateX(-100%);
+  width: 20%;
+  background-color: transparent;
+  transition: transform 0.5s ease-in-out, background-color 0.5s ease-in-out;
+}
+
+.sidebar.active {
+  transform: translateX(0);
+  background-color: white;
+  z-index: 1000;
 }
 
 
@@ -555,22 +559,11 @@ body {
     margin-bottom: 1.5rem !important;
   }
 
-  #sidebar {
-    position: fixed;
-    left: 0;
-    z-index: 999;
-    width: 30%;
-    transition: transform 0.5s ease;
-    background-color: white;
-    margin-top: 15%;
+  .sidebar {
+    width: 100%; 
+    z-index: 1000;
   }
-  
-  #sidebar.active{
-    position: fixed;
-    left: -100%;
-    transition: 0.5s;
-    z-index: 999;
-  }
+
 
   .navbar > .container-fluid {
     flex-wrap: unset !important;
@@ -579,6 +572,7 @@ body {
   .navbar {
     position: fixed !important;
     z-index: 1000;
+    width: 100%;
   }
 
   .mobile-card {
@@ -597,7 +591,8 @@ body {
   .hamburger {
     position: fixed !important;
     z-index: 1000;
-    top: 7%
+    top: 1%;
+    left: 0;
   }
 
   /* Login Page */

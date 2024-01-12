@@ -52,7 +52,7 @@ const Login = () => {
       // console.log("DFX_NETWORK:", process.env.DFX_NETWORK);
       // console.log("INTERNET_IDENTITY_CANISTER_ID:", process.env.INTERNET_IDENTITY_CANISTER_ID);
       // console.log("BACKEND_CANISTER_ID:", process.env.BACKEND_CANISTER_ID);
-      const identityProvider = process.env.DFX_NETWORK === 'ic'
+      const identityProvider = process.env.DFX_NETWORK === 'playground'
         ? 'https://identity.ic0.app'
         : `http://127.0.0.1:4943/?canisterId=${process.env.INTERNET_IDENTITY_CANISTER_ID}`;
       console.log(identityProvider);

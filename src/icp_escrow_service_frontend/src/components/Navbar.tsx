@@ -3,8 +3,6 @@ import { AuthClient } from "@dfinity/auth-client";
 import { useNavigate, useLocation } from 'react-router';
 import { useAuth } from '../contexts/AuthContext';
 import { Dropdown } from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import '../App.css';
 import localForage from "localforage";
 import { FaCopy } from 'react-icons/fa';
 import { Principal } from '@dfinity/principal';
@@ -13,13 +11,20 @@ import { usePrincipal } from '../hooks/usePrincipal';
 import { UserProfile } from '../../../declarations/backend/backend.did';
 import { DropDirection } from 'react-bootstrap/esm/DropdownContext';
 import Cookies from 'js-cookie';
+import Sidebar from './Sidebar';
 
 type Notification = {
     dealId: bigint;
     message: string;
 };
 
-const Navbar = () => {
+type NavbarProps = {
+    isSidebarActive: boolean;
+    setIsSidebarActive: React.Dispatch<React.SetStateAction<boolean>>;
+  };
+  
+
+  const Navbar: React.FC<NavbarProps> = ({ isSidebarActive, setIsSidebarActive }) => {
     const { logout } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
@@ -32,6 +37,10 @@ const Navbar = () => {
     const [pictureUrls, setPictureUrls] = useState<string[]>([]);
     const notificationRef = useRef(null);
     const [dropDirection, setDropDirection] = useState<DropDirection>('down');
+
+    const handleHamburgerClick = () => {
+        setIsSidebarActive(!isSidebarActive);
+    };
 
     const handleProfileClick = () => {
         navigate('/profile');
@@ -143,9 +152,6 @@ const Navbar = () => {
         navigate(`/deal-overview/${dealId}`);
     };
 
-    const handleHomeClick = () => {
-        navigate('/dashboard');
-    }
 
     const handleLogout = async () => {
         try {
@@ -166,123 +172,133 @@ const Navbar = () => {
 
     return (
         isLoading ? (
-            <nav className="navbar navbar-expand-lg navbar-white bg-white">
-                <div className="container-fluid">
-                    <div className="navbar-brand mobile-font-size-10px" onClick={handleHomeClick}>ICP Escrow Service</div>
-
-                    <div className="ms-auto"></div>
-
-                    <Dropdown show={showNotification} onToggle={toggleNotification} ref={notificationRef} drop={dropDirection}>
-                        <Dropdown.Toggle as="div" id="dropdown-notification" className="notification-avatar ms-3 d-flex align-items-center justify-content-center">
-                            <img src="/notification.png" className="notification-icon" alt="Notification Avatar" />
-                        </Dropdown.Toggle>
-
-                        <Dropdown.Menu align="end" className="notification-list p-0 mobile-font-size-8px">
-                            {notifications.length === 0 ? (
-                                <Dropdown.Item>No notifications</Dropdown.Item>
-                            ) : (
-                                notifications.map(notification => (
-                                    <Dropdown.Item key={notification.dealId.toString()} className="notification-item py-2 border-bottom" onClick={() => handleNotificationClick(notification.dealId)}>
-                                        {notification.message}
-                                    </Dropdown.Item>
-                                ))
-                            )}
-                            <Dropdown.Item className='clear-notification-btn py-2 rounded-bottom'>Clear Message</Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown>
-
-
-                    <div className="vertical-divider mx-4"></div>
-
-                    <div className="d-flex align-items-center">
-                        <div className="avatar me-3">
-                            {pictureUrls.length > 0 ? (
-                                pictureUrls.map(url => (
-                                    <img src={url} key={url} alt="User Avatar" />
-                                ))
-                            ) : (
-                                <div className="spinner"></div>
-                            )}
+            <>
+                <Sidebar isSidebarActive={isSidebarActive} />
+                <nav className="navbar navbar-expand-lg navbar-white bg-white">
+                    <div className="container-fluid">
+                        <div className="ms-auto"></div>
+                        <div className="btn-group hamburger ">
+                        <button className="btn btn-default" type="button" id="menu-toggle" onClick={handleHamburgerClick}>
+                            <img src="/hamburger.png" alt="Menu" style={{width: '15px'}}/>
+                        </button>
                         </div>
-                        <div>
-                            <p className="mb-0 mobile-font-size-8px">
-                                <FaCopy className="copy-icon " onClick={handleCopy} />
-                                {formatPrincipal(principal)}
-                            </p>
-                            {copied && <span className='mobile-font-size-8px'>Copied to clipboard</span>}
-                        </div>
-                        <Dropdown>
-                            <Dropdown.Toggle variant="default" id="dropdown-basic" >
+                        <Dropdown show={showNotification} onToggle={toggleNotification} ref={notificationRef} drop={dropDirection}>
+                            <Dropdown.Toggle as="div" id="dropdown-notification" className="notification-avatar ms-3 d-flex align-items-center justify-content-center">
+                                <img src="/notification.png" className="notification-icon" alt="Notification Avatar" />
                             </Dropdown.Toggle>
-                            <Dropdown.Menu>
-                                <Dropdown.Item onClick={handleProfileClick}>Profile</Dropdown.Item>
-                                <Dropdown.Item href="#">Settings</Dropdown.Item>
-                                <Dropdown.Divider />
-                                <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
+
+                            <Dropdown.Menu align="end" className="notification-list p-0 mobile-font-size-8px">
+                                {notifications.length === 0 ? (
+                                    <Dropdown.Item>No notifications</Dropdown.Item>
+                                ) : (
+                                    notifications.map(notification => (
+                                        <Dropdown.Item key={notification.dealId.toString()} className="notification-item py-2 border-bottom" onClick={() => handleNotificationClick(notification.dealId)}>
+                                            {notification.message}
+                                        </Dropdown.Item>
+                                    ))
+                                )}
+                                <Dropdown.Item className='clear-notification-btn py-2 rounded-bottom'>Clear Message</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
+
+
+                        <div className="vertical-divider mx-4"></div>
+
+                        <div className="d-flex align-items-center">
+                            <div className="avatar me-3">
+                                {pictureUrls.length > 0 ? (
+                                    pictureUrls.map(url => (
+                                        <img src={url} key={url} alt="User Avatar" />
+                                    ))
+                                ) : (
+                                    <div className="spinner"></div>
+                                )}
+                            </div>
+                            <div>
+                                <p className="mb-0 mobile-font-size-8px">
+                                    <FaCopy className="copy-icon " onClick={handleCopy} />
+                                    {formatPrincipal(principal)}
+                                </p>
+                                {copied && <span className='mobile-font-size-8px'>Copied to clipboard</span>}
+                            </div>
+                            <Dropdown>
+                                <Dropdown.Toggle variant="default" id="dropdown-basic" >
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                    <Dropdown.Item onClick={handleProfileClick}>Profile</Dropdown.Item>
+                                    <Dropdown.Item href="#">Settings</Dropdown.Item>
+                                    <Dropdown.Divider />
+                                    <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
+                        </div>
                     </div>
-                </div>
-            </nav>
+                </nav>
+            </>
         ) : (
-            <nav className="navbar navbar-expand-lg navbar-white bg-white">
-                <div className="container-fluid">
-                    <div className="navbar-brand mobile-font-size-10px" onClick={handleHomeClick}>ICP Escrow Service</div>
-
-                    <div className="ms-auto"></div>
-
-                    <Dropdown show={showNotification} onToggle={toggleNotification} ref={notificationRef} drop={dropDirection}>
-                        <Dropdown.Toggle as="div" id="dropdown-notification" className="notification-avatar ms-3 d-flex align-items-center justify-content-center">
-                            <img src="/notification.png" className="notification-icon" alt="Notification Avatar" />
-                        </Dropdown.Toggle>
-
-                        <Dropdown.Menu align="end" className="notification-list p-0 mobile-font-size-8px">
-                            {notifications.length === 0 ? (
-                                <Dropdown.Item>No notifications</Dropdown.Item>
-                            ) : (
-                                notifications.map(notification => (
-                                    <Dropdown.Item key={notification.dealId.toString()} className="notification-item py-2 border-bottom" onClick={() => handleNotificationClick(notification.dealId)}>
-                                        {notification.message}
-                                    </Dropdown.Item>
-                                ))
-                            )}
-                            <Dropdown.Item className='clear-notification-btn py-2 rounded-bottom'>Clear Message</Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown>
-
-
-                    <div className="vertical-divider mx-4"></div>
-
-                    <div className="d-flex align-items-center">
-                        <div className="avatar me-3">
-                            {pictureUrls.length > 0 ? (
-                                pictureUrls.map(url => (
-                                    <img src={url} key={url} alt="User Avatar" />
-                                ))
-                            ) : (
-                                <img src="https://www.w3schools.com/howto/img_avatar.png" alt="User Avatar" />
-                            )}
+            <>
+                <Sidebar isSidebarActive={isSidebarActive} />
+                <nav className="navbar navbar-expand-lg navbar-white bg-white">
+                    <div className="container-fluid">
+                        <div className="ms-auto"></div>
+                        <div className="btn-group hamburger ">
+                        <button className="btn btn-default" type="button" id="menu-toggle" onClick={handleHamburgerClick}>
+                            <img src="hamburger.png" className="menu-icon" alt="" />
+                        </button>
                         </div>
-                        <div>
-                            <p className="mb-0 mobile-font-size-8px">
-                                <FaCopy className="copy-icon " onClick={handleCopy} />
-                                {formatPrincipal(principal)}
-                            </p>
-                            {copied && <span className='mobile-font-size-8px'>Copied to clipboard</span>}
-                        </div>
-                        <Dropdown>
-                            <Dropdown.Toggle variant="default" id="dropdown-basic" >
+                        <Dropdown show={showNotification} onToggle={toggleNotification} ref={notificationRef} drop={dropDirection}>
+                            <Dropdown.Toggle as="div" id="dropdown-notification" className="notification-avatar ms-3 d-flex align-items-center justify-content-center">
+                                <img src="/notification.png" className="notification-icon" alt="Notification Avatar" />
                             </Dropdown.Toggle>
-                            <Dropdown.Menu>
-                                <Dropdown.Item onClick={handleProfileClick}>Profile</Dropdown.Item>
-                                <Dropdown.Item href="#">Settings</Dropdown.Item>
-                                <Dropdown.Divider />
-                                <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
+
+                            <Dropdown.Menu align="end" className="notification-list p-0 mobile-font-size-8px">
+                                {notifications.length === 0 ? (
+                                    <Dropdown.Item>No notifications</Dropdown.Item>
+                                ) : (
+                                    notifications.map(notification => (
+                                        <Dropdown.Item key={notification.dealId.toString()} className="notification-item py-2 border-bottom" onClick={() => handleNotificationClick(notification.dealId)}>
+                                            {notification.message}
+                                        </Dropdown.Item>
+                                    ))
+                                )}
+                                <Dropdown.Item className='clear-notification-btn py-2 rounded-bottom'>Clear Message</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
+
+
+                        <div className="vertical-divider mx-4"></div>
+
+                        <div className="d-flex align-items-center">
+                            <div className="avatar me-3">
+                                {pictureUrls.length > 0 ? (
+                                    pictureUrls.map(url => (
+                                        <img src={url} key={url} alt="User Avatar" />
+                                    ))
+                                ) : (
+                                    <img src="https://www.w3schools.com/howto/img_avatar.png" alt="User Avatar" />
+                                )}
+                            </div>
+                            <div>
+                                <p className="mb-0 mobile-font-size-8px">
+                                    <FaCopy className="copy-icon " onClick={handleCopy} />
+                                    {formatPrincipal(principal)}
+                                </p>
+                                {copied && <span className='mobile-font-size-8px'>Copied to clipboard</span>}
+                            </div>
+                            <Dropdown>
+                                <Dropdown.Toggle variant="default" id="dropdown-basic" >
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                    <Dropdown.Item onClick={handleProfileClick}>Profile</Dropdown.Item>
+                                    <Dropdown.Item href="#">Settings</Dropdown.Item>
+                                    <Dropdown.Divider />
+                                    <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
+                        </div>
                     </div>
-                </div>
-            </nav>
+                </nav>
+            </>
         )
     );
 };

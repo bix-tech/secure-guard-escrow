@@ -28,6 +28,8 @@ import UserProfilePage from './pages/UserProfile';
 const NavbarWrapper = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [isSidebarActive, setIsSidebarActive] = useState(false);
+
 
   useEffect(() => {
     localforage.setItem('lastVisitedRoute', location.pathname);
@@ -45,7 +47,8 @@ const NavbarWrapper = () => {
     return null;
   }
 
-  return <Navbar />;
+  return <Navbar isSidebarActive={isSidebarActive} setIsSidebarActive={setIsSidebarActive} />;
+
 };
 
 
@@ -53,6 +56,7 @@ function App() {
   const [dealDetails, setDealDetails] = useState({});
   const auth = useAuth();
   const isAuthenticated = auth ? auth.isAuthenticated : false;
+
 
   const CreateStep1 = ({ onNext, onFormSubmit }: { onNext: string, onFormSubmit: (data: any) => void }) => {
     const navigate = useNavigate();
@@ -104,7 +108,6 @@ function App() {
             </Routes>
           </DealFlowProvider>
         </DealDataProvider>
-
       </AuthProvider>
     </Router>
   );

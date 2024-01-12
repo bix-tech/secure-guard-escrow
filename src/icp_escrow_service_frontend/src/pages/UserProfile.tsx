@@ -168,7 +168,7 @@ const UserProfilePage = () => {
             </div>
         ) : (
             <div className="profile-container card p-5">
-                <form onSubmit={submitUserProfile} className="profile-form d-flex flex-column align-items-center">
+                <form onSubmit={submitUserProfile} className="profile-form d-flex flex-column align-items-center mt-5">
                     <div className="form-group">
                         <input
                             type="file"

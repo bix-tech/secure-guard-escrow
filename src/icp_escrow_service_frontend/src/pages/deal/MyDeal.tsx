@@ -3,7 +3,6 @@ import { backend } from '../../../../declarations/backend';
 import { usePrincipal } from '../../hooks/usePrincipal';
 import { Principal } from '@dfinity/principal';
 import { Deal } from '../../../../declarations/backend/backend.did';
-import Sidebar from '../../components/Sidebar';
 import { useNavigate } from 'react-router-dom';
 
 
@@ -12,13 +11,6 @@ const MyDeal = () => {
     const [deal, setDeal] = useState<Deal[] | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
-    const [isHamburgerActive, setIsHamburgerActive] = useState(true);
-
-    const handleHamburgerClick = () => {
-        setIsHamburgerActive((prev) => !prev);
-      };
-    
-
 
     const handleActionDetail = async (dealId: bigint) => {
         const result = await backend.getDeal(dealId);
@@ -72,7 +64,6 @@ const MyDeal = () => {
     return (
         <div className="container-fluid">
             <div className="row d-flex">
-            <Sidebar isHamburgerActive={isHamburgerActive} handleHamburgerClick={handleHamburgerClick}/>
                 <div className="col-9 mydeal-card">
                     {isLoading ? (
                         <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
