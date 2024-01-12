@@ -172,8 +172,8 @@ const UserProfilePage : React.FC<SidebarProps> = ( {isSidebarActive} ) => {
             </div>
         ) : (
             <div className="container-fluid d-flex flex-column p-5">
-                <div className={`profile-container card p-5 ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
-                    <form onSubmit={submitUserProfile} className="profile-form d-flex flex-column align-items-center mt-5">
+                <div className={`profile-container card mt-2 p-5 ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
+                    <form onSubmit={submitUserProfile} className="profile-form d-flex flex-column align-items-center">
                         <div className="form-group">
                             <input
                                 type="file"
@@ -202,7 +202,7 @@ const UserProfilePage : React.FC<SidebarProps> = ( {isSidebarActive} ) => {
                                 />
                             )}
                         </div>
-                        <div className="mb-3">
+                        <div className="mt-5 mb-3">
                             <div className="form-row col-md-9 text-start mx-auto">
                                 <label>Name</label>
                                 <input type="text" placeholder="Name" value={name} onChange={handleNameChange} className="form-control" />
