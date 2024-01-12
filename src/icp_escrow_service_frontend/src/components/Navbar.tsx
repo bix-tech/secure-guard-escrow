@@ -24,7 +24,7 @@ type NavbarProps = {
   };
   
 
-  const Navbar: React.FC<NavbarProps> = ({ isSidebarActive, setIsSidebarActive }) => {
+  const Navbar: React.FC<NavbarProps> = ({ isSidebarActive, setIsSidebarActive}) => {
     const { logout } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
@@ -37,6 +37,7 @@ type NavbarProps = {
     const [pictureUrls, setPictureUrls] = useState<string[]>([]);
     const notificationRef = useRef(null);
     const [dropDirection, setDropDirection] = useState<DropDirection>('down');
+
 
     const handleHamburgerClick = () => {
         setIsSidebarActive(!isSidebarActive);

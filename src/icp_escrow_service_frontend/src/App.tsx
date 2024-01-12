@@ -28,7 +28,7 @@ import UserProfilePage from './pages/UserProfile';
 const NavbarWrapper = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [isSidebarActive, setIsSidebarActive] = useState(false);
+  const [isSidebarActive, setIsSidebarActive] = useState(window.innerWidth > 768);
 
 
   useEffect(() => {
@@ -39,6 +39,12 @@ const NavbarWrapper = () => {
         navigate(lastVisitedRoute);
       }
     };
+
+    const handleResize = () => {
+      setIsSidebarActive(window.innerWidth > 768);
+    };
+
+    window.addEventListener('resize', handleResize);
 
     getLastVisitedRoute();
   }, []);
