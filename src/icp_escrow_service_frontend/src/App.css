@@ -533,7 +533,7 @@ body {
 }
 
 .full-width {
-  animation: full-width 0.5s forwards;
+  animation: full-width 0.8s forwards;
 }
 
 .not-full-width {
@@ -541,7 +541,7 @@ body {
 }
 
 .col-md-9 {
-  width: 100%;
+  width: 100% !important;
 }
 
 /* Mobile View */
@@ -611,10 +611,6 @@ body {
     width: 100%;
   }
 
-  .mobile-card {
-    width: 80% !important;
-    /* padding: 1px !important; */
-  }
 
   .menu-icon {
     border: none;

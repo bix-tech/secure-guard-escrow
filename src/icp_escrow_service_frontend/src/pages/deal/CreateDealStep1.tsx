@@ -53,7 +53,7 @@ const CreateDeal: React.FC<CreateDealProps> = ({ onNext, isSidebarActive }) => {
     return (
         <div className="container-fluid p-3 d-flex flex-column">
             <div className={`card create-deal-step-1-card p-5 my-5 mobile-font-size-8px ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
-                <div className="card-body text-center">
+                <div className="card-body text-center p-5">
                     <CreateDealProgressBar currentStep={1} />
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <div className="mb-3">
