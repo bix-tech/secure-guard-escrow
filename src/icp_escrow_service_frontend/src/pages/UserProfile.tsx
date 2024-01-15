@@ -163,16 +163,20 @@ const UserProfilePage : React.FC<SidebarProps> = ( {isSidebarActive} ) => {
 
     return (
         isLoading ? (
-            <div className="container-fluid mt-1 d-flex flex-column">
-                <div className="d-flex justify-content-center align-items-center" style={{ height: '80vh' }}>
-                    <div className="spinner-grow text-success" role="status">
-                        <span className="visually-hidden">Loading...</span>
+            <div className="container-fluid p-4">
+                <div className="row d-flex">
+                    <div className={`profile-container card mb-5 mt-2 p-3 ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
+                        <div className="d-flex justify-content-center align-items-center" style={{ height: '80vh' }}>
+                            <div className="spinner-grow text-success" role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         ) : (
-            <div className="container-fluid d-flex flex-column p-5">
-                <div className={`profile-container card mb-5 mt-2 p-5 ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
+            <div className="container-fluid p-4">
+                <div className={`profile-container card mb-5 mt-2 p-3 ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
                     <form onSubmit={submitUserProfile} className="profile-form d-flex flex-column align-items-center">
                         <div className="form-group">
                             <input

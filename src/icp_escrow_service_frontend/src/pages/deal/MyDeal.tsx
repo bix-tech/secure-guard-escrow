@@ -69,7 +69,7 @@ const MyDeal : React.FC<SidebarProps> = ( { isSidebarActive }) => {
             <div className="row d-flex">
                 <div className={`col-9 mydeal-card ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
                     {isLoading ? (
-                        <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+                        <div className="d-flex justify-content-center align-items-center" style={{ height: '80vh' }}>
                             <div className="spinner-grow text-success" role="status">
                                 <span className="visually-hidden">Loading...</span>
                             </div>
