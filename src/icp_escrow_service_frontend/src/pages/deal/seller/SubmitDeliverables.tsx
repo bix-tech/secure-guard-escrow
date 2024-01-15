@@ -16,7 +16,7 @@ interface SidebarProps {
 };
 
 
-const CreateDeal : React.FC<SidebarProps> = ( {isSidebarActive} ) => {
+const CreateDeal: React.FC<SidebarProps> = ({ isSidebarActive }) => {
     const [isLoading, setIsLoading] = useState(true);
     const { principal } = usePrincipal();
     const [editorContent, setEditorContent] = React.useState('');
@@ -94,22 +94,22 @@ const CreateDeal : React.FC<SidebarProps> = ( {isSidebarActive} ) => {
         setEditorContent(content);
     };
 
-useEffect(() => {
-    const fetchDeal = async () => {
-        try {
-            const deal = await backend.getDeal(BigInt(dealId || 0));
-            if ('ok' in deal && deal.ok.from.toString() === principal && deal.ok.status === "In Progress"){
-                console.log(principal);
-                setIsLoading(false);
-            } else {
-                navigate('/dashboard');
+    useEffect(() => {
+        const fetchDeal = async () => {
+            try {
+                const deal = await backend.getDeal(BigInt(dealId || 0));
+                if ('ok' in deal && deal.ok.from.toString() === principal && deal.ok.status === "In Progress") {
+                    console.log(principal);
+                    setIsLoading(false);
+                } else {
+                    navigate('/dashboard');
+                }
+            } catch (error) {
+                console.error("Failed to fetch deal:", error);
             }
-        } catch (error) {
-            console.error("Failed to fetch deal:", error); 
-        }
-    };
-    fetchDeal();
-}, [principal]);
+        };
+        fetchDeal();
+    }, [principal]);
 
     return (
         isLoading ? (
@@ -122,39 +122,39 @@ useEffect(() => {
             </div>
         ) : (
             <div className="container-fluid mt-1 d-flex flex-column">
-            <div className={`card p-5 my-5 mb-5 ${isSidebarActive ? 'not-full-width' : 'full-width' }`}>
-                <div className="card-body text-center">
+                <div className={`card p-5 my-5 mb-5 ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
+                    <div className="card-body text-center">
 
-                    <InitiatingDealProgressBar currentStep={3} />
+                        <InitiatingDealProgressBar currentStep={3} />
 
-                    <form className="mt-5" onSubmit={onSubmit}>
-                        <div className="mb-3">
-                            <div className="form-row col-md-9 text-start mx-auto">
-                                <label htmlFor="projectName" className="form-label text-start">Upload Pictures</label>
-                                <br />
-                                <label htmlFor="projectName" className="form-label text-start">Recommended size 1500 x 600 (px)</label>
-                                <br />
+                        <form className="mt-5" onSubmit={onSubmit}>
+                            <div className="mb-3">
+                                <div className="form-row col-md-9 text-start mx-auto">
+                                    <label htmlFor="projectName" className="form-label text-start">Upload Pictures</label>
+                                    <br />
+                                    <label htmlFor="projectName" className="form-label text-start">Recommended size 1500 x 600 (px)</label>
+                                    <br />
 
-                                <div className="file-drop-area" id="fileDropArea" onClick={triggerFileInput}>
-                                    <p>Click here or drag and drop files to upload</p>
-                                    <p>Max File Size: 50 MB</p>
-                                    <input type="file" id="fileInput" multiple style={{ display: 'none' }} onChange={handleDocumentSelect} ref={fileInputRef} />
+                                    <div className="file-drop-area" id="fileDropArea" onClick={triggerFileInput}>
+                                        <p>Click here or drag and drop files to upload</p>
+                                        <p>Max File Size: 50 MB</p>
+                                        <input type="file" id="fileInput" multiple style={{ display: 'none' }} onChange={handleDocumentSelect} ref={fileInputRef} />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="mb-3">
-                            <div className="form-row col-md-9 text-start mx-auto">
-                                <label htmlFor="deal-description" className="form-label text-start">Deal Description</label>
-                                <TiptapEditor onContentChange={handleEditorContentChange} className="form-control" />
+                            <div className="mb-3">
+                                <div className="form-row col-md-9 text-start mx-auto">
+                                    <label htmlFor="deal-description" className="form-label text-start">Deal Description</label>
+                                    <TiptapEditor onContentChange={handleEditorContentChange} className="form-control" />
+                                </div>
                             </div>
-                        </div>
 
-                        <button type="submit" className="btn mx-auto col-md-9 submit-deal-btn mt-3">Submit Deliverables</button>
-                    </form>
+                            <button type="submit" className="btn mx-auto col-md-9 submit-deal-btn mt-3">Submit Deliverables</button>
+                        </form>
 
+                    </div>
                 </div>
-            </div>
             </div>
         )
     )
