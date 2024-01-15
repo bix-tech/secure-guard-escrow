@@ -63,7 +63,7 @@ const CreateDeal : React.FC<SidebarProps> = ( {isSidebarActive} ) => {
         }
     };
 
-    const onSubmit = async (event: any) => {
+    const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         console.log("Deal ID:", dealId);
         console.log("Uploaded Documents:", uploadedDocuments);

@@ -56,7 +56,7 @@ const LockToken : React.FC<SidebarProps> = ( {isSidebarActive} ) => {
     }, [principal, navigate, isPrincipalLoading]);
 
 
-    const handleSubmit = async (event: any) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setIsLoading(true);
         const lockTokenResult = await backend.lockToken(Principal.fromText(principal || ''), BigInt(amount), BigInt(dealId || 0));

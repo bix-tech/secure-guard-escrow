@@ -131,7 +131,7 @@ const UserProfilePage : React.FC<SidebarProps> = ( {isSidebarActive} ) => {
     }
 
 
-    const submitUserProfile = async (event: any) => {
+    const submitUserProfile = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {
             let profilePicture: FileReference | null = null;

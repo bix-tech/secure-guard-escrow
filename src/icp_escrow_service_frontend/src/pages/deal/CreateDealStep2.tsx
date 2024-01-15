@@ -107,7 +107,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext, isSidebarActive })
         setPaymentSchedules(newSchedules);
     };
 
-    const onSubmit = async (event: any) => {
+    const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {
             const formattedDealStart = dealStart ? dealStart.getTime() : null;
