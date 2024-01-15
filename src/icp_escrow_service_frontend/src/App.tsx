@@ -11,6 +11,7 @@ import { DealFlowProvider } from './contexts/InitiateDealFlowContext';
 import 'bootstrap/dist/css/bootstrap.css';
 import Footer from './components/Footer';
 import { Login, Dashboard, WaitingBuyerLockToken, DealDetail, CreateDealStep1, CreateDealStep2, CreateDealStep3, InitiateDealLockToken, SubmitDeliverables, LockTokenSuccessfully, SubmitDeliverablesSuccessfully, MyDeal, Transactions, UserProfile } from './pages/index';
+import Notifications from './pages/Notifications';
 
 
 
@@ -97,6 +98,7 @@ function App() {
               <Route path="/" element={<Login />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard isSidebarActive={isSidebarActive}/></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><UserProfile isSidebarActive={isSidebarActive} /></ProtectedRoute>} />
+              <Route path="/notifications" element={<ProtectedRoute><Notifications isSidebarActive={isSidebarActive} /></ProtectedRoute>} />
               <Route path="/myDeal" element={<ProtectedRoute><MyDeal isSidebarActive={isSidebarActive} /></ProtectedRoute>} />
               <Route path="/my-transactions" element={<ProtectedRoute><Transactions isSidebarActive={isSidebarActive} /></ProtectedRoute>} />
               <Route path="/deal-overview/:dealId" element={<ProtectedRoute><DealDetail isSidebarActive={isSidebarActive} /></ProtectedRoute>} />
