@@ -1,8 +1,9 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import InitiatingDealProgressBar from '../../../components/InitiatingDealProgressBar';
 import { backend } from '../../../../../declarations/backend';
 import { useParams, useNavigate } from 'react-router-dom';
 import TiptapEditor from '../../../components/TiptapEditor';
+import { usePrincipal } from '../../../hooks/usePrincipal';
 
 
 type DocumentFile = {
@@ -17,6 +18,7 @@ interface SidebarProps {
 
 const CreateDeal : React.FC<SidebarProps> = ( {isSidebarActive} ) => {
     const [isLoading, setIsLoading] = useState(true);
+    const { principal } = usePrincipal();
     const [editorContent, setEditorContent] = React.useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [uploadedDocuments, setUploadedDocuments] = useState<DocumentFile[]>([]);
@@ -92,9 +94,22 @@ const CreateDeal : React.FC<SidebarProps> = ( {isSidebarActive} ) => {
         setEditorContent(content);
     };
 
-    React.useEffect(() => {
-        setIsLoading(false);
-    }, []);
+useEffect(() => {
+    const fetchDeal = async () => {
+        try {
+            const deal = await backend.getDeal(BigInt(dealId || 0));
+            if ('ok' in deal && deal.ok.from.toString() === principal && deal.ok.status === "In Progress"){
+                console.log(principal);
+                setIsLoading(false);
+            } else {
+                navigate('/dashboard');
+            }
+        } catch (error) {
+            console.error("Failed to fetch deal:", error); 
+        }
+    };
+    fetchDeal();
+}, [principal]);
 
     return (
         isLoading ? (
