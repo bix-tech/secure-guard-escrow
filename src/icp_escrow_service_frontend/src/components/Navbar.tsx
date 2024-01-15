@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AuthClient } from "@dfinity/auth-client";
 import { useNavigate, useLocation } from 'react-router';
 import { useAuth } from '../contexts/AuthContext';
@@ -8,8 +8,8 @@ import { FaCopy } from 'react-icons/fa';
 import { Principal } from '@dfinity/principal';
 import { backend } from "../../../declarations/backend";
 import { usePrincipal } from '../hooks/usePrincipal';
-import { UserProfile } from '../../../declarations/backend/backend.did';
 import { DropDirection } from 'react-bootstrap/esm/DropdownContext';
+import { useProfilePicture } from '../hooks/useProfilePicture';
 import Cookies from 'js-cookie';
 import Sidebar from './Sidebar';
 
@@ -34,9 +34,9 @@ type NavbarProps = {
     const [copied, setCopied] = useState(false);
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [showNotification, setShowNotification] = useState(false);
-    const [pictureUrls, setPictureUrls] = useState<string[]>([]);
     const notificationRef = useRef(null);
     const [dropDirection, setDropDirection] = useState<DropDirection>('down');
+    const { profilePictureUrl, fetchProfilePicture } = useProfilePicture();
 
 
     const handleHamburgerClick = () => {
@@ -75,26 +75,6 @@ type NavbarProps = {
         }
     };
 
-    const fetchUserProfilePicture = useCallback(async (user: UserProfile) => {
-        try {
-            if (principal) {
-                const pictureRef = user.profilePicture;
-                const blob = await backend.getProfilePicture(pictureRef, Principal.fromText(principal || ''));
-                if (blob) {
-                    const array = Array.isArray(blob[0]) ? new Uint8Array(blob[0]) : blob[0];
-                    if (array) {
-                        const blobObject = new Blob([array]);
-                        const url = URL.createObjectURL(blobObject);
-                        setPictureUrls([url]);
-                    }
-                }
-            }
-        } catch (error) {
-            console.error("Error in fetchUserProfilePicture:", error);
-        } finally {
-            setIsLoading(false);
-        }
-    }, [principal]);
 
     useEffect(() => {
         const initAuth = async () => {
@@ -112,7 +92,7 @@ type NavbarProps = {
                 if (principal) {
                     const userProfile = await backend.getUserProfile(Principal.fromText(principal));
                     if ('ok' in userProfile) {
-                        fetchUserProfilePicture(userProfile.ok);
+                        fetchProfilePicture(userProfile.ok);
                     } else {
                         setIsLoading(false);
                         navigate('/profile');
@@ -145,7 +125,7 @@ type NavbarProps = {
         return () => {
             window.removeEventListener('resize', handleResize);
         };
-    }, [fetchUserProfilePicture, principal, location]);
+    }, [fetchProfilePicture, principal, location]);
 
 
 
@@ -207,8 +187,8 @@ type NavbarProps = {
 
                         <div className="d-flex align-items-center">
                             <div className="avatar me-3">
-                                {pictureUrls.length > 0 ? (
-                                    pictureUrls.map(url => (
+                                {profilePictureUrl.length > 0 ? (
+                                    profilePictureUrl.map(url => (
                                         <img src={url} key={url} alt="User Avatar" />
                                     ))
                                 ) : (
@@ -271,8 +251,8 @@ type NavbarProps = {
 
                         <div className="d-flex align-items-center">
                             <div className="avatar me-3">
-                                {pictureUrls.length > 0 ? (
-                                    pictureUrls.map(url => (
+                                {profilePictureUrl.length > 0 ? (
+                                    profilePictureUrl.map(url => (
                                         <img src={url} key={url} alt="User Avatar" />
                                     ))
                                 ) : (

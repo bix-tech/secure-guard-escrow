@@ -556,6 +556,9 @@ body {
     100% {  }
   }
   
+  .card.mobile-card {
+    padding: 1rem !important;
+  }
 
   .mobile-font-size-8px {
     font-size: 8px !important;
