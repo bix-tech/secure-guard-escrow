@@ -601,6 +601,7 @@ body {
     margin-bottom: 1.5rem !important;
   }
 
+
   .sidebar {
     width: 100%; 
     z-index: 1000;
@@ -668,7 +669,7 @@ body {
     margin-left: auto;
     position: relative;
     right: 5%;
-    top: 7%;
+    top: 4%;
   }
   /* End Dashboard Page */
 

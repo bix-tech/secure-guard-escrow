@@ -4,7 +4,7 @@ import { Principal } from "@dfinity/principal";
 import { usePrincipal } from "../hooks/usePrincipal";
 import { useNavigate } from "react-router";
 
-interface DashboardProps{
+interface DashboardProps {
   isSidebarActive: boolean;
 }
 interface ActivityLog {
@@ -22,7 +22,7 @@ interface ActivityLog {
 }
 const itemsPerPage = 10;
 
-const Dashboard : React.FC<DashboardProps> = ({ isSidebarActive}) => {
+const Dashboard: React.FC<DashboardProps> = ({ isSidebarActive }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
   const { principal } = usePrincipal();
@@ -78,11 +78,9 @@ const Dashboard : React.FC<DashboardProps> = ({ isSidebarActive}) => {
 
   return (
     <div className="container-fluid d-flex flex-column p-3">
-    <div className="row d-flex">
-        <div className={`col-md-9 ms-sm-auto col-lg-12 px-5 d-flex flex-column`} style={{ position: 'relative', minHeight:'100vh' }}>
-          <button className="btn btn-create btn-primary" onClick={handleCreateDeal}> Create Deal </button>
-          <div className="button-container mx-5" style={{ float: 'right' }}>
-          </div>
+      <div className="row d-flex">
+        <div className={`col-md-9 ms-sm-auto col-lg-12 px-5 d-flex flex-column`} style={{ position: 'relative', minHeight: '100vh' }}>
+          <button className="btn btn-create btn-primary my-auto" onClick={handleCreateDeal} style={{ position: 'absolute' }}> Create Deal </button>
           <div className={`card dashboard-card p-5 margin-5 mobile-card d-flex align-items-center ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
             <h2>Activity Logs</h2>
             <div>Total logs: {totalItems}</div>
