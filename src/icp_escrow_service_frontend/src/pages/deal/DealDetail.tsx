@@ -111,7 +111,7 @@ const DealOverview: React.FC<SidebarProps> = ({ isSidebarActive }) => {
 
     if (!deal) {
         return <div className="container-fluid mt-1 d-flex flex-column">
-            <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+            <div className="d-flex justify-content-center align-items-center" style={{ height: '80vh' }}>
                 <div className="spinner-grow text-success" role="status">
                     <span className="visually-hidden">Loading...</span>
                 </div>
