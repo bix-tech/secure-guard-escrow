@@ -128,9 +128,12 @@ const DealOverview: React.FC<SidebarProps> = ({ isSidebarActive }) => {
                 setConfirmModal(false);
             } else {
                 console.error('Deal confirmation failed', result);
+                toast.error(`Deal confirmation failed: ${result.err}`);
+                setConfirmModal(false);
             }
         } catch (error) {
             console.error('Deal confirmation failed', error);
+            toast.error(`Deal confirmation failed: ${(error as Error).message}`);
         }
     }
 
@@ -144,9 +147,12 @@ const DealOverview: React.FC<SidebarProps> = ({ isSidebarActive }) => {
                 setCancelModal(false);
             } else {
                 console.error('Deal cancellation failed', result.err);
+                toast.error(`Deal cancellation failed: ${result.err}`);
+                setCancelModal(false);
             }
         } catch (error) {
             console.error('Deal cancellation failed', error);
+            toast.error(`Deal cancellation failed: ${(error as Error).message}`);
         }
     }
 
