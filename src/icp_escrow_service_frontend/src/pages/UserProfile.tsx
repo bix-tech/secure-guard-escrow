@@ -165,7 +165,7 @@ const UserProfilePage : React.FC<SidebarProps> = ( {isSidebarActive} ) => {
         isLoading ? (
             <div className="container-fluid p-4">
                 <div className="row d-flex">
-                    <div className={`profile-container card mb-5 mt-2 p-3 ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
+                    <div className={`profile-container mobile-profile-container card mb-5 mt-3 p-3 ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
                         <div className="d-flex justify-content-center align-items-center" style={{ height: '80vh' }}>
                             <div className="spinner-grow text-success" role="status">
                                 <span className="visually-hidden">Loading...</span>
@@ -176,7 +176,7 @@ const UserProfilePage : React.FC<SidebarProps> = ( {isSidebarActive} ) => {
             </div>
         ) : (
             <div className="container-fluid p-4">
-                <div className={`profile-container card mb-5 mt-2 p-3 ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
+                <div className={`profile-container mobile-profile-container card mb-5 mt-3 p-3 ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
                     <form onSubmit={submitUserProfile} className="profile-form d-flex flex-column align-items-center">
                         <div className="form-group">
                             <input
@@ -207,37 +207,37 @@ const UserProfilePage : React.FC<SidebarProps> = ( {isSidebarActive} ) => {
                             )}
                         </div>
                         <div className="mt-5 mb-3">
-                            <div className="form-row col-md-9 text-start mx-auto">
+                            <div className="form-row col-12 text-start mx-auto">
                                 <label>Name</label>
                                 <input type="text" placeholder="Name" value={name} onChange={handleNameChange} className="form-control" />
                             </div>
                         </div>
                         <div className="mb-3">
-                            <div className="form-row col-md-9 text-start mx-auto">
+                            <div className="form-row col-12 text-start mx-auto">
                                 <label>Email:</label>
                                 <input type="email" placeholder="Email" value={email} onChange={handleEmailChange} className="form-control" />
                             </div>
                         </div>
                         <div className="mb-3">
-                            <div className="form-row col-md-9 text-start mx-auto">
+                            <div className="form-row col-12 text-start mx-auto">
                                 <label>Phone:</label>
                                 <input type="tel" placeholder="Phone" value={phone} onChange={handlePhoneChange} className="form-control" />
                             </div>
                         </div>
                         <div className="mb-3">
-                            <div className="form-row col-md-9 text-start mx-auto">
+                            <div className="form-row col-12 text-start mx-auto">
                                 <label>Address:</label>
                                 <input type="text" placeholder="Address" value={address} onChange={handleAddressChange} className="form-control" />
                             </div>
                         </div>
                         <div className="mb-3">
-                            <div className="form-row col-md-9 text-start mx-auto">
+                            <div className="form-row col-12 text-start mx-auto">
                                 <label>Age:</label>
                                 <input type="number" placeholder="Age" value={age ? age.toString() : ''} onChange={handleAgeChange} className="form-control" />
                             </div>
                         </div>
                         <div className="mb-3">
-                            <div className="form-row col-md-9 text-start mx-auto">
+                            <div className="form-row col-12 text-start mx-auto">
                                 <label htmlFor="open-date" className="form-label text-start">
                                     DOB
                                 </label>

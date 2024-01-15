@@ -41,7 +41,16 @@ const NavbarWrapper = ({ isSidebarActive, setIsSidebarActive }: { isSidebarActiv
   }
 
   return <Navbar isSidebarActive={isSidebarActive} setIsSidebarActive={setIsSidebarActive} />;
+};
 
+const FooterWrapper = ({ isSidebarActive }: { isSidebarActive: boolean }) => {
+  const location = useLocation();
+
+  if (location.pathname === "/") {
+    return null;
+  }
+
+  return <Footer isSidebarActive={isSidebarActive} />;
 };
 
 
@@ -100,7 +109,7 @@ function App() {
               <Route path="/deal/seller/submit-deliverables/:dealId" element={<ProtectedRoute><SubmitDeliverables isSidebarActive={isSidebarActive}/></ProtectedRoute>} />
               <Route path="/deal/seller/submit-deliverables-successfully/:dealId" element={<ProtectedRoute><SubmitDeliverablesSuccessfully isSidebarActive={isSidebarActive} /></ProtectedRoute>} />
             </Routes>
-            <Footer isSidebarActive={isSidebarActive} />
+            <FooterWrapper isSidebarActive={isSidebarActive} />
           </DealFlowProvider>
         </DealDataProvider>
       </AuthProvider>

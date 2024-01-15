@@ -92,6 +92,9 @@ const CreateDeal : React.FC<SidebarProps> = ( {isSidebarActive} ) => {
         setEditorContent(content);
     };
 
+    React.useEffect(() => {
+        setIsLoading(false);
+    }, []);
 
     return (
         isLoading ? (

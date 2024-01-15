@@ -386,10 +386,9 @@ body {
 }
 
 .btn-cancel {
-  background-color: #D6D6D6 !important;
+  background-color: gray !important;
   color: white !important;
-  border-radius: 20px !important;
-  border: 1px solid #D6D6D6 !important;
+  border-radius: 10px !important;
   padding: 5px 10px;
   font-size: 14px; 
 }
@@ -540,9 +539,9 @@ body {
   animation: not-full-width 0.5s forwards;
 }
 
-.col-md-9 {
+/* .col-md-9 {
   width: 100% !important;
-}
+} */
 
 /* Mobile View */
 @media only screen and (max-width: 769px) {
@@ -554,6 +553,10 @@ body {
   @keyframes not-full-width {
     0% { }
     100% {  }
+  }
+
+  .card.mobile-profile-container{
+    margin-top: 20% !important;
   }
   
   .card.mobile-card {

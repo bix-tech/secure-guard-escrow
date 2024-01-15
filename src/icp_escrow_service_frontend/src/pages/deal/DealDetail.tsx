@@ -178,11 +178,13 @@ const DealOverview: React.FC<SidebarProps> = ({ isSidebarActive }) => {
     return (
         isLoading ? (
             <div className="container-fluid mt-1 d-flex flex-column">
-                <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
-                    <div className="spinner-grow text-success" role="status">
-                        <span className="visually-hidden">Loading...</span>
+                <main className={`col-md-9 ms-sm-auto col-lg-10 px-md-4 ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
+                    <div className="d-flex justify-content-center align-items-center" style={{ height: '80vh' }}>
+                        <div className="spinner-grow text-success" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                        </div>
                     </div>
-                </div>
+                </main>
             </div>
         ) : (
             <div className="container-fluid mt-1">
@@ -277,7 +279,7 @@ const DealOverview: React.FC<SidebarProps> = ({ isSidebarActive }) => {
                                 </div>
                             </div>
                         </div>
-                        <div className="row mb-3">
+                        <div className="row mb-5">
                             <div className="col-md-12">
                                 <div className="card p-5 mx-auto my-5">
                                     <h4>Deliverables</h4>

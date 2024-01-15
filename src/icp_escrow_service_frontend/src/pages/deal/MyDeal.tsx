@@ -89,7 +89,7 @@ const MyDeal : React.FC<SidebarProps> = ( { isSidebarActive }) => {
                                         text: isBuyer ? 'Waiting for seller to submit deliverables' : 'Proceed to submit deliverables'
                                     },
                                     'Submitted Deliverables': {
-                                        badge: 'success',
+                                        badge: 'primary',
                                         text: isBuyer ? 'Proceed to confirm deal' : 'Waiting for buyer to confirm deal'
                                     },
                                     'Completed': {
