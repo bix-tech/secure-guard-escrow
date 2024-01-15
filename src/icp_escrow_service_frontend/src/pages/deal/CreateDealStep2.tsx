@@ -50,7 +50,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext, isSidebarActive })
     const [recipientPrincipal, setRecipientPrincipal] = useState<string>('');
     const { principal } = usePrincipal();
     const { dealData, setDealData } = useDealData();
-    const [amount, setAmount] = useState<number>(0);
+    const [amount, setAmount] = useState<number>(0.0);
     const pictureInputRef = useRef<HTMLInputElement>(null);
     const documentInputRef = useRef<HTMLInputElement>(null);
     const [dealStart, setOpenDate] = useState<Date | null>(null);
@@ -155,7 +155,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext, isSidebarActive })
                     description: schedule.packageDescription,
                 })),
                 from: from,
-                amount: BigInt(amount),
+                amount: Number(amount),
                 createTime: BigInt(Date.now()),
                 submissionTime: [BigInt(0)] as [bigint],
                 sellerCancelRequest: false,
@@ -313,8 +313,8 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext, isSidebarActive })
                 </div>
             </div>
         ) : (
-            <div className="container-fluid d-flex flex-column justify-content-center align-items-center p-3">
-                <div className={`card create-deal-step-2-card p-5 margin-y-5 mobile-font-size-8px ${isSidebarActive ? 'not-full-width' : 'full-width'}`} >
+            <div className="container-fluid d-flex flex-column justify-content-center align-items-center p-3 pb-5">
+                <div className={`card create-deal-step-2-card p-5 margin-5 mobile-card mobile-font-size-8px ${isSidebarActive ? 'not-full-width' : 'full-width'}`} >
                     <div className="card-body text-center">
                         <CreateDealProgressBar currentStep={2} />
                         <form className="mt-5" onSubmit={onSubmit}>
@@ -445,12 +445,12 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext, isSidebarActive })
                                                     {/* Total Token */}
                                                     <label htmlFor={`amount-${index}`} className="form-label text-start mt-3">Total Token</label>
                                                     <input
-                                                        type="text"
+                                                        type="number"
                                                         className="form-control mobile-font-size-8px"
                                                         id="amount"
                                                         placeholder="Total Token"
                                                         value={amount}
-                                                        onChange={e => setAmount(parseInt(e.target.value))}
+                                                        onChange={e => setAmount(parseFloat(e.target.value))}
                                                     />
 
                                                     {/* Remove Button */}

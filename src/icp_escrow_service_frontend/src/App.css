@@ -521,6 +521,7 @@ body {
   background-color: white;
   z-index: 1000;
 }
+
 @keyframes full-width {
   0% { width: calc(100% - 16%); margin-left: 16%; }
   100% { width: 100%; margin-left: 0; }
@@ -752,3 +753,7 @@ body {
   cursor: pointer;
 }
 
+.form-control.rich-editor {
+  resize: vertical; 
+  overflow: auto; 
+}

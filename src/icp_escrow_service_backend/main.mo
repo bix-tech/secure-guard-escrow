@@ -18,7 +18,6 @@ import Account "account";
 import Wallet "wallet";
 import Deal "deal";
 
-
 actor {
   public type Result<A, B> = Result.Result<A, B>;
 
@@ -36,9 +35,9 @@ actor {
 
   var profilePictures : HashMap.HashMap<Nat, Blob> = HashMap.HashMap(10, Nat.equal, Hash.hash);
 
-  let ledger : TrieMap.TrieMap<Account.Account, Nat> = TrieMap.TrieMap(Account.accountsEqual, Account.accountsHash);
+  let ledger : TrieMap.TrieMap<Account.Account, Float> = TrieMap.TrieMap(Account.accountsEqual, Account.accountsHash);
 
-  let lockedTokens : TrieMap.TrieMap<Account.Account, Nat> = TrieMap.TrieMap(Account.accountsEqual, Account.accountsHash);
+  let lockedTokens : TrieMap.TrieMap<Account.Account, Float> = TrieMap.TrieMap(Account.accountsEqual, Account.accountsHash);
 
   let platformAcc : Principal = Principal.fromText("msfjg-mdjak-g5m3u-6rel6-bdj6e-2olg2-v2eo2-k6pmq-73oey-m6pq5-qqe");
 
@@ -115,7 +114,7 @@ actor {
     name : Text;
     from : Principal;
     to : Principal;
-    amount : Nat;
+    amount : Float;
     picture : FileReference;
     supportingDocuments : [FileReference];
     description : Text;
@@ -134,7 +133,7 @@ actor {
     dealId : Nat;
     description : Text;
     activityType : Text;
-    amount : Nat;
+    amount : Float;
     status : DealStatus;
     activityTime : Time;
     user : Principal;
@@ -146,7 +145,7 @@ actor {
     dealName : Text;
     description : Text;
     activityType : Text;
-    amount : Nat;
+    amount : Float;
     status : DealStatus;
     activityTime : Time;
     user : Principal;
@@ -462,17 +461,17 @@ actor {
     };
   };
 
-  public shared ({ caller }) func checkToken(principal : Principal) : async ?Nat {
+  public shared ({ caller }) func checkToken(principal : Principal) : async ?Float {
     let defaultAccount = { owner = principal; subaccount = null };
     return ledger.get(defaultAccount);
   };
 
-  public shared ({ caller }) func checkLockedToken(principal : Principal) : async ?Nat {
+  public shared ({ caller }) func checkLockedToken(principal : Principal) : async ?Float {
     let defaultAccount = { owner = principal; subaccount = null };
     return lockedTokens.get(defaultAccount);
   };
 
-  public shared ({ caller }) func lockToken(principal : Principal, amount : Nat, dealId : Nat) : async Wallet.LockTokenResult {
+  public shared ({ caller }) func lockToken(principal : Principal, amount : Float, dealId : Nat) : async Wallet.LockTokenResult {
     let buyerAccount = { owner = principal; subaccount = null };
     let balance = ledger.get(buyerAccount);
 
@@ -487,7 +486,7 @@ actor {
           ledger.put(buyerAccount, balance - amount);
           let existingLockedAmountOpt = lockedTokens.get(buyerAccount);
           let existingLockedAmount = switch (existingLockedAmountOpt) {
-            case (null) { 0 };
+            case (null) { 0.0 };
             case (?amount) { amount };
           };
 
@@ -625,13 +624,13 @@ actor {
           case (?lockedAmount) {
             let sellerBalanceOpt = ledger.get(sellerAccount);
             let sellerBalance = switch (sellerBalanceOpt) {
-              case (null) { 0 };
+              case (null) { 0.0 };
               case (?balance) { balance };
             };
 
             let platformBalanceOpt = ledger.get(platformAccount);
             let platformBalance = switch (platformBalanceOpt) {
-              case (null) { 0 };
+              case (null) { 0.0 };
               case (?balance) { balance };
             };
             let dealFee = (deal.amount * 1) / 100;
@@ -1102,7 +1101,7 @@ actor {
     };
   };
 
-  public func mintTokens(principal : Principal, amount : Nat) : async () {
+  public func mintTokens(principal : Principal, amount : Float) : async () {
     let defaultAccount = { owner = principal; subaccount = null };
     let balanceOpt = ledger.get(defaultAccount);
     switch (balanceOpt) {

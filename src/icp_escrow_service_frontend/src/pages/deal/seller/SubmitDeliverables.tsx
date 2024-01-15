@@ -97,13 +97,14 @@ const CreateDeal: React.FC<SidebarProps> = ({ isSidebarActive }) => {
     useEffect(() => {
         const fetchDeal = async () => {
             try {
+                if (principal){
                 const deal = await backend.getDeal(BigInt(dealId || 0));
-                if ('ok' in deal && deal.ok.from.toString() === principal && deal.ok.status === "In Progress") {
-                    console.log(principal);
+                if ('ok' in deal && deal.ok.from.toText() === principal && deal.ok.status === "In Progress") {
                     setIsLoading(false);
                 } else {
                     navigate('/dashboard');
                 }
+            }
             } catch (error) {
                 console.error("Failed to fetch deal:", error);
             }

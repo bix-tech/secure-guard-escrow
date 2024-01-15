@@ -7,7 +7,7 @@ type FooterProps = {
 
 const Footer: React.FC<FooterProps> = ({ isSidebarActive, children }) => {
   return (
-    <div className={`bottom-bar d-flex justify-content-between p-4 ${isSidebarActive ? 'not-full-width' : 'full-width'}`} style={{ marginTop: '20px' }}>
+    <div className={`bottom-bar d-flex justify-content-between p-4 ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
           <div className="left-side mobile-font-size-8px">
             <span>© 2023 SecureGuard Escrow</span>
           </div>

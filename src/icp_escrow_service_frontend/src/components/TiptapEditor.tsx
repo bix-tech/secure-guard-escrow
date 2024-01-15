@@ -128,28 +128,22 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({ onContentChange, className 
                             <i className="fas fa-underline"></i>
                         </button>
                         <button type="button" onClick={setStrike} className={`editor-button ${editor?.isActive('strike') ? 'is-active' : ''}`}>
-                        <i className="fa-solid fa-strikethrough"></i>
+                            <i className="fa-solid fa-strikethrough"></i>
                         </button>
                         <button type="button" onClick={setCode} className={`editor-button ${editor?.isActive('code') ? 'is-active' : ''}`}>
-                        <i className="fas fa-code"></i>
+                            <i className="fas fa-code"></i>
                         </button>
-                        {/* <button type="button" onClick={setBlockquote} className={`editor-button ${editor?.isActive('blockquote') ? 'is-active' : ''}`}>
-                        <i className="fa-solid fa-block-quote"></i>                   
-                        </button> */}
                         <button type="button" onClick={setBulletList} className={`editor-button ${editor?.isActive('bulletList') ? 'is-active' : ''}`}>
-                        <i className="fa-solid fa-list"></i>
+                            <i className="fa-solid fa-list"></i>
                         </button>
                         <button type="button" onClick={setOrderedList} className={`editor-button ${editor?.isActive('orderedList') ? 'is-active' : ''}`}>
-                        <i className="fas fa-list-ol"></i>
+                            <i className="fas fa-list-ol"></i>
                         </button>
-                        {/* <button type="button" onClick={setHorizontalRule} className={`editor-button ${editor?.isActive('horizontalRule') ? 'is-active' : ''}`}>
-                        <i className="fa-solid fa-horizontal-rule"></i>
-                        </button> */}
                         <button type="button" onClick={setLink} className={`editor-button ${editor?.isActive('link') ? 'is-active' : ''}`}>
-                        <i className="fas fa-link"></i>
+                            <i className="fas fa-link"></i>
                         </button>
                         <button type="button" onClick={setImage} className={`editor-button ${editor?.isActive('image') ? 'is-active' : ''}`}>
-                        <i className="fas fa-image"></i>
+                            <i className="fas fa-image"></i>
                         </button>
 
 
@@ -157,7 +151,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({ onContentChange, className 
                 ) : (
                     <p>Loading editor...</p>
                 )}
-                <div className={className}>
+                <div className={`${className}`}>
                     <EditorContent editor={editor} />
                 </div>
             </div>

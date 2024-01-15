@@ -13,7 +13,7 @@ interface SidebarProps {
 const LockToken : React.FC<SidebarProps> = ( {isSidebarActive} ) => {
     const { dealData, setDealData } = useDealData();
     const [isLoading, setIsLoading] = useState(true);
-    const [amount, setAmount] = useState<bigint>(BigInt(0));
+    const [amount, setAmount] = useState<number>(Number(0.0));
     const { dealId } = useParams();
     const navigate = useNavigate();
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -31,7 +31,7 @@ const LockToken : React.FC<SidebarProps> = ( {isSidebarActive} ) => {
                     const result = await backend.getDeal(BigInt(dealId || 0));
                     if ('ok' in result) {
                         if (result.ok.status === "Pending") {
-                            setAmount(BigInt(result.ok.amount));
+                            setAmount(Number(result.ok.amount));
                             setDealData(prevDealData => ({
                                 ...prevDealData,
                                 to: result.ok.to.toString(),
@@ -59,7 +59,7 @@ const LockToken : React.FC<SidebarProps> = ( {isSidebarActive} ) => {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setIsLoading(true);
-        const lockTokenResult = await backend.lockToken(Principal.fromText(principal || ''), BigInt(amount), BigInt(dealId || 0));
+        const lockTokenResult = await backend.lockToken(Principal.fromText(principal || ''), Number(amount), BigInt(dealId || 0));
         console.log("Lock token result:", lockTokenResult);
         console.log("Lock token result:", principal, amount, dealId)
         if ('TokenLocked' in lockTokenResult) {
@@ -97,7 +97,7 @@ const LockToken : React.FC<SidebarProps> = ( {isSidebarActive} ) => {
                                     id="tokenAmount"
                                     placeholder="Token Number"
                                     value={amount.toString()}
-                                    onChange={(e) => setAmount(BigInt(e.target.value))}
+                                    onChange={(e) => setAmount(Number(e.target.value))}
                                 />
                             </div>
                         </div>
