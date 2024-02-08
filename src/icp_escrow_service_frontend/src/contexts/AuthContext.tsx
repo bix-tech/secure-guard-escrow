@@ -1,6 +1,7 @@
 import localforage from 'localforage';
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import Cookies from 'js-cookie';
+import { useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
     isAuthenticated: boolean;
@@ -26,6 +27,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setIsAuthenticated(false);
     };
 
+    const verifyConnection = async () => {
+        const connected = await window.ic.plug.isConnected();
+        if (!connected) await window.ic.plug.requestConnect({ whitelist, host });
+    };
+
+
+    const whitelist = ['ryjl3-tyaaa-aaaaa-aaaba-cai', 'rdmx6-jaaaa-aaaaa-aaadq-cai']; // replace with your canister IDs
+    const host = 'https://ic0.app';
+    const navigate = useNavigate();
     useEffect(() => {
         const checkAuthentication = async () => {
             const storedAuthState = await localforage.getItem<boolean>('isAuthenticated');
@@ -34,10 +44,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 setIsAuthenticated(true);
             } else {
                 setIsAuthenticated(false);
+                navigate('/');
             }
         };
 
         checkAuthentication();
+        verifyConnection();
     }, []);
 
     return (

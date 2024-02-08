@@ -9,16 +9,13 @@
       "type": "assets",
       "source": ["dist/"]
     },
-    "internet_identity": {
+    "ledger": {
       "type": "custom",
-      "candid": "https://github.com/dfinity/internet-identity/releases/download/release-2023-11-17/internet_identity.did",
-      "wasm": "https://github.com/dfinity/internet-identity/releases/download/release-2023-11-17/internet_identity_dev.wasm.gz",
-      "remote": {
-        "id": {
-          "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
+      "candid": "src/ledger/ledger.did",
+      "wasm": "src/ledger/ledger-canister.wasm",
+      "declarations": {
+        "output": "src/frontend/declarations/ledger"
         }
-      },
-      "frontend": {}
     }
   },
   "defaults": {
@@ -27,6 +24,6 @@
     }
   },
   "output_env_file": ".env",
-  "dfx": "0.15.2",
+  "dfx": "0.16.0",
   "version": 2
 }

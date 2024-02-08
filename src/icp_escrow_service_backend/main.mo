@@ -17,11 +17,37 @@ import Int "mo:base/Int";
 import Account "account";
 import Wallet "wallet";
 import Deal "deal";
+import Nat64 "mo:base/Nat64";
+import Int64 "mo:base/Int64";
+import Option "mo:base/Option";
+import Prim "mo:⛔";
+import List "mo:base/List";
+import CertifiedData "mo:base/CertifiedData";
+import Error "mo:base/Error";
+import Nat8 "mo:base/Nat8";
+import Trie "mo:base/Trie";
+import Helpers "helpers";
+import T "Types";
+import LT "ledger";
+// import Ledger "canister:ledger";
+shared actor class Escrow() = this {
 
-actor {
+  let Ledger = actor "ryjl3-tyaaa-aaaaa-aaaba-cai" : LT.Self;
+
   public type Result<A, B> = Result.Result<A, B>;
 
   public type ResultDeal<T> = { #ok : T; #err : Text };
+
+  let ledger_principal : Principal = Principal.fromActor(Ledger);
+  let icp_fee : Nat64 = 10_000;
+
+  public type LockTokenResult = {
+    #TokenLocked : ();
+    #TokenNotLocked : ();
+    #DealNotFound : ();
+    #InsufficientFunds : { balance : LT.Tokens };
+    #TransferError : LT.TransferError;
+  };
 
   type Order = { #less; #equal; #greater };
 
@@ -34,10 +60,6 @@ actor {
   var userProfiles : HashMap.HashMap<Principal, UserProfile> = HashMap.HashMap(10, Principal.equal, Principal.hash);
 
   var profilePictures : HashMap.HashMap<Nat, Blob> = HashMap.HashMap(10, Nat.equal, Hash.hash);
-
-  let ledger : TrieMap.TrieMap<Account.Account, Float> = TrieMap.TrieMap(Account.accountsEqual, Account.accountsHash);
-
-  let lockedTokens : TrieMap.TrieMap<Account.Account, Float> = TrieMap.TrieMap(Account.accountsEqual, Account.accountsHash);
 
   let platformAcc : Principal = Principal.fromText("msfjg-mdjak-g5m3u-6rel6-bdj6e-2olg2-v2eo2-k6pmq-73oey-m6pq5-qqe");
 
@@ -114,7 +136,7 @@ actor {
     name : Text;
     from : Principal;
     to : Principal;
-    amount : Float;
+    amount : { e8s : Nat64 };
     picture : FileReference;
     supportingDocuments : [FileReference];
     description : Text;
@@ -133,7 +155,7 @@ actor {
     dealId : Nat;
     description : Text;
     activityType : Text;
-    amount : Float;
+    amount : { e8s : Nat64 };
     status : DealStatus;
     activityTime : Time;
     user : Principal;
@@ -240,6 +262,23 @@ actor {
           return null;
         };
       };
+    };
+  };
+
+  public shared ({ caller }) func userInfo() : async T.UserInfo {
+    await getUserInfo(caller);
+  };
+
+  public func getUserInfo(principal : Principal) : async T.UserInfo {
+    let user_balance = await getBalance(principal);
+    let address = Helpers.getAddress(Principal.fromActor(this), principal);
+
+    Debug.print("Address length: " # Nat.toText(Array.size(address)));
+
+    return {
+      principal = principal;
+      address = address;
+      balance = user_balance;
     };
   };
 
@@ -461,143 +500,134 @@ actor {
     };
   };
 
-  public shared ({ caller }) func checkToken(principal : Principal) : async ?Float {
-    let defaultAccount = { owner = principal; subaccount = null };
-    return ledger.get(defaultAccount);
+  func isAnonymous(p : Principal) : Bool {
+    Blob.equal(Principal.toBlob(p), Blob.fromArray([0x04]));
   };
 
-  public shared ({ caller }) func checkLockedToken(principal : Principal) : async ?Float {
-    let defaultAccount = { owner = principal; subaccount = null };
-    return lockedTokens.get(defaultAccount);
+  public shared ({ caller }) func balanceUser() : async Nat64 {
+    await getBalance(caller);
   };
 
-  public shared ({ caller }) func lockToken(principal : Principal, amount : Float, dealId : Nat) : async Wallet.LockTokenResult {
-    let buyerAccount = { owner = principal; subaccount = null };
-    let balance = ledger.get(buyerAccount);
+  public func getBalance(caller : Principal) : async Nat64 {
+    let account = Blob.toArray(Account.accountIdentifier(caller, Account.defaultSubaccount()));
+    let balance = await Ledger.account_balance({ account });
+    return balance.e8s;
+  };
 
-    switch (balance) {
+
+  public shared ({ caller }) func lockToken(principal : Principal, amount : LT.Tokens, dealId : Nat) : async LockTokenResult {
+
+    let dealOpt = deals.get(dealId);
+    let buyerBalance = await getBalance(caller);
+
+    switch (dealOpt) {
+      
+      case (?deal) {  
+            let updatedDeal = {
+              id = dealId;
+              status = "In Progress";
+              name = deal.name;
+              from = deal.from;
+              to = deal.to;
+              amount = deal.amount;
+              picture = deal.picture;
+              description = deal.description;
+              dealCategory = deal.dealCategory;
+              dealType = deal.dealType;
+              paymentScheduleInfo = deal.paymentScheduleInfo;
+              dealTimeline = deal.dealTimeline;
+              deliverables = deal.deliverables;
+              supportingDocuments = deal.supportingDocuments;
+              createTime = deal.createTime;
+              submissionTime = deal.submissionTime;
+              buyerCancelRequest = deal.buyerCancelRequest;
+              sellerCancelRequest = deal.sellerCancelRequest;
+            };
+            deals.put(dealId, updatedDeal);
+
+            let activityLog = {
+              dealId = dealId;
+              description = "Tokens locked for the deal.";
+              activityType = "Tokens Locked";
+              amount = deal.amount;
+              status = "Tokens Locked";
+              activityTime = Time.now();
+              user = principal;
+              deal = updatedDeal;
+            };
+            await createActivityLog(activityLog, principal);
+
+            return #TokenLocked;
+          };
       case (null) {
-        return #InsufficientBalance;
-      };
-      case (?balance) {
-        if (balance < amount) {
-          return #InsufficientBalance;
-        } else {
-          ledger.put(buyerAccount, balance - amount);
-          let existingLockedAmountOpt = lockedTokens.get(buyerAccount);
-          let existingLockedAmount = switch (existingLockedAmountOpt) {
-            case (null) { 0.0 };
-            case (?amount) { amount };
-          };
-
-          let newLockedAmount = existingLockedAmount + amount;
-          lockedTokens.put(buyerAccount, newLockedAmount);
-
-          let dealOpt = deals.get(dealId);
-          switch (dealOpt) {
-            case (null) {
-              ledger.put(buyerAccount, balance);
-              let _ = lockedTokens.remove(buyerAccount);
-              return #TokenNotLocked;
-            };
-            case (?deal) {
-              if (principal != deal.to) {
-                ledger.put(buyerAccount, balance);
-                let _ = lockedTokens.remove(buyerAccount);
-                return #NotAuthorized;
-              };
-
-              if (deal.status != "Pending") {
-                ledger.put(buyerAccount, balance);
-                let _ = lockedTokens.remove(buyerAccount);
-                return #DealNotPending;
-              };
-
-              let updatedDeal = {
-                id = dealId;
-                status = "In Progress";
-                name = deal.name;
-                from = deal.from;
-                to = deal.to;
-                amount = deal.amount;
-                picture = deal.picture;
-                description = deal.description;
-                dealCategory = deal.dealCategory;
-                dealType = deal.dealType;
-                paymentScheduleInfo = deal.paymentScheduleInfo;
-                dealTimeline = deal.dealTimeline;
-                deliverables = deal.deliverables;
-                supportingDocuments = deal.supportingDocuments;
-                createTime = deal.createTime;
-                submissionTime = deal.submissionTime;
-                buyerCancelRequest = deal.buyerCancelRequest;
-                sellerCancelRequest = deal.sellerCancelRequest;
-              };
-
-              let buyerLog = {
-                dealId = dealId;
-                description = "Deal in progress, you've locked token for this deal.";
-                activityType = "Deal In Progress";
-                status = "In Progress";
-                amount = deal.amount;
-                activityTime = Time.now();
-                user = deal.to;
-                deal = updatedDeal;
-              };
-
-              let sellerLog = {
-                dealId = dealId;
-                description = "Deal in progress, buyer has locked token for this deal.";
-                activityType = "Deal In Progress";
-                status = "In Progress";
-                amount = deal.amount;
-                activityTime = Time.now();
-                user = deal.from;
-                deal = updatedDeal;
-              };
-
-              let transactionBuyerLog = {
-                dealId = dealId;
-                dealName = deal.name;
-                description = "Locked token for this deal.";
-                activityType = "Locked Token";
-                status = "In Progress";
-                amount = deal.amount;
-                activityTime = Time.now();
-                user = deal.to;
-                deal = updatedDeal;
-              };
-
-              let transactionSellerLog = {
-                dealId = dealId;
-                dealName = deal.name;
-                description = "Buyer locked token for this deal.";
-                activityType = "Locked Token";
-                status = "In Progress";
-                amount = deal.amount;
-                activityTime = Time.now();
-                user = deal.from;
-                deal = updatedDeal;
-              };
-
-              await createActivityLog(buyerLog, deal.to);
-              await createActivityLog(sellerLog, deal.from);
-
-              await createTransactionLog(transactionBuyerLog, deal.to);
-              await createTransactionLog(transactionSellerLog, deal.from);
-
-              addNotification(updatedDeal.from, { dealId = nextDealId - 1; message = "Buyer locked token, you can submit deliverables now." });
-
-              deals.put(dealId, updatedDeal);
-              return #TokenLocked;
-            };
-          };
-        };
+        return #DealNotFound;
       };
     };
   };
 
+  // private func transferICP(caller : Principal, amount : Nat64) : async LT.TransferResult {
+  //   let account = Blob.toArray(Account.accountIdentifier(Principal.fromActor(this), Account.defaultSubaccount()));
+
+  //   let res = await Ledger.transfer({
+  //     memo : Nat64 = 0;
+  //     from_subaccount = ?Helpers.getSubaccount(caller);
+  //     to = account;
+  //     amount = { e8s = amount - icp_fee };
+  //     fee = { e8s = icp_fee };
+  //     created_at_time = ?{
+  //       timestamp_nanos = Nat64.fromNat(Int.abs(Time.now()));
+  //     };
+  //   });
+
+  //   return res;
+  // };
+
+  // private func depositIcp(caller: Principal): async T.DepositReceipt {
+
+  //         // Calculate target subaccount
+  //         // NOTE: Should this be hashed first instead?
+  //         let source_account = Account.accountIdentifier(Principal.fromActor(this), Account.principalToSubaccount(caller));
+
+  //         // Check ledger for value
+  //         let balance = await Ledger.account_balance({ account = source_account });
+
+  //         // Transfer to default subaccount
+  //         let icp_receipt = if (balance.e8s > icp_fee) {
+  //             await Ledger.transfer({
+  //                 memo: Nat64    = 0;
+  //                 // from_subaccount = ?Account.principalToSubaccount(caller);
+  //                from_subaccount = ?Helpers.getSubaccount(caller);
+  //                 to = Account.accountIdentifier(Principal.fromActor(this), Account.defaultSubaccount());
+  //                 amount = { e8s = balance.e8s - Nat64.fromNat(icp_fee)};
+  //                 fee = { e8s = Nat64.fromNat(icp_fee) };
+  //                 created_at_time = ?{ timestamp_nanos = Nat64.fromNat(Int.abs(Time.now())) };
+  //             })
+  //         } else {
+  //             return #Err(#BalanceLow);
+  //         };
+
+  //         switch icp_receipt {
+  //             case ( #Err _) {
+  //                 return #Err(#TransferFailure);
+  //             };
+  //             case _ {};
+  //         };
+  //         let available = { e8s : balance.e8s - icp_fee };
+
+  //         // keep track of deposited ICP
+  //         book.addTokens(caller,ledger,available.e8s);
+
+  //         // Return result
+  //         #Ok(available.e8s)
+  //     };
+
+   public func canisterBalance() : async LT.Tokens {
+    await Ledger.account_balance({ account = Blob.toArray(Account.accountIdentifier(Principal.fromActor(this), Account.defaultSubaccount())) });
+  };
+
+
   public shared ({ caller }) func confirmDeal(dealId : Nat, principal : Principal) : async Result<(), Text> {
+    let canisterBackend = Principal.fromActor(this); 
     let dealOpt = deals.get(dealId);
 
     switch (dealOpt) {
@@ -612,86 +642,105 @@ actor {
           return #err("Deal is not in a state that can be confirmed");
         };
 
-        let sellerAccount = { owner = deal.from; subaccount = null };
-        let buyerAccount = { owner = deal.to; subaccount = null };
-        let platformAccount = { owner = platformAcc; subaccount = null };
-        let lockedAmountOpt = lockedTokens.get(buyerAccount);
+        let sellerAccountBlob = Account.accountIdentifier(deal.from, Account.defaultSubaccount());
+        let sellerAccount : [Nat8] = Blob.toArray(sellerAccountBlob);
 
-        switch (lockedAmountOpt) {
-          case (null) {
-            return #err("No tokens are locked for this deal");
+        let platformAccBlob = Account.accountIdentifier(platformAcc, Account.defaultSubaccount());
+        let platformAccount : [Nat8] = Blob.toArray(platformAccBlob);
+
+        let dealFeeE8s = deal.amount.e8s / 100;
+        let dealFee = { e8s = dealFeeE8s };
+
+        let transferFeeAmount = dealFee.e8s;
+        let transferDealAmount = deal.amount.e8s - dealFee.e8s;
+
+        let transferResult = await Ledger.transfer({
+          memo : Nat64 = 0;
+          from_subaccount = null;
+          to = platformAccount;
+          amount = dealFee;
+          fee = { e8s = icp_fee };
+          created_at_time = ?{
+            timestamp_nanos = Nat64.fromNat(Int.abs(Time.now()));
           };
-          case (?lockedAmount) {
-            let sellerBalanceOpt = ledger.get(sellerAccount);
-            let sellerBalance = switch (sellerBalanceOpt) {
-              case (null) { 0.0 };
-              case (?balance) { balance };
-            };
+        });
 
-            let platformBalanceOpt = ledger.get(platformAccount);
-            let platformBalance = switch (platformBalanceOpt) {
-              case (null) { 0.0 };
-              case (?balance) { balance };
-            };
-            let dealFee = (deal.amount * 1) / 100;
-            ledger.put(platformAccount, dealFee + platformBalance);
-            ledger.put(sellerAccount, sellerBalance + (deal.amount - dealFee));
-            let newLockedAmount = lockedAmount - deal.amount;
-            lockedTokens.put(buyerAccount, newLockedAmount);
-
-            let updatedDeal = {
-              id = dealId;
-              status = "Completed";
-              name = deal.name;
-              from = deal.from;
-              to = deal.to;
-              amount = deal.amount;
-              picture = deal.picture;
-              description = deal.description;
-              dealCategory = deal.dealCategory;
-              dealType = deal.dealType;
-              supportingDocuments = deal.supportingDocuments;
-              paymentScheduleInfo = deal.paymentScheduleInfo;
-              dealTimeline = deal.dealTimeline;
-              deliverables = deal.deliverables;
-              createTime = deal.createTime;
-              submissionTime = deal.submissionTime;
-              buyerCancelRequest = false;
-              sellerCancelRequest = false;
-            };
-
-            let sellerLog = {
-              dealId = dealId;
-              description = "Deal completed, buyer has confirmed the deal.";
-              activityType = "Deal Completed";
-              status = "Completed";
-              amount = deal.amount;
-              activityTime = Time.now();
-              user = deal.from;
-              deal = updatedDeal;
-            };
-
-            let buyerLog = {
-              dealId = dealId;
-              description = "Deal completed, you've confirmed the deal.";
-              activityType = "Deal Completed";
-              status = "Completed";
-              amount = deal.amount;
-              activityTime = Time.now();
-              user = deal.to;
-              deal = updatedDeal;
-            };
-
-            await createActivityLog(buyerLog, deal.to);
-            await createActivityLog(sellerLog, deal.from);
-
-            addNotification(updatedDeal.from, { dealId = nextDealId - 1; message = "Buyer confirmed the deal. Please check if you've received the token." });
-
-            deals.put(dealId, updatedDeal);
-
-            return #ok(());
+        switch (transferResult) {
+          case (#err(e)) {
+            return #err("Failed to transfer fee to platform account: " # + e);
           };
+          case _ {};
         };
+
+        let transferSellerResult = await Ledger.transfer({
+          memo : Nat64 = 0;
+          from_subaccount = null;
+          to = sellerAccount;
+          amount = { e8s = transferDealAmount };
+          fee = { e8s = icp_fee };
+          created_at_time = ?{
+            timestamp_nanos = Nat64.fromNat(Int.abs(Time.now()));
+          };
+        });
+
+        switch (transferSellerResult) {
+          case (#err(e)) {
+            return #err("Failed to transfer amount to seller: " # + e);
+          };
+          case _ {};
+        };
+
+        let updatedDeal = {
+          id = dealId;
+          status = "Completed";
+          name = deal.name;
+          from = deal.from;
+          to = deal.to;
+          amount = deal.amount;
+          picture = deal.picture;
+          description = deal.description;
+          dealCategory = deal.dealCategory;
+          dealType = deal.dealType;
+          supportingDocuments = deal.supportingDocuments;
+          paymentScheduleInfo = deal.paymentScheduleInfo;
+          dealTimeline = deal.dealTimeline;
+          deliverables = deal.deliverables;
+          createTime = deal.createTime;
+          submissionTime = deal.submissionTime;
+          buyerCancelRequest = false;
+          sellerCancelRequest = false;
+        };
+
+        let sellerLog = {
+          dealId = dealId;
+          description = "Deal completed, buyer has confirmed the deal.";
+          activityType = "Deal Completed";
+          status = "Completed";
+          amount = deal.amount;
+          activityTime = Time.now();
+          user = deal.from;
+          deal = updatedDeal;
+        };
+
+        let buyerLog = {
+          dealId = dealId;
+          description = "Deal completed, you've confirmed the deal.";
+          activityType = "Deal Completed";
+          status = "Completed";
+          amount = deal.amount;
+          activityTime = Time.now();
+          user = deal.to;
+          deal = updatedDeal;
+        };
+
+        await createActivityLog(buyerLog, deal.to);
+        await createActivityLog(sellerLog, deal.from);
+
+        addNotification(updatedDeal.from, { dealId = nextDealId - 1; message = "Buyer confirmed the deal. Please check if you've received the token." });
+
+        deals.put(dealId, updatedDeal);
+
+        return #ok(());
       };
     };
   };
@@ -808,51 +857,43 @@ actor {
           };
         };
 
-        if (isBuyer) {
-          let buyerLog = {
+        if (isBuyer or isSeller) {
+          let cancelLog = {
             dealId = dealId;
-            description = "Deal cancelled, please wait for seller to cancel the deal too.";
+            description = "Deal cancelled.";
             activityType = "Deal Cancelation";
             status = "Cancelled";
             amount = deal.amount;
             activityTime = Time.now();
-            user = deal.to;
+            user = principal;
             deal = updatedDeal;
           };
 
-          await createActivityLog(buyerLog, deal.to);
-        } else if (isSeller) {
-          let sellerLog = {
-            dealId = dealId;
-            description = "Deal cancelled, please wait for buyer to cancel the deal too.";
-            activityType = "Deal Cancelation";
-            status = "Cancelled";
-            amount = deal.amount;
-            activityTime = Time.now();
-            user = deal.from;
-            deal = updatedDeal;
-          };
-
-          await createActivityLog(sellerLog, deal.from);
+          await createActivityLog(cancelLog, principal);
         };
 
         if (updatedDeal.buyerCancelRequest and updatedDeal.sellerCancelRequest) {
-          let buyerAccount = { owner = deal.to; subaccount = null };
-          let lockedAmountOpt = lockedTokens.get(buyerAccount);
-          switch (lockedAmountOpt) {
-            case (null) {};
-            case (?lockedAmount) {
-              let balanceOpt = ledger.get(buyerAccount);
-              switch (balanceOpt) {
-                case (null) {
-                  ledger.put(buyerAccount, lockedAmount);
-                };
-                case (?balance) {
-                  ledger.put(buyerAccount, balance + lockedAmount);
-                };
-              };
-              let _ = lockedTokens.remove(buyerAccount);
+          let buyerAccountBlob = Account.accountIdentifier(deal.to, Account.defaultSubaccount());
+          let buyerAccount : [Nat8] = Blob.toArray(buyerAccountBlob);
+          let platformAccount = Account.accountIdentifier(platformAcc, Account.defaultSubaccount());
+
+          let refundAmount = deal.amount.e8s;
+          let refundResults = await Ledger.transfer({
+            memo : Nat64 = 0;
+            from_subaccount = null;
+            to = buyerAccount;
+            amount = { e8s = refundAmount };
+            fee = { e8s = icp_fee };
+            created_at_time = ?{
+              timestamp_nanos = Nat64.fromNat(Int.abs(Time.now()));
             };
+          });
+
+          switch (refundResults) {
+            case (#Err(e)) {
+              return #err("Failed to refund locked amount");
+            };
+            case _ {};
           };
 
           let finalDeal = {
@@ -867,39 +908,16 @@ actor {
             dealCategory = deal.dealCategory;
             dealType = deal.dealType;
             paymentScheduleInfo = deal.paymentScheduleInfo;
+            supportingDocuments = deal.supportingDocuments;
             dealTimeline = deal.dealTimeline;
             deliverables = deal.deliverables;
-            supportingDocuments = deal.supportingDocuments;
             createTime = deal.createTime;
             submissionTime = deal.submissionTime;
             buyerCancelRequest = false;
             sellerCancelRequest = false;
           };
 
-          let afterBuyerLog = {
-            dealId = dealId;
-            description = "Deal cancelled, you've cancelled the deal.";
-            activityType = "Deal Cancelation";
-            status = "Cancelled";
-            amount = deal.amount;
-            activityTime = Time.now();
-            user = deal.to;
-            deal = finalDeal;
-          };
-
-          let afterSellerLog = {
-            dealId = dealId;
-            description = "Deal cancelled, you've cancelled the deal.";
-            activityType = "Deal Cancelation";
-            status = "Cancelled";
-            amount = deal.amount;
-            activityTime = Time.now();
-            user = deal.from;
-            deal = finalDeal;
-          };
-
-          await createActivityLog(afterBuyerLog, deal.to);
-          await createActivityLog(afterSellerLog, deal.from);
+          deals.put(dealId, finalDeal);
 
           if (finalDeal.from == principal) {
             addNotification(finalDeal.to, { dealId = nextDealId - 1; message = "Seller cancelled the deal." });
@@ -907,7 +925,6 @@ actor {
             addNotification(finalDeal.from, { dealId = nextDealId - 1; message = "Buyer cancelled the deal." });
           };
 
-          deals.put(dealId, finalDeal);
           return #ok(finalDeal);
         } else {
           deals.put(dealId, updatedDeal);
@@ -915,6 +932,87 @@ actor {
         };
       };
     };
+  };
+
+  public func getTotalDeals(user: Principal) : async Nat {
+    let allDeals = Iter.toArray(deals.vals());
+
+    let userDeals = Array.filter(
+      allDeals,
+      func(deal : Deal) : Bool {
+        deal.from == user or deal.to == user;
+      },
+    );
+
+    return Array.size(userDeals);
+  };
+
+  public func getTotalCompletedDeals(user: Principal) : async Nat {
+    let allDeals = Iter.toArray(deals.vals());
+
+    let userDeals = Array.filter(
+      allDeals,
+      func(deal : Deal) : Bool {
+        deal.from == user or deal.to == user;
+      },
+    );
+
+    let completedDeals = Array.filter(
+      userDeals,
+      func(deal : Deal) : Bool {
+        deal.status == "Completed";
+      },
+    );
+
+    return Array.size(completedDeals);
+  };
+
+  public func getTotalInProgressDeals(user : Principal) : async Nat {
+    let allDeals = Iter.toArray(deals.vals());
+
+    let userDeals = Array.filter(
+      allDeals,
+      func(deal : Deal) : Bool {
+        deal.from == user or deal.to == user;
+      },
+    );
+
+    let inProgressDeals = Array.filter(
+      userDeals,
+      func(deal : Deal) : Bool {
+        deal.status == "In Progress";
+      },
+    );
+
+    return Array.size(inProgressDeals);
+  };
+
+  public func getTotalInProgressDealsAmount(user : Principal) : async Nat64 {
+    let allDeals = Iter.toArray(deals.vals());
+
+    let userDeals = Array.filter(
+      allDeals,
+      func(deal : Deal) : Bool {
+        deal.from == user or deal.to == user;
+      },
+    );
+
+    let inProgressDeals = Array.filter(
+      userDeals,
+      func(deal : Deal) : Bool {
+        deal.status == "In Progress";
+      },
+    );
+
+    let totalAmount = Array.foldLeft(
+      inProgressDeals,
+      0 : Nat64,
+      func(acc : Nat64, deal : Deal) : Nat64 {
+        acc + deal.amount.e8s;
+      },
+    );
+
+    return totalAmount;
   };
 
   public func getActivityLogsForUser(user : Principal, page : Nat, itemsPerPage : Nat) : async [ActivityLog] {
@@ -1101,19 +1199,6 @@ actor {
     };
   };
 
-  public func mintTokens(principal : Principal, amount : Float) : async () {
-    let defaultAccount = { owner = principal; subaccount = null };
-    let balanceOpt = ledger.get(defaultAccount);
-    switch (balanceOpt) {
-      case (null) {
-        ledger.put(defaultAccount, amount);
-      };
-      case (?balance) {
-        ledger.put(defaultAccount, balance + amount);
-      };
-    };
-  };
-
   public shared (msg) func callerPrincipal() : async Principal {
     return msg.caller;
   };
@@ -1121,4 +1206,5 @@ actor {
   system func heartbeat() : async () {
     await autoConfirmDeals();
   };
+
 };

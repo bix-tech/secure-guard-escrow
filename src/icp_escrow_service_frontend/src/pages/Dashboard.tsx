@@ -29,6 +29,10 @@ const Dashboard: React.FC<DashboardProps> = ({ isSidebarActive }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [totalDeals, setTotalDeals] = useState(0);
+  const [totalInProgressDeals, setTotalInProgressDeals] = useState(0);
+  const [totalCompletedDeals, setTotalCompletedDeals] = useState(0);
+  const [totalInProgressDealsAmount, setTotalInProgressDealsAmount] = useState(0);
   const navigate = useNavigate();
 
 
@@ -51,7 +55,7 @@ const Dashboard: React.FC<DashboardProps> = ({ isSidebarActive }) => {
           ...log,
           dealId: Number(log.dealId),
           description: log.description.toString(),
-          amount: Number(log.amount),
+          amount: Number(log.amount.e8s) / 1e8,
           activityTime: Number(log.activityTime),
           user: log.user.toString(),
           status: log.status.toString(),
@@ -68,10 +72,58 @@ const Dashboard: React.FC<DashboardProps> = ({ isSidebarActive }) => {
     }
   };
 
+  const fetchTotalDeals = async () => {
+    try {
+      const totalDeals = Number(await backend.getTotalDeals(Principal.fromText(principal || '')));
+      console.log("Total deals:", totalDeals);
+      setTotalDeals(totalDeals);
+    } catch (error) {
+      console.error("Failed to fetch total deals:", error);
+    }
+  }
+
+  const fetchTotalInProgressDeals = async () => {
+    try {
+      const totalInProgressDeals = Number(await backend.getTotalInProgressDeals(Principal.fromText(principal || '')));
+      console.log("Total in progress deals:", totalInProgressDeals);
+      setTotalInProgressDeals(totalInProgressDeals);
+    } catch (error) {
+      console.error("Failed to fetch total in progress deals:", error);
+    }
+  }
+
+  const fetchTotalCompletedDeals = async () => {
+    try {
+      const totalCompletedDeals = Number(await backend.getTotalCompletedDeals(Principal.fromText(principal || '')));
+      console.log("Total completed deals:", totalCompletedDeals);
+      setTotalCompletedDeals(totalCompletedDeals);
+    } catch (error) {
+      console.error("Failed to fetch total completed deals:", error);
+    }
+  }
+
+  const fetchTotalInProgressDealsAmount = async () => {
+    try {
+      const totalInProgressDealsAmount = Number(await backend.getTotalInProgressDealsAmount(Principal.fromText(principal || '')));
+      console.log("Total in progress deals amount:", totalInProgressDealsAmount);
+      setTotalInProgressDealsAmount(totalInProgressDealsAmount);
+    } catch (error) {
+      console.error("Failed to fetch total in progress deals amount:", error);
+    }
+  }
+
+  const formatAmount = (amount: number) => {
+    const amountInIcp = amount / 1e8;
+    return `${amountInIcp.toFixed(4)} ICP`;
+  }
 
   useEffect(() => {
     if (principal) {
       fetchActivityLogs();
+      fetchTotalDeals();
+      fetchTotalInProgressDeals();
+      fetchTotalCompletedDeals();
+      fetchTotalInProgressDealsAmount();
     }
   }, [principal, currentPage]);
 
@@ -81,6 +133,22 @@ const Dashboard: React.FC<DashboardProps> = ({ isSidebarActive }) => {
       <div className="row d-flex">
         <div className={`col-md-9 ms-sm-auto col-lg-12 px-5 d-flex flex-column`} style={{ position: 'relative', minHeight: '100vh' }}>
           <button className="btn btn-create btn-primary my-auto" onClick={handleCreateDeal} style={{ position: 'absolute' }}> Create Deal </button>
+          <div className="d-flex justify-content-between">
+            <div className={`card dashboard-card p-5 margin-5 mobile-card d-flex align-items-center ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
+              <h5 style={{textAlign: 'center'}}>Total Deals:  <br/>{totalDeals}</h5>
+            </div>
+            <div className={`card dashboard-card p-5 margin-5 mobile-card d-flex align-items-center ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
+              <h5 style={{textAlign: 'center'}}>Total In Progress Deals: <br/> {totalInProgressDeals}</h5>
+            </div>
+          </div>
+          <div className="d-flex justify-content-between">
+            <div className={`card dashboard-card p-5 margin-5 mobile-card d-flex align-items-center ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
+              <h5 style={{textAlign: 'center'}}>Total Completed Deals: <br/> {totalCompletedDeals}</h5>
+            </div>
+            <div className={`card dashboard-card p-5 margin-5 mobile-card d-flex align-items-center ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
+              <h5 style={{textAlign: 'center'}}>Total In Progress Deal Amount: <br/>{formatAmount(totalInProgressDealsAmount)}</h5>
+            </div>
+          </div>
           <div className={`card dashboard-card p-5 margin-5 mobile-card d-flex align-items-center ${isSidebarActive ? 'not-full-width' : 'full-width'}`}>
             <h2>Activity Logs</h2>
             <div>Total logs: {totalItems}</div>

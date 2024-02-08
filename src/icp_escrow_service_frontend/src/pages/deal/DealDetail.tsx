@@ -25,6 +25,8 @@ const DealOverview: React.FC<SidebarProps> = ({ isSidebarActive }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [showConfirmModal, setConfirmModal] = useState(false);
     const [showCancelModal, setCancelModal] = useState(false);
+    // const canisterBackend = Principal.fromText('bd3sg-teaaa-aaaaa-qaaba-cai').toText();
+    // const platformAccount = Principal.fromText('rwlgt-iiaaa-aaaaa-aaaaa-cai').toText();
 
     const navigate = useNavigate();
 
@@ -118,6 +120,8 @@ const DealOverview: React.FC<SidebarProps> = ({ isSidebarActive }) => {
             </div>
         </div>
     }
+
+    
 
     const handleConfirmDeal = async (dealId: number) => {
         try {

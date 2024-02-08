@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { AuthClient } from "@dfinity/auth-client";
+// import { AuthClient } from "@dfinity/auth-client";
 import { useNavigate, useLocation } from 'react-router';
 import { useAuth } from '../contexts/AuthContext';
 import { Dropdown } from 'react-bootstrap';
-import localForage from "localforage";
 import { FaCopy } from 'react-icons/fa';
 import { Principal } from '@dfinity/principal';
 import { backend } from "../../../declarations/backend";
@@ -12,7 +11,7 @@ import { DropDirection } from 'react-bootstrap/esm/DropdownContext';
 import { useProfilePicture } from '../hooks/useProfilePicture';
 import Cookies from 'js-cookie';
 import Sidebar from './Sidebar';
-
+import localforage from 'localforage';
 type Notification = {
     dealId: bigint;
     message: string;
@@ -30,7 +29,7 @@ type NavbarProps = {
     const location = useLocation();
     const { principal } = usePrincipal();
     const [isLoading, setIsLoading] = useState(true);
-    const [authClient, setAuthClient] = useState<AuthClient | null>(null);
+    // const [authClient, setAuthClient] = useState<AuthClient | null>(null);
     const [copied, setCopied] = useState(false);
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [showNotification, setShowNotification] = useState(false);
@@ -77,16 +76,6 @@ type NavbarProps = {
 
 
     useEffect(() => {
-        const initAuth = async () => {
-            try {
-                const authClient = await AuthClient.create();
-                setAuthClient(authClient);
-            } catch (error) {
-                console.error("Failed to create auth client:", error);
-            }
-        };
-        initAuth();
-
         const fetchUserProfile = async () => {
             try {
                 if (principal) {
@@ -133,24 +122,19 @@ type NavbarProps = {
         navigate(`/deal-overview/${dealId}`);
     };
 
-
     const handleLogout = async () => {
         try {
-            if (authClient) {
-                await authClient.logout();
-            }
             logout();
+            localforage.clear();
+            sessionStorage.clear();
             Cookies.remove('principal');
-            await localForage.removeItem('pictureUrl');
-
             navigate('/');
-
             console.log("Logout successful");
         } catch (error) {
             console.error("Error in handleLogout:", error);
         }
     };
-
+    
     return (
         isLoading ? (
             <>
@@ -192,7 +176,11 @@ type NavbarProps = {
                                         <img src={url} key={url} alt="User Avatar" />
                                     ))
                                 ) : (
-                                    <div className="spinner"></div>
+                                    <img
+                                    src="https://www.w3schools.com/howto/img_avatar.png"
+                                    alt="Avatar"
+                                    className="avatar"
+                                />
                                 )}
                             </div>
                             <div>
@@ -207,7 +195,7 @@ type NavbarProps = {
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
                                     <Dropdown.Item onClick={handleProfileClick}>Profile</Dropdown.Item>
-                                    <Dropdown.Item href="#">Settings</Dropdown.Item>
+                                    {/* <Dropdown.Item href="#">Settings</Dropdown.Item> */}
                                     <Dropdown.Divider />
                                     <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
                                 </Dropdown.Menu>
@@ -271,7 +259,7 @@ type NavbarProps = {
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
                                     <Dropdown.Item onClick={handleProfileClick}>Profile</Dropdown.Item>
-                                    <Dropdown.Item href="#">Settings</Dropdown.Item>
+                                    {/* <Dropdown.Item href="#">Settings</Dropdown.Item> */}
                                     <Dropdown.Divider />
                                     <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
                                 </Dropdown.Menu>

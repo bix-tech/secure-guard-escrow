@@ -50,7 +50,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext, isSidebarActive })
     const [recipientPrincipal, setRecipientPrincipal] = useState<string>('');
     const { principal } = usePrincipal();
     const { dealData, setDealData } = useDealData();
-    const [amount, setAmount] = useState<number>(0.0);
+    const [amount, setAmount] = useState<string>('0');
     const pictureInputRef = useRef<HTMLInputElement>(null);
     const documentInputRef = useRef<HTMLInputElement>(null);
     const [dealStart, setOpenDate] = useState<Date | null>(null);
@@ -106,6 +106,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext, isSidebarActive })
         newSchedules[index][field] = event.target.value as never;
         setPaymentSchedules(newSchedules);
     };
+    
 
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -155,7 +156,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext, isSidebarActive })
                     description: schedule.packageDescription,
                 })),
                 from: from,
-                amount: Number(amount),
+                amount: { e8s: BigInt(Math.round(parseFloat(amount) * 1e8)) },
                 createTime: BigInt(Date.now()),
                 submissionTime: [BigInt(0)] as [bigint],
                 sellerCancelRequest: false,
@@ -405,7 +406,7 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext, isSidebarActive })
 
                             <div className="mb-3">
                                 <div className="form-row col-md-9 text-start mx-auto">
-                                <label htmlFor="recipientPrincipal" className="form-label text-start mt-3">{label}</label>
+                                    <label htmlFor="recipientPrincipal" className="form-label text-start mt-3">{label}</label>
                                     <input type="text" placeholder="Enter recipient Principal ID" value={recipientPrincipal} onChange={(e) => setRecipientPrincipal(e.target.value)} className="form-control" id="recipientPrincipal" />
                                 </div>
                             </div>
@@ -440,19 +441,23 @@ const CreateDealStep2: React.FC<CreateDealProps> = ({ onNext, isSidebarActive })
                                                         placeholder="Description"
                                                         value={schedule.packageDescription}
                                                         onChange={e => handleScheduleChange(e, index, 'packageDescription')}
-                                                    />                                                
+                                                    />
 
                                                     {/* Total Token */}
                                                     <label htmlFor={`amount-${index}`} className="form-label text-start mt-3">Total Token</label>
-                                                    <input
-                                                        type="number"
-                                                        className="form-control mobile-font-size-8px"
-                                                        id="amount"
-                                                        placeholder="Total Token"
-                                                        value={amount}
-                                                        onChange={e => setAmount(parseFloat(e.target.value))}
-                                                    />
-
+<input
+    type="text"
+    className="form-control"
+    id="amount"
+    placeholder="Total Token"
+    value={amount}
+    onChange={(e) => {
+        const value = e.target.value;
+        if (!isNaN(Number(value)) || value === '') {
+            setAmount(value);
+        }
+    }}
+/>
                                                     {/* Remove Button */}
                                                     <button type="button" className="btn col-md-12 remove-payment-btn mt-4 mobile-font-size-8px" onClick={() => removeSchedule(index)}>Remove Payment Schedule</button>
                                                 </div>

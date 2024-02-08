@@ -58,12 +58,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarActive }) => {
                 Profile
               </div>
             </li>
-            <li className="nav-item">
+            {/* <li className="nav-item">
               <a className="nav-link mb-3" href="#">
                 <img src="/help-center.png" alt="User Avatar" className="menu-icon me-2" />
                 Help Center
               </a>
-            </li>
+            </li> */}
           </ul>
         </div>
       </nav>

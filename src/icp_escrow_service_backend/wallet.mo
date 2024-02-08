@@ -15,6 +15,7 @@ module {
         #TokenNotLocked;
         #NotAuthorized;
         #DealNotPending;
+        #DealNotFound;
     };
 
 };
