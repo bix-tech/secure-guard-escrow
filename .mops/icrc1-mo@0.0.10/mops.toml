@@ -1,0 +1,23 @@
+[dependencies]
+base = "https://github.com/dfinity/motoko-base#moc-0.10.1@80ededb39954739b18b88fc0e5561264003cf9ab"
+array = "https://github.com/aviate-labs/array.mo#v0.2.0@863a668bcbb3c3799a62c36b2cba2c32d1fcc433"
+StableTrieMap = "https://github.com/NatLabs/StableTrieMap#main@4781cb03efd34b124c22396c69710b374366c797"
+StableBuffer = "https://github.com/canscale/StableBuffer#v0.2.0@1af0e8814bac5ca7ed23a6c094204b46d9056c2e"
+map9 = "https://github.com/ZhenyaUsenko/motoko-hash-map#v9.0.1@10b68f6ea8df5e72dfa4c07a50c8bb60a916c233"
+itertools = "0.1.2"
+vector = "0.2.0"
+star = "0.1.1"
+rep-indy-hash = "0.1.1"
+account = "1.0.1"
+
+[dev-dependencies]
+test = "1.2.0"
+fuzz = "0.1.2"
+matchers = "https://github.com/kritzcreek/motoko-matchers#v1.3.0@3dac8a071b69e4e651b25a7d9683fe831eb7cffd"
+
+[package]
+name = "icrc1-mo"
+version = "0.0.10"
+description = "icrc1 for motoko"
+repository = "https://github.com/PanIndustrial-Org/icrc1.mo"
+keywords = [ "icrc1", "fungible", "token", "standard", "dfinity" ]

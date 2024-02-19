@@ -1,0 +1,15 @@
+[dependencies]
+array = "https://github.com/aviate-labs/array.mo#v0.2.0@863a668bcbb3c3799a62c36b2cba2c32d1fcc433"
+base = "https://github.com/dfinity/motoko-base#moc-0.7.4@d2f20b7a169cfabcf75c6672e24f016a6ed89f86"
+itertools = "0.1.2"
+
+[package]
+name = "account"
+version = "1.0.1"
+description = "A Motoko implementation of ICRC-1 and ICRC-7 Accounts."
+repository = "https://github.com/letmejustputthishere/account"
+keywords = [ "account", "icrc", "icrc1", "icrc7", "icrc-1", "icrc-7" ]
+license = "MIT"
+
+[dev-dependencies]
+test = "1.1.1"
