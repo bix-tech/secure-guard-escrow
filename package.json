@@ -1,49 +1,63 @@
 {
   "name": "icp_escrow_service_frontend",
-  "version": "0.2.0",
-  "description": "Internet Computer starter application",
-  "keywords": [
-    "Internet Computer",
-    "Motoko",
-    "JavaScript",
-    "Canister"
-  ],
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "build": "webpack",
-    "prebuild": "dfx generate",
-    "start": "webpack serve --mode development --env development",
-    "deploy:local": "dfx deploy --network=local",
-    "deploy:ic": "dfx deploy --network=ic",
-    "generate": "dfx generate icp_escrow_service_backend"
+    "dev": "vite",
+    "setup": "npm i && dfx canister create backend && dfx generate backend && npm run build && dfx deploy",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@dfinity/agent": "^0.20.2",
+    "@dfinity/auth-client": "^0.20.2",
     "@dfinity/candid": "^0.20.2",
-    "@dfinity/principal": "^0.20.2"
+    "@dfinity/identity": "^0.20.2",
+    "@dfinity/ledger-icp": "^2.1.1",
+    "@dfinity/principal": "^0.20.2",
+    "@hookform/resolvers": "^3.3.3",
+    "@psychedelic/plug-connect": "^0.2.0",
+    "@psychedelic/plug-inpage-provider": "^2.5.1",
+    "@tiptap/extension-image": "^2.1.13",
+    "@tiptap/extension-link": "^2.1.13",
+    "@tiptap/extension-text-align": "^2.1.13",
+    "@tiptap/extension-underline": "^2.1.13",
+    "@tiptap/pm": "^2.1.13",
+    "@tiptap/react": "^2.1.13",
+    "@tiptap/starter-kit": "^2.1.13",
+    "bootstrap": "^5.3.2",
+    "dotenv": "^16.3.1",
+    "globals": "^13.24.0",
+    "js-cookie": "^3.0.5",
+    "js-sha256": "^0.11.0",
+    "localforage": "^1.10.0",
+    "react": "^18.2.0",
+    "react-bootstrap": "^2.9.1",
+    "react-datepicker": "^4.25.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.49.2",
+    "react-icons": "^4.12.0",
+    "react-router-dom": "^6.21.1",
+    "react-toastify": "^9.1.3",
+    "yup": "^1.3.3"
   },
   "devDependencies": {
-    "assert": "2.0.0",
-    "buffer": "6.0.3",
-    "copy-webpack-plugin": "^11.0.0",
-    "dotenv": "^16.0.3",
-    "events": "3.3.0",
-    "html-webpack-plugin": "5.5.0",
-    "process": "0.11.10",
-    "stream-browserify": "3.0.0",
-    "terser-webpack-plugin": "^5.3.3",
-    "util": "0.12.4",
-    "webpack": "^5.73.0",
-    "webpack-cli": "^4.10.0",
-    "webpack-dev-server": "^4.8.1"
-  },
-  "engines": {
-    "node": "^12 || ^14 || ^16 || >=17",
-    "npm": "^7.17 || >=8"
-  },
-  "browserslist": [
-    "last 2 chrome version",
-    "last 2 firefox version",
-    "last 2 safari version",
-    "last 2 edge version"
-  ]
+    "@types/draft-js": "^0.11.16",
+    "@types/js-cookie": "^3.0.6",
+    "@types/node": "^20.10.5",
+    "@types/react": "^18.2.45",
+    "@types/react-datepicker": "^4.19.4",
+    "@types/react-dom": "^18.2.18",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "@vitejs/plugin-basic-ssl": "^1.0.2",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.8"
+  }
 }
