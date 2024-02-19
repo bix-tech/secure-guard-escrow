@@ -71,6 +71,10 @@ body {
   display: none;
 }
 
+.align-start {
+  align-items: flex-start;
+}
+
 .clear-notification-btn {
   background-color: #237A88 !important;
   color: white !important;
@@ -501,7 +505,7 @@ body {
   top: 0; 
 }
 
-.hamburger:hover {
+.hamburger button:hover {
   opacity: 0.5;
 }
 
@@ -570,6 +574,10 @@ body {
 
   .mobile-font-size-10px {
     font-size: 10px !important;
+  }
+
+  .logo {
+    display: none;
   }
 
   h1 {

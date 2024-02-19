@@ -146,6 +146,7 @@ type NavbarProps = {
                         <button className="btn btn-default" type="button" id="menu-toggle" onClick={handleHamburgerClick}>
                             <img src="/hamburger.png" alt="Menu" style={{width: '15px'}}/>
                         </button>
+                        <img src="/logo.png" alt="Logo" className="logo" style={{width: '250px', height: '50px'}}/>
                         </div>
                         <Dropdown show={showNotification} onToggle={toggleNotification} ref={notificationRef} drop={dropDirection}>
                             <Dropdown.Toggle as="div" id="dropdown-notification" className="notification-avatar ms-3 d-flex align-items-center justify-content-center">

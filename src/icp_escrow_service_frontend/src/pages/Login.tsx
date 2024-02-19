@@ -158,7 +158,7 @@ const Login = () => {
       <div className="card login-card p-5" style={{ width: '50%' }}>
         <div className="card-body text-center">
           <div className="mb-5 mx-auto">
-            <img style={{height: '150px', width: '200px', objectFit: 'contain'}} src="/logo.png" alt="User Avatar" />
+            <img style={{height: '100px', width: '200px', objectFit: 'contain'}} src="/logo.png" alt="User Avatar" />
           </div>
           {/* <h5 className="card-title">ESCROW SERVICE</h5> */}
           <PlugConnect
