@@ -5,9 +5,6 @@ Welcome to your Secure Guard Escrow project and to the internet computer develop
 To get started, you might want to explore the project directory structure and the default configuration file. Working with this project in your development environment will not affect any production deployment or identity tokens.
 
 ## Project Overview and Process
-
-In this section, you can provide a detailed overview of your project's process. This can include step-by-step instructions, screenshots, and GIFs that demonstrate how to use your project or show what it does.
-
 Here's a GIF showing the process:
 
 ![Process GIF](https://media.giphy.com/media/lQdjAXS0unmSD7e2wX/giphy.gif)
