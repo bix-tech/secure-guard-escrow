@@ -160,7 +160,6 @@ const Login = () => {
           <div className="mb-5 mx-auto">
             <img style={{height: '100px', width: '200px', objectFit: 'contain'}} src="/logo.png" alt="User Avatar" />
           </div>
-          {/* <h5 className="card-title">ESCROW SERVICE</h5> */}
           <PlugConnect
               whitelist={['be2us-64aaa-aaaaa-qaabq-cai','bd3sg-teaaa-aaaaa-qaaba-cai','ryjl3-tyaaa-aaaaa-aaaba-cai','cojoz-raaaa-aaaao-a3b7q-cai','cjiin-4yaaa-aaaao-a3b7a-cai']}
               onConnectCallback={handleLogin}

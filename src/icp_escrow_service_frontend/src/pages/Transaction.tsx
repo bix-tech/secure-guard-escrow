@@ -47,7 +47,7 @@ const Transaction: React.FC<SidebarProps> = ({ isSidebarActive }) => {
                         dealId: Number(log.dealId),
                         dealName: log.dealName.toString(),
                         description: log.description.toString(),
-                        amount: Number(log.amount),
+                        amount: Number(log.amount.e8s)/1e8,
                         activityTime: Number(log.activityTime),
                         user: log.user.toString(),
                         status: log.status.toString(),

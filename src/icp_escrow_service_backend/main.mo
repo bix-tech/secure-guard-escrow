@@ -167,7 +167,7 @@ shared actor class Escrow() = this {
     dealName : Text;
     description : Text;
     activityType : Text;
-    amount : Float;
+    amount : { e8s : Nat64 };
     status : DealStatus;
     activityTime : Time;
     user : Principal;
@@ -272,8 +272,6 @@ shared actor class Escrow() = this {
   public func getUserInfo(principal : Principal) : async T.UserInfo {
     let user_balance = await getBalance(principal);
     let address = Helpers.getAddress(Principal.fromActor(this), principal);
-
-    Debug.print("Address length: " # Nat.toText(Array.size(address)));
 
     return {
       principal = principal;
@@ -514,120 +512,62 @@ shared actor class Escrow() = this {
     return balance.e8s;
   };
 
-
   public shared ({ caller }) func lockToken(principal : Principal, amount : LT.Tokens, dealId : Nat) : async LockTokenResult {
-
     let dealOpt = deals.get(dealId);
     let buyerBalance = await getBalance(caller);
 
     switch (dealOpt) {
-      
-      case (?deal) {  
-            let updatedDeal = {
-              id = dealId;
-              status = "In Progress";
-              name = deal.name;
-              from = deal.from;
-              to = deal.to;
-              amount = deal.amount;
-              picture = deal.picture;
-              description = deal.description;
-              dealCategory = deal.dealCategory;
-              dealType = deal.dealType;
-              paymentScheduleInfo = deal.paymentScheduleInfo;
-              dealTimeline = deal.dealTimeline;
-              deliverables = deal.deliverables;
-              supportingDocuments = deal.supportingDocuments;
-              createTime = deal.createTime;
-              submissionTime = deal.submissionTime;
-              buyerCancelRequest = deal.buyerCancelRequest;
-              sellerCancelRequest = deal.sellerCancelRequest;
-            };
-            deals.put(dealId, updatedDeal);
 
-            let activityLog = {
-              dealId = dealId;
-              description = "Tokens locked for the deal.";
-              activityType = "Tokens Locked";
-              amount = deal.amount;
-              status = "Tokens Locked";
-              activityTime = Time.now();
-              user = principal;
-              deal = updatedDeal;
-            };
-            await createActivityLog(activityLog, principal);
+      case (?deal) {
+        let updatedDeal = {
+          id = dealId;
+          status = "In Progress";
+          name = deal.name;
+          from = deal.from;
+          to = deal.to;
+          amount = deal.amount;
+          picture = deal.picture;
+          description = deal.description;
+          dealCategory = deal.dealCategory;
+          dealType = deal.dealType;
+          paymentScheduleInfo = deal.paymentScheduleInfo;
+          dealTimeline = deal.dealTimeline;
+          deliverables = deal.deliverables;
+          supportingDocuments = deal.supportingDocuments;
+          createTime = deal.createTime;
+          submissionTime = deal.submissionTime;
+          buyerCancelRequest = deal.buyerCancelRequest;
+          sellerCancelRequest = deal.sellerCancelRequest;
+        };
+        deals.put(dealId, updatedDeal);
 
-            return #TokenLocked;
-          };
+        let activityLog = {
+          dealId = dealId;
+          description = "Tokens locked for the deal.";
+          activityType = "Tokens Locked";
+          amount = deal.amount;
+          status = "Tokens Locked";
+          activityTime = Time.now();
+          user = principal;
+          deal = updatedDeal;
+        };
+        await createActivityLog(activityLog, principal);
+
+        return #TokenLocked;
+      };
       case (null) {
         return #DealNotFound;
       };
     };
   };
 
-  // private func transferICP(caller : Principal, amount : Nat64) : async LT.TransferResult {
-  //   let account = Blob.toArray(Account.accountIdentifier(Principal.fromActor(this), Account.defaultSubaccount()));
-
-  //   let res = await Ledger.transfer({
-  //     memo : Nat64 = 0;
-  //     from_subaccount = ?Helpers.getSubaccount(caller);
-  //     to = account;
-  //     amount = { e8s = amount - icp_fee };
-  //     fee = { e8s = icp_fee };
-  //     created_at_time = ?{
-  //       timestamp_nanos = Nat64.fromNat(Int.abs(Time.now()));
-  //     };
-  //   });
-
-  //   return res;
-  // };
-
-  // private func depositIcp(caller: Principal): async T.DepositReceipt {
-
-  //         // Calculate target subaccount
-  //         // NOTE: Should this be hashed first instead?
-  //         let source_account = Account.accountIdentifier(Principal.fromActor(this), Account.principalToSubaccount(caller));
-
-  //         // Check ledger for value
-  //         let balance = await Ledger.account_balance({ account = source_account });
-
-  //         // Transfer to default subaccount
-  //         let icp_receipt = if (balance.e8s > icp_fee) {
-  //             await Ledger.transfer({
-  //                 memo: Nat64    = 0;
-  //                 // from_subaccount = ?Account.principalToSubaccount(caller);
-  //                from_subaccount = ?Helpers.getSubaccount(caller);
-  //                 to = Account.accountIdentifier(Principal.fromActor(this), Account.defaultSubaccount());
-  //                 amount = { e8s = balance.e8s - Nat64.fromNat(icp_fee)};
-  //                 fee = { e8s = Nat64.fromNat(icp_fee) };
-  //                 created_at_time = ?{ timestamp_nanos = Nat64.fromNat(Int.abs(Time.now())) };
-  //             })
-  //         } else {
-  //             return #Err(#BalanceLow);
-  //         };
-
-  //         switch icp_receipt {
-  //             case ( #Err _) {
-  //                 return #Err(#TransferFailure);
-  //             };
-  //             case _ {};
-  //         };
-  //         let available = { e8s : balance.e8s - icp_fee };
-
-  //         // keep track of deposited ICP
-  //         book.addTokens(caller,ledger,available.e8s);
-
-  //         // Return result
-  //         #Ok(available.e8s)
-  //     };
-
-   public func canisterBalance() : async LT.Tokens {
-    await Ledger.account_balance({ account = Blob.toArray(Account.accountIdentifier(Principal.fromActor(this), Account.defaultSubaccount())) });
+  public func canisterBalance() : async LT.Tokens {
+    await Ledger.account_balance({
+      account = Blob.toArray(Account.accountIdentifier(Principal.fromActor(this), Account.defaultSubaccount()));
+    });
   };
 
-
   public shared ({ caller }) func confirmDeal(dealId : Nat, principal : Principal) : async Result<(), Text> {
-    let canisterBackend = Principal.fromActor(this); 
     let dealOpt = deals.get(dealId);
 
     switch (dealOpt) {
@@ -735,6 +675,33 @@ shared actor class Escrow() = this {
 
         await createActivityLog(buyerLog, deal.to);
         await createActivityLog(sellerLog, deal.from);
+
+        let sellerTransactionLog = {
+          dealId = dealId;
+          dealName = deal.name;
+          description = "Deal completed, buyer has confirmed the deal.";
+          activityType = "Deal Completed";
+          amount = deal.amount;
+          status = "Completed";
+          activityTime = Time.now();
+          user = deal.from;
+          deal = updatedDeal;
+        };
+
+        let buyerTransactionLog = {
+          dealId = dealId;
+          dealName = deal.name;
+          description = "Deal completed, you've confirmed the deal.";
+          activityType = "Deal Completed";
+          amount = deal.amount;
+          status = "Completed";
+          activityTime = Time.now();
+          user = deal.to;
+          deal = updatedDeal;
+        };
+
+        await createTransactionLog(sellerTransactionLog, deal.from);
+        await createTransactionLog(buyerTransactionLog, deal.to);
 
         addNotification(updatedDeal.from, { dealId = nextDealId - 1; message = "Buyer confirmed the deal. Please check if you've received the token." });
 
@@ -934,7 +901,7 @@ shared actor class Escrow() = this {
     };
   };
 
-  public func getTotalDeals(user: Principal) : async Nat {
+  public func getTotalDeals(user : Principal) : async Nat {
     let allDeals = Iter.toArray(deals.vals());
 
     let userDeals = Array.filter(
@@ -947,7 +914,7 @@ shared actor class Escrow() = this {
     return Array.size(userDeals);
   };
 
-  public func getTotalCompletedDeals(user: Principal) : async Nat {
+  public func getTotalCompletedDeals(user : Principal) : async Nat {
     let allDeals = Iter.toArray(deals.vals());
 
     let userDeals = Array.filter(
@@ -1120,7 +1087,28 @@ shared actor class Escrow() = this {
       deal = newLog.deal;
     };
 
-    transactionLogs.put(createLog.dealId, Array.append(existingLogs, [createLog]));
+    let additionalLog : TransactionLog = {
+      dealId = newLog.dealId;
+      dealName = newLog.dealName;
+      description = newLog.description;
+      activityType = newLog.activityType;
+      amount = newLog.amount;
+      status = newLog.status;
+      activityTime = Time.now();
+      user = newLog.user;
+      deal = newLog.deal;
+    };
+
+      let existingAdditionalLogs = switch (transactionLogs.get(additionalLog.dealId)) {
+      case (null) {
+        [];
+      };
+      case (?logs) {
+        logs;
+      };
+    };
+
+    transactionLogs.put(additionalLog.dealId, Array.append(existingAdditionalLogs, [additionalLog]));
   };
 
   public func getTransactionLogsForUser(user : Principal, page : Nat, itemsPerPage : Nat) : async [TransactionLog] {
